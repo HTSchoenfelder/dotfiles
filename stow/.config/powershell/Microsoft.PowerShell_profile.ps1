@@ -1,0 +1,1 @@
+oh-my-posh init pwsh --config ~/dotfiles/misc/omp.json| Invoke-Expression

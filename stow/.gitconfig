@@ -1,0 +1,90 @@
+[user]
+	email = mail@henrikschoenfelder.de
+	name = Henrik Schönfelder
+
+[credential]
+	helper = 
+	helper = /usr/local/bin/git-credential-manager
+	credentialStore = gpg
+
+[credential "https://dev.azure.com"]
+	useHttpPath = true
+
+[core]
+	autocrlf = false
+	editor = nvim  	
+  commentChar = ";"
+
+[init]
+	defaultbranch = main
+
+[include]
+    path = ~/.gitconfig_machine
+
+[includeIf "gitdir:~/projects/work/"]
+    path = ~/projects/work/.gitconfig_work
+
+[push]
+  autoSetupRemote = true
+
+[merge]
+	tool = vscode
+
+[mergetool]
+  keepBackup = false
+
+[diff]
+	tool = vscode
+
+[mergetool "vscode"]
+	cmd = code --wait --merge $REMOTE $LOCAL $BASE $MERGED
+
+[difftool "vscode"]
+	cmd = code --wait --diff $LOCAL $REMOTE
+
+[difftool "vimdiff"]
+  cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
+
+[mergetool "vimdiff"]
+  cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
+
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  required = true
+  process = git-lfs filter-process
+
+[alias]
+  a = add
+  aa = add --all
+  amend = commit --amend
+  b = branch
+  bb = branch -a
+  bc = "!f() { git branch --merged | grep -Ev '(^\\*|master|main)' | xargs -r git branch -d; }; f"
+  bd = branch -d
+  bdf = "!f() { git branch | grep -v \"^*\" | fzf --height=20% --reverse --info=inline | xargs -r git branch -d; }; f"
+  bf = "!f() { git branch --format='%(refname:short)|%(objectname:short)|%(contents:subject)' --sort=-committerdate | column -t -s '|' | grep -v \"^*\" | fzf --height=20% --reverse --info=inline | awk '{print $1}' | xargs -r git checkout; }; f"
+  cherry-pit = "!f() { git rebase --rebase-merges --onto \"$1\"^ \"$1\"; }; f"
+  cm = commit -m
+  co = checkout
+  d = diff
+  ec = config --global -e
+  go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
+  l = log --relative-date --graph --abbrev-commit -10
+  la = l --all
+  ll = log --relative-date --graph --abbrev-commit
+  lla = ll --all
+  p = push
+  remotes = remote -v
+  s = status -s
+  st = status
+  sd = d --cached
+  sh = show --pretty=fuller
+
+[format]
+  pretty = format:%C(yellow)%h %Cblue%>(12)%ad %Cgreen%<(7)%aN%Cred%d %Creset%s
+
+[gpg]
+  program = gpg
+[credential "https://git.t3.daimlertruck.com"]
+	provider = github

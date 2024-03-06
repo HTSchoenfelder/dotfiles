@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ $# -lt 1 ]; then
+    echo "Usage: $0 <shortCode>"
+    exit 1
+fi
+
+value=$(jq -r --arg key "$1" '.[$key]' "${HOME}/files/snippets.json")
+
+if [ -z "$value" ]; then
+    exit 1
+fi
+
+echo -n "$value" | xclip -selection clipboard
+
+xdotool key --clearmodifiers "ctrl+v"
