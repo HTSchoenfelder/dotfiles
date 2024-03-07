@@ -12,8 +12,7 @@
 
 [core]
 	autocrlf = false
-	editor = nvim  	
-  commentChar = ";"
+	editor = nvim
 
 [init]
 	defaultbranch = main
@@ -48,12 +47,6 @@
 [mergetool "vimdiff"]
   cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
 
-[filter "lfs"]
-  clean = git-lfs clean -- %f
-  smudge = git-lfs smudge -- %f
-  required = true
-  process = git-lfs filter-process
-
 [alias]
   a = add
   aa = add --all
@@ -86,5 +79,4 @@
 
 [gpg]
   program = gpg
-[credential "https://git.t3.daimlertruck.com"]
-	provider = github
+
