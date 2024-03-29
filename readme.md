@@ -3,5 +3,5 @@
 ## Initial setup
 
 ``` sh
-wget -q -O - https://github.com/HTSchoenfelder/dotfiles/blob/main/setup.sh | bash
+wget -q -O - https://raw.githubusercontent.com/HTSchoenfelder/dotfiles/main/setup.sh | bash
 ```
