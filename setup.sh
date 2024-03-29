@@ -1,7 +1,9 @@
 #! /bin/bash
 
 if [ -d "~/dotfiles" ]; then
-    echo "Cloning dotfiles..."
+    echo "dotfiles already cloned ..."    
+else
+    echo "Cloning dotfiles ..."
 
     sudo add-apt-repository -y ppa:git-core/ppa
     sudo apt update
@@ -10,8 +12,6 @@ if [ -d "~/dotfiles" ]; then
     sudo apt update && sudo apt install git -y
     git clone https://github.com/htschoenfelder/dotfiles.git
     cd dotfiles
-else
-    echo "dotfiles already cloned. Skipping..."
 fi
 
 pwd
