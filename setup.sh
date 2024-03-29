@@ -20,10 +20,11 @@ pwd
 ./scripts/setup-git.sh
 ./scripts/setup-shell-extensions.sh
 
-chsh -s $(which zsh)
 sudo usermod -aG docker $USER
 
-rm rm ~/.gitconfig
-rm rm ~/.zshrc
+rm ~/.gitconfig
+rm ~/.zshrc
 stow stow
+
+chsh -s $(which zsh)
 exec zsh
