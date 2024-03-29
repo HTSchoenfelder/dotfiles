@@ -1,6 +1,8 @@
 #! /bin/bash
 
 sudo apt update && sudo apt upgrade -y
+
+echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | sudo debconf-set-selections
 sudo apt install -y \
       curl \
       jq \
@@ -22,7 +24,8 @@ sudo apt install -y \
       htop \
       tmux \
       make \
-      build-essential
+      build-essential \
+      ttf-mscorefonts-installer
 
 mkdir -p ~/software
 mkdir -p ~/.local/bin
@@ -112,9 +115,9 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 
 # Nerd Font
 font_name="Agave"
-curl -OL "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.zip"
+curl -L -o ~/Downloads/$font_name.zip "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.zip"
 mkdir -p  "$HOME/.fonts"
-unzip -o "$font_name.zip" -d "$HOME/.fonts/$font_name/"
+unzip -o "~/Downloads/$font_name.zip" -d "$HOME/.fonts/$font_name/"
 fc-cache -fv
 
 # PowerShell

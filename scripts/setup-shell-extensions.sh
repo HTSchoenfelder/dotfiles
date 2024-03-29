@@ -34,6 +34,11 @@ for uuid in "${extensions[@]}"; do
 
     # gnome-extensions install --force "${uuid}.zip"
     # echo "Installed ${uuid}"
+    # gnome-extensions enable "${uuid}"
+    # echo "Enabled ${uuid}"
+
+    # rm "${uuid}.zip"
+    # echo "Cleaned up ${uuid}.zip"
 
     if ! gnome-extensions list | grep --quiet ${uuid}; then
         echo "Attempting remote installation for ${uuid}"
@@ -47,7 +52,7 @@ for uuid in "${extensions[@]}"; do
 
     gnome-extensions enable "${uuid}"
     echo "Enabled ${uuid}"
-
-    # rm "${uuid}.zip"
-    # echo "Cleaned up ${uuid}.zip"
 done
+
+# dconf dump / > current_dconf.ini
+cat ~/dotfiles/misc/dconf.ini | dconf load /
