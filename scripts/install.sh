@@ -19,7 +19,10 @@ sudo apt install -y \
       ripgrep \
       stow \
       hey \
-      htop
+      htop \
+      tmux \
+      make \
+      build-essential
 
 mkdir -p ~/software
 mkdir -p ~/.local/bin
@@ -93,6 +96,12 @@ sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf ~/Downloads/go.tar.gz
 
 # Azure CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+# Azure Developer CLI
+curl -fsSL https://aka.ms/install-azd.sh | sudo bash
+
+# nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 
 # Azure Data Studio
 curl -L -o ~/Downloads/azureDataStudio.deb https://go.microsoft.com/fwlink/?linkid=2251736

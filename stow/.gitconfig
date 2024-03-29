@@ -26,6 +26,9 @@
 [push]
   autoSetupRemote = true
 
+[worktree]
+  guessRemote = true
+
 [merge]
 	tool = vscode
 
@@ -79,4 +82,3 @@
 
 [gpg]
   program = gpg
-

@@ -1,0 +1,40 @@
+{
+    "createdBy": "Redirector v3.5.3",
+    "createdAt": "2023-11-24T16:30:42.144Z",
+    "redirects": [
+        {
+            "description": "Example redirect, try going to http://example.com/anywordhere",
+            "exampleUrl": "http://example.com/some-word-that-matches-wildcard",
+            "exampleResult": "https://google.com/search?q=some-word-that-matches-wildcard",
+            "error": null,
+            "includePattern": "http://example.com/*",
+            "excludePattern": "",
+            "patternDesc": "Any word after example.com leads to google search for that word.",
+            "redirectUrl": "https://google.com/search?q=$1",
+            "patternType": "W",
+            "processMatches": "noProcessing",
+            "disabled": false,
+            "grouped": false,
+            "appliesTo": [
+                "main_frame"
+            ]
+        },
+        {
+            "description": "MS Learn",
+            "exampleUrl": "https://learn.microsoft.com/de-de/azure/azure-monitor/overview",
+            "exampleResult": "https://learn.microsoft.com/en-us/azure/azure-monitor/overview",
+            "error": null,
+            "includePattern": "https://learn.microsoft.com/*/*",
+            "excludePattern": "",
+            "patternDesc": "",
+            "redirectUrl": "https://learn.microsoft.com/en-us/$2",
+            "patternType": "W",
+            "processMatches": "noProcessing",
+            "disabled": false,
+            "grouped": false,
+            "appliesTo": [
+                "main_frame"
+            ]
+        }
+    ]
+}
