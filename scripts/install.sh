@@ -30,17 +30,6 @@ sudo apt install -y \
 mkdir -p ~/software
 mkdir -p ~/.local/bin
 
-# Git
-sudo add-apt-repository -y ppa:git-core/ppa
-sudo apt update
-sudo apt install -y git
-
-# Git Credential Manager
-releases_url="https://api.github.com/repos/git-ecosystem/git-credential-manager/releases/latest"
-deb_download_url=$(curl -s "$releases_url" | jq -r '.assets[] | select(.name | endswith(".deb")) | .browser_download_url')
-curl -L -o ~/Downloads/git-credential-manager.deb "$deb_download_url"
-sudo apt install ~/Downloads/git-credential-manager.deb
-
 # Chrome
 curl -o ~/Downloads/google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo apt install ~/Downloads/google-chrome-stable_current_amd64.deb

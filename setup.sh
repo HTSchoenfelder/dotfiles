@@ -6,10 +6,8 @@ else
     echo "Cloning dotfiles ..."
 
     sudo add-apt-repository -y ppa:git-core/ppa
-    sudo apt update
-    sudo apt install -y git
+    sudo apt update && sudo apt install -y git
 
-    sudo apt update && sudo apt install git -y
     git clone https://github.com/htschoenfelder/dotfiles.git
     cd dotfiles
 fi
