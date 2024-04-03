@@ -21,6 +21,7 @@ KEY_ID="Henrik Schönfelder <mail@henrikschoenfelder.de>"
 
 if ! gpg --list-keys | grep -q "$KEY_ID"; then
     echo "Key $KEY_ID does not exist. Executing actions."
+    export GPG_TTY=$(tty)
     gpg --quick-generate-key "$KEY_ID" default default 2y
 else
     echo "Key $KEY_ID already exists."
