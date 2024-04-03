@@ -1,31 +1,24 @@
 #! /bin/bash
 
 sudo apt update && sudo apt upgrade -y
-
-echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | sudo debconf-set-selections
 sudo apt install -y \
-      curl \
-      jq \
-      dconf-editor \
-      pavucontrol \
       software-properties-common \
+      make \
+      build-essential \
+      libfuse2 \
+      curl \
       pass \
-      gnome-browser-connector \
-      gnome-shell-extensions \
-      gnome-tweaks \
-      ca-certificates \
       gnupg \
+      jq \
+      pavucontrol \
+      ca-certificates \
       zsh \
       guake \
-      libfuse2 \
       ripgrep \
       stow \
       hey \
       htop \
-      tmux \
-      make \
-      build-essential \
-      ttf-mscorefonts-installer
+      tmux
 
 mkdir -p ~/software
 mkdir -p ~/.local/bin
@@ -69,6 +62,7 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo usermod -aG docker $USER
 
 # kubectl
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -98,23 +92,6 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 # Azure Data Studio
 curl -L -o ~/Downloads/azureDataStudio.deb https://go.microsoft.com/fwlink/?linkid=2251736
 sudo apt install ~/Downloads/azureDataStudio.deb
-
-# ohmyzsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-
-ZSH_CUSTOM_DEFAULT=~/.oh-my-zsh/custom
-git clone --depth 1 https://github.com/zsh-users/zsh-autosuggestions.git ${ZSH_CUSTOM:-$ZSH_CUSTOM_DEFAULT}/plugins/zsh-autosuggestions
-git clone --depth 1 https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-$ZSH_CUSTOM_DEFAULT}/plugins/zsh-syntax-highlighting
-git clone --depth 1 https://github.com/zdharma-continuum/fast-syntax-highlighting.git ${ZSH_CUSTOM:-$ZSH_CUSTOM_DEFAULT}/plugins/fast-syntax-highlighting
-git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${ZSH_CUSTOM:-$ZSH_CUSTOM_DEFAULT}/plugins/zsh-autocomplete
-
-
-# Nerd Font
-font_name="Agave"
-curl -L -o ~/Downloads/$font_name.zip "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.zip"
-mkdir -p  "$HOME/.fonts"
-unzip -o "~/Downloads/$font_name.zip" -d "$HOME/.fonts/$font_name/"
-fc-cache -fv
 
 # PowerShell
 curl -L -o ~/Downloads/powershell.deb https://github.com/PowerShell/PowerShell/releases/download/v7.4.1/powershell-lts_7.4.1-1.deb_amd64.deb
