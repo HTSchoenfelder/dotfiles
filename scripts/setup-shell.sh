@@ -20,6 +20,6 @@ git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${ZSH_
 # Nerd Font
 font_name="Agave"
 curl -L -o ~/Downloads/$font_name.zip "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.zip"
-mkdir -p  "$HOME/.fonts"
-unzip -o "~/Downloads/$font_name.zip" -d "$HOME/.fonts/$font_name/"
+mkdir -p  $HOME/.fonts
+unzip -o ~/Downloads/$font_name.zip"-d $HOME/.fonts/$font_name/
 fc-cache -fv

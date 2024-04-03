@@ -16,14 +16,15 @@ fi
 pwd
 
 mkdir -p ~/.local/bin
-rm ~/.gitconfig
-rm ~/.zshrc
-stow stow
 
 ./scripts/setup-git.sh
 ./scripts/setup-shell.sh
 ./scripts/setup-gnome-shell-extensions.sh
 ./scripts/install-packages.sh
+
+rm ~/.gitconfig
+rm ~/.zshrc
+stow stow
 
 exec zsh
 chsh -s $(which zsh)
