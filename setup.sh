@@ -24,3 +24,6 @@ stow stow
 ./scripts/setup-shell.sh
 ./scripts/setup-gnome-shell-extensions.sh
 ./scripts/install-packages.sh
+
+exec zsh
+chsh -s $(which zsh)

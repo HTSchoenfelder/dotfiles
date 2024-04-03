@@ -23,6 +23,3 @@ curl -L -o ~/Downloads/$font_name.zip "https://github.com/ryanoasis/nerd-fonts/r
 mkdir -p  "$HOME/.fonts"
 unzip -o "~/Downloads/$font_name.zip" -d "$HOME/.fonts/$font_name/"
 fc-cache -fv
-
-chsh -s $(which zsh)
-exec zsh
