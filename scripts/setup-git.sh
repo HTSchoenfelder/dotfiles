@@ -1,9 +1,9 @@
 #! /bin/bash
 
 # Install Packages
-sudo add-apt-repository -y ppa:git-core/ppa
-sudo apt update
-sudo apt install -y \
+add-apt-repository -y ppa:git-core/ppa
+apt update
+apt install -y \
       git \
       curl \
       pass \
@@ -14,7 +14,7 @@ sudo apt install -y \
 releases_url="https://api.github.com/repos/git-ecosystem/git-credential-manager/releases/latest"
 deb_download_url=$(curl -s "$releases_url" | jq -r '.assets[] | select(.name | endswith(".deb")) | .browser_download_url')
 curl -L -o ./git-credential-manager.deb "$deb_download_url"
-sudo apt install ./git-credential-manager.deb
+apt install ./git-credential-manager.deb
 rm ./git-credential-manager.deb
 
 KEY_ID="Henrik Schönfelder <mail@henrikschoenfelder.de>"

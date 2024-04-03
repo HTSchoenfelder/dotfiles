@@ -1,7 +1,7 @@
 #!/bin/bash
 
-sudo apt update
-sudo apt install -y \
+apt update
+apt install -y \
     gnome-browser-connector \
     gnome-shell-extensions \
     gnome-tweaks \

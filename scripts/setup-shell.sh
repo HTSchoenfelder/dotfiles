@@ -1,8 +1,8 @@
 #! /bin/bash
 
-sudo apt update
-echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | sudo debconf-set-selections
-sudo apt install -y \
+apt update
+echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
+apt install -y \
       zsh \
       tmux \
       ttf-mscorefonts-installer
