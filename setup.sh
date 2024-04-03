@@ -1,7 +1,7 @@
 #! /bin/bash
 
-add-apt-repository -y ppa:git-core/ppa
-apt update && apt install -y git stow
+sudo add-apt-repository -y ppa:git-core/ppa
+sudo apt update && sudo apt install -y git stow
 
 if [ -d "~/dotfiles" ]; then
     echo "dotfiles already cloned ..."
