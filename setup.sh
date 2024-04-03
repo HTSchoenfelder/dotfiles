@@ -1,7 +1,5 @@
 #! /bin/bash
 
-export HOME="/home/henrik"
-
 add-apt-repository -y ppa:git-core/ppa
 apt update && apt install -y git stow
 
