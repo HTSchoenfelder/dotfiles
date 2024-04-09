@@ -12,7 +12,7 @@ disown
 nohup google-chrome --profile-directory="Profile 3" &> /dev/null &
 disown
 
-code /home/henrik/terminal
+code /home/henrik
 code /home/henrik/files
 code /home/henrik/dotfiles
 

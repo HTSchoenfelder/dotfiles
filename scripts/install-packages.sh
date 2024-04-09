@@ -18,7 +18,8 @@ sudo apt install -y \
       stow \
       hey \
       htop \
-      tmux
+      tmux \
+      xdotool
 
 mkdir -p ~/software
 mkdir -p ~/.local/bin

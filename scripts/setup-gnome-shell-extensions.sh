@@ -27,8 +27,8 @@ extensions=(
     docker@stickman_0x00.com
     window-calls@domandoman.xyz
     focused-window-dbus@flexagoon.com
-    super-key@tommimon.github.com
     gnome-one-window-wonderland@jqno.nl
+    move-to-next-screen@wosar.me
 )
 
 for uuid in "${extensions[@]}"; do
