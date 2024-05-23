@@ -98,6 +98,9 @@ sudo apt install ~/Downloads/azureDataStudio.deb
 curl -L -o ~/Downloads/powershell.deb https://github.com/PowerShell/PowerShell/releases/download/v7.4.1/powershell-lts_7.4.1-1.deb_amd64.deb
 sudo apt install ~/Downloads/powershell.deb
 
+# Oh My Posh
+curl -s https://ohmyposh.dev/install.sh | sudo bash -s
+
 # Synology Drive
 curl -o ~/Downloads/synology-drive-client.deb https://global.synologydownload.com/download/Utility/SynologyDriveClient/3.4.0-15724/Ubuntu/Installer/synology-drive-client-15724.x86_64.deb
 sudo apt install ~/Downloads/synology-drive-client.deb
