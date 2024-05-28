@@ -3,6 +3,7 @@
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y \
       software-properties-common \
+      apt-transport-https \
       make \
       build-essential \
       libfuse2 \
@@ -28,9 +29,7 @@ mkdir -p ~/.local/bin
 sudo apt install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager cpu-checker qemu-utils
 sudo usermod -aG kvm $USER
 sudo usermod -aG libvirt $USER
-sudo systemctl start libvirtd
-sudo systemctl enable libvirtd
-sudo systemctl status libvirtd
+sudo systemctl enable --now libvirtd
 
 # Chrome
 curl -o ~/Downloads/google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -73,6 +72,14 @@ sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo usermod -aG docker $USER
 
+# PowerShell
+source /etc/os-release
+wget -q https://packages.microsoft.com/config/ubuntu/$VERSION_ID/packages-microsoft-prod.deb
+sudo dpkg -i packages-microsoft-prod.deb
+rm packages-microsoft-prod.deb
+sudo apt-get update
+sudo apt-get install -y powershell
+
 # kubectl
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
@@ -101,10 +108,6 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 # Azure Data Studio
 curl -L -o ~/Downloads/azureDataStudio.deb https://go.microsoft.com/fwlink/?linkid=2251736
 sudo apt install ~/Downloads/azureDataStudio.deb
-
-# PowerShell
-curl -L -o ~/Downloads/powershell.deb https://github.com/PowerShell/PowerShell/releases/download/v7.4.1/powershell-lts_7.4.1-1.deb_amd64.deb
-sudo apt install ~/Downloads/powershell.deb
 
 # Oh My Posh
 curl -s https://ohmyposh.dev/install.sh | sudo bash -s
