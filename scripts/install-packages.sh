@@ -24,6 +24,14 @@ sudo apt install -y \
 mkdir -p ~/software
 mkdir -p ~/.local/bin
 
+# Virtualization
+sudo apt install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager cpu-checker qemu-utils
+sudo usermod -aG kvm $USER
+sudo usermod -aG libvirt $USER
+sudo systemctl start libvirtd
+sudo systemctl enable libvirtd
+sudo systemctl status libvirtd
+
 # Chrome
 curl -o ~/Downloads/google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo apt install ~/Downloads/google-chrome-stable_current_amd64.deb
