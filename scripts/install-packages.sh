@@ -12,6 +12,7 @@ sudo apt install -y \
       gnupg \
       jq \
       pavucontrol \
+      qpwgraph \
       ca-certificates \
       zsh \
       guake \
@@ -20,7 +21,8 @@ sudo apt install -y \
       hey \
       htop \
       tmux \
-      xdotool
+      xdotool \
+      cifs-utils
 
 mkdir -p ~/software
 mkdir -p ~/.local/bin

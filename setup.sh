@@ -26,5 +26,4 @@ rm ~/.gitconfig
 rm ~/.zshrc
 stow stow
 
-exec zsh
-chsh -s $(which zsh)
+sudo chsh -s $(which zsh)
