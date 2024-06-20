@@ -74,6 +74,11 @@ sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo usermod -aG docker $USER
 
+# Docker Dive
+DIVE_VERSION=$(curl -sL "https://api.github.com/repos/wagoodman/dive/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+curl -OL https://github.com/wagoodman/dive/releases/download/v${DIVE_VERSION}/dive_${DIVE_VERSION}_linux_amd64.deb
+sudo apt install ./dive_${DIVE_VERSION}_linux_amd64.deb
+
 # PowerShell
 source /etc/os-release
 wget -q https://packages.microsoft.com/config/ubuntu/$VERSION_ID/packages-microsoft-prod.deb
@@ -97,6 +102,18 @@ LATEST_GO_VERSION="$(curl --silent 'https://go.dev/VERSION?m=text' | head -n 1)"
 LATEST_GO_DOWNLOAD_URL="https://go.dev/dl/${LATEST_GO_VERSION}.linux-amd64.tar.gz"
 curl -L -o ~/Downloads/go.tar.gz "$LATEST_GO_DOWNLOAD_URL"
 sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf ~/Downloads/go.tar.gz
+
+# Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain nightly -y
+sudo apt install -y \
+     cmake \
+     pkg-config \
+     libfreetype6-dev \
+     libfontconfig1-dev \
+     libxcb-xfixes0-dev \
+     libxkbcommon-dev \
+     python3
+
 
 # Azure CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
