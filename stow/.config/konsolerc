@@ -12,6 +12,7 @@ ConfigVersion=1
 RemoveWindowTitleBarAndFrame=true
 
 [MainWindow]
+1920x1080 screen: Window-Maximized=true
 2 screens: Height=1080
 2 screens: Width=1920
 2 screens: Window-Maximized=true

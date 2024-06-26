@@ -22,7 +22,8 @@ sudo apt install -y \
       htop \
       tmux \
       xdotool \
-      cifs-utils
+      cifs-utils \
+      ruby-full
 
 mkdir -p ~/software
 mkdir -p ~/.local/bin

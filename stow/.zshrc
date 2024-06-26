@@ -36,7 +36,8 @@ alias dps='docker ps --format "table {{printf \"%.20s\" .Names}}\t{{.Image}}\t{{
 
 alias ll='ls -alF'
 alias la='ls -A'
-alias l='ls -CF'
+alias l='colorls -aog'
+alias x='exec zsh'
 
 alias code='code --profile Default'
 alias proj='cd ~/projects'
