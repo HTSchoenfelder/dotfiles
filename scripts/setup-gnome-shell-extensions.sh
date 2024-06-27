@@ -35,18 +35,38 @@ for uuid in "${extensions[@]}"; do
     echo "Processing extension: ${uuid}"
 
     if ! gnome-extensions list | grep --quiet ${uuid}; then
-        echo "Attempting remote installation for ${uuid}"
-        gdbus call --session \
-            --dest org.gnome.Shell.Extensions \
-            --object-path /org/gnome/Shell/Extensions \
-            --method org.gnome.Shell.Extensions.InstallRemoteExtension \
-            "'${uuid}'"
-        echo "Remote installation attempted for ${uuid}"
+        echo "Instaalling for ${uuid}"
+        # install_gnome_extension "${uuid}"        
+        install_gnome_extension_dbus "${uuid}"        
+        echo "Installed ${uuid}"
     fi
 
     gnome-extensions enable "${uuid}"
     echo "Enabled ${uuid}"
+
 done
 
 # dconf dump / > current_dconf.ini
 cat ~/dotfiles/misc/dconf.ini | dconf load /
+
+function install_gnome_extension() {
+    local uuid=$1
+    VERSION_TAG=$(curl -Lfs "https://extensions.gnome.org/extension-query/?uuid=${uuid}" | jq '.extensions[0].shell_version_map | to_entries | max_by(.value.version) | .value.pk')
+    echo "Latest version tag for ${uuid}: ${VERSION_TAG}"
+    curl -L "https://extensions.gnome.org/download-extension/${uuid}.shell-extension.zip?version_tag=${VERSION_TAG}" -o "${uuid}.zip"
+    echo "Downloaded ${uuid}"
+    gnome-extensions install --force "${uuid}.zip"
+    echo "Installed ${uuid}"
+    rm "${uuid}.zip"
+    echo "Cleaned up ${uuid}.zip"
+}
+
+function install_gnome_extension_dbus() {
+    local uuid=$1
+
+    gdbus call --session \
+            --dest org.gnome.Shell.Extensions \
+            --object-path /org/gnome/Shell/Extensions \
+            --method org.gnome.Shell.Extensions.InstallRemoteExtension \
+            "'${uuid}'"
+}

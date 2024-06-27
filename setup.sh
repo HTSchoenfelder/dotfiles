@@ -18,8 +18,8 @@ pwd
 mkdir -p ~/.local/bin
 
 ./scripts/setup-git.sh
-./scripts/setup-shell.sh
 ./scripts/setup-gnome-shell-extensions.sh
+./scripts/setup-shell.sh
 ./scripts/install-packages.sh
 
 rm ~/.gitconfig
