@@ -15,7 +15,6 @@ sudo apt install -y \
       qpwgraph \
       ca-certificates \
       zsh \
-      guake \
       ripgrep \
       stow \
       hey \
