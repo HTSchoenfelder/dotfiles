@@ -25,7 +25,9 @@ sudo pacman -Sy --needed --noconfirm \
     ttf-agave-nerd \
     starship \
     zsh \
-    waybar
+    waybar \
+    dunst \
+    wireplumber
 
 git clone https://aur.archlinux.org/yay.git
 cd yay
