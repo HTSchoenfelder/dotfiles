@@ -25,14 +25,16 @@ sudo pacman -Sy --needed \
     starship \
     zsh
 
-git clone https://aur.archlinux.org/yay.git
-cd yay
+mkdir /tmp/yay
+cd /tmp/yay
+curl -OJ 'https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=yay'
 makepkg -si
-cd ..
+cd
+rm -rf /tmp/yay
 yay --version
 
 yay -Syu
-yay -S --needed \
+yay -Sy --needed \
     git-credential-manager \
     visual-studio-code-bin
 
