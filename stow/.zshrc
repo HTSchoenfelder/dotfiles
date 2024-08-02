@@ -27,7 +27,6 @@ setopt appendhistory
 alias cl='clear'
 alias d='docker'
 alias k='kubectl'
-alias bat='batcat'
 alias dotnet-install='curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin'
 # use without arguments to install latest sdk and runtime
 # dotnet-install --runtime dotnet --channel 7.0
@@ -44,8 +43,6 @@ alias proj='cd ~/projects'
 
 alias aza='az account show --output tsv --query "name"'
 alias azas='az account set --subscription'
-
-alias bat='batcat'
 
 mc() {
     mkdir -p $@ && cd ${@:$#}

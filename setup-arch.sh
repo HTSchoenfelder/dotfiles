@@ -24,7 +24,8 @@ sudo pacman -Sy --needed --noconfirm \
     fzf \
     ttf-agave-nerd \
     starship \
-    zsh
+    zsh \
+    waybar
 
 git clone https://aur.archlinux.org/yay.git
 cd yay
@@ -35,7 +36,10 @@ yay --version
 yay -Syu
 yay -Sy --needed --noconfirm \
     git-credential-manager \
-    visual-studio-code-bin
+    visual-studio-code-bin \
+    ulauncher \
+    ruby-colorls \
+    google-chrome
 
 if [ -d "~/dotfiles" ]; then
     echo "dotfiles already cloned ..."
@@ -55,6 +59,8 @@ mkdir -p ~/.local/bin
 
 rm ~/.gitconfig
 rm ~/.zshrc
+rm ~/.config/hypr/hypr.conf
+
 stow stow
 
-sudo chsh -s $(which zsh)
+chsh -s $(which zsh)
