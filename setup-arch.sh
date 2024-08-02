@@ -27,7 +27,8 @@ sudo pacman -Sy --needed --noconfirm \
     zsh \
     waybar \
     dunst \
-    wireplumber
+    wireplumber \
+    tldr
 
 git clone https://aur.archlinux.org/yay.git
 cd yay
@@ -36,7 +37,7 @@ cd
 yay --version
 
 yay -Syu
-yay -Sy --needed --noconfirm --answerclean None \
+yay -Sy --needed --noconfirm --answerclean N \
     git-credential-manager \
     visual-studio-code-bin \
     ulauncher \
