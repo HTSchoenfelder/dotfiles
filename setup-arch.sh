@@ -36,7 +36,7 @@ cd
 yay --version
 
 yay -Syu
-yay -Sy --needed --noconfirm \
+yay -Sy --needed --noconfirm --answerclean None \
     git-credential-manager \
     visual-studio-code-bin \
     ulauncher \
