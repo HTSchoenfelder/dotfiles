@@ -22,7 +22,8 @@ sudo pacman -S --needed \
     bat \
     fzf \
     ttf-agave-nerd \
-    starship
+    starship \
+    zsh
 
 git clone https://aur.archlinux.org/yay.git
 cd yay
