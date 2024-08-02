@@ -28,7 +28,7 @@ sudo pacman -Sy --needed \
 
 git clone https://aur.archlinux.org/yay.git
 cd yay
-makepkg -si
+yes | makepkg -si
 cd
 yay --version
 
