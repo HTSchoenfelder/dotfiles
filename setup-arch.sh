@@ -30,10 +30,16 @@ sudo pacman -Sy --needed --noconfirm \
     wireplumber \
     tldr
 
-git clone https://aur.archlinux.org/yay.git
-cd yay
-yes | makepkg -si
-cd
+## check if yay is installed by calling yay --version and only then install it
+if yay --version &> /dev/null; then
+    echo "yay already installed ..."
+else
+    echo "Installing yay ..."
+    git clone https://aur.archlinux.org/yay.git
+    cd yay
+    yes | makepkg -si
+    cd
+fi
 yay --version
 
 yay -Syu
