@@ -1,7 +1,9 @@
 #! /bin/bash
 
+sudo add-apt-repository -y ppa:git-core/ppa
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y \
+      git \
       software-properties-common \
       apt-transport-https \
       make \
@@ -22,10 +24,20 @@ sudo apt install -y \
       tmux \
       xdotool \
       cifs-utils \
-      ruby-full
+      ruby-full \
+      konsole \
+      zoxide \
+      bat
 
 mkdir -p ~/software
 mkdir -p ~/.local/bin
+
+# Install Git Credential Manager
+releases_url="https://api.github.com/repos/git-ecosystem/git-credential-manager/releases/latest"
+deb_download_url=$(curl -s "$releases_url" | jq -r '.assets[] | select(.name | endswith(".deb")) | .browser_download_url')
+curl -L -o ./git-credential-manager.deb "$deb_download_url"
+sudo apt install ./git-credential-manager.deb
+rm ./git-credential-manager.deb
 
 # Virtualization
 sudo apt install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager cpu-checker qemu-utils

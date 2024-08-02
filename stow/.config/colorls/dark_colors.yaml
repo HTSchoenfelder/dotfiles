@@ -1,0 +1,47 @@
+# Catpuccin themed color settings for colorls
+#
+# Main Colors
+unrecognized_file: '#fab387' # Peach
+recognized_file:   '#cdd6f4' # Text
+executable_file:   '#a6e3a1' # Green
+dir:               '#cba6f7' # Mauve
+
+# Link
+dead_link: '#f38ba8'         # Red
+link:      '#89dceb'         # Sky
+
+# Special Files
+socket:    '#a6e3a1'         # Green
+blockdev:  '#a6e3a1'         # Green
+chardev:   '#a6e3a1'         # Green
+
+# Access Modes
+write:     '#f9e2af'         # Yellow
+read:      '#a6e3a1'         # Green
+exec:      '#f38ba8'         # Red
+no_access: '#f38ba8'         # Red
+
+# Age
+hour_old:    '#b4befe'       # Lavender
+day_old:     '#9399b2'       # Overlay2
+no_modifier: '#45475a'       # Surface1
+
+# File Size
+file_large:  '#f38ba8'       # Red
+file_medium: '#fab387'       # Peach
+file_small:  '#a6e3a1'       # Green
+
+# Random
+report: '#89dceb'            # Sky
+user:   '#89dceb'            # Sky
+tree:   '#45475a'            # Surface1
+empty:  '#9399b2'            # Overlay2
+error:  '#f38ba8'            # Red
+normal: '#cdd6f4'            # Text
+
+# Git
+addition:     '#89dceb'      # Sky
+modification: '#f9e2af'      # Yellow
+deletion:     '#f38ba8'      # Red
+untracked:    '#fab387'      # Peach
+unchanged:    '#a6e3a1'      # Green

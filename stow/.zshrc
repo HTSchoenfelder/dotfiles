@@ -3,8 +3,6 @@ ZSH_THEME="henrik"
 
 zstyle ':omz:update' mode reminder  # just remind me to update when it's time
 
-# https://gist.github.com/n1snt/454b879b8f0b7995740ae04c5fb5b7df
-
 plugins=( \
           git \
           docker \
@@ -18,8 +16,7 @@ plugins=( \
           fast-syntax-highlighting\
           )
 
-source $ZSH/oh-my-zsh.sh
-# eval "$(oh-my-posh init zsh --config ~/dotfiles/misc/omp.json)"
+# source $ZSH/oh-my-zsh.sh
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 HISTFILE=~/.zsh_history
@@ -30,7 +27,10 @@ setopt appendhistory
 alias cl='clear'
 alias d='docker'
 alias k='kubectl'
+alias bat='batcat'
 alias dotnet-install='curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin'
+# use without arguments to install latest sdk and runtime
+# dotnet-install --runtime dotnet --channel 7.0
 
 alias dps='docker ps --format "table {{printf \"%.20s\" .Names}}\t{{.Image}}\t{{.Command}}\t{{.ID}}\t{{printf \"%.15s\" .Status}}"'
 
@@ -44,6 +44,8 @@ alias proj='cd ~/projects'
 
 alias aza='az account show --output tsv --query "name"'
 alias azas='az account set --subscription'
+
+alias bat='batcat'
 
 mc() {
     mkdir -p $@ && cd ${@:$#}
@@ -71,3 +73,7 @@ export DOTNET_ROOT=/home/henrik/.dotnet
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+eval "$(zoxide init zsh)"
+
+eval "$(starship init zsh)"

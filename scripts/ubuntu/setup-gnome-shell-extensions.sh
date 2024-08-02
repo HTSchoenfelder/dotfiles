@@ -31,24 +31,6 @@ extensions=(
     move-to-next-screen@wosar.me
 )
 
-for uuid in "${extensions[@]}"; do
-    echo "Processing extension: ${uuid}"
-
-    if ! gnome-extensions list | grep --quiet ${uuid}; then
-        echo "Instaalling for ${uuid}"
-        # install_gnome_extension "${uuid}"        
-        install_gnome_extension_dbus "${uuid}"        
-        echo "Installed ${uuid}"
-    fi
-
-    gnome-extensions enable "${uuid}"
-    echo "Enabled ${uuid}"
-
-done
-
-# dconf dump / > current_dconf.ini
-cat ~/dotfiles/misc/dconf.ini | dconf load /
-
 function install_gnome_extension() {
     local uuid=$1
     VERSION_TAG=$(curl -Lfs "https://extensions.gnome.org/extension-query/?uuid=${uuid}" | jq '.extensions[0].shell_version_map | to_entries | max_by(.value.version) | .value.pk')
@@ -70,3 +52,21 @@ function install_gnome_extension_dbus() {
             --method org.gnome.Shell.Extensions.InstallRemoteExtension \
             "'${uuid}'"
 }
+
+for uuid in "${extensions[@]}"; do
+    echo "Processing extension: ${uuid}"
+
+    if ! gnome-extensions list | grep --quiet ${uuid}; then
+        echo "Instaalling for ${uuid}"
+        # install_gnome_extension "${uuid}"        
+        install_gnome_extension_dbus "${uuid}"        
+        echo "Installed ${uuid}"
+    fi
+
+    gnome-extensions enable "${uuid}"
+    echo "Enabled ${uuid}"
+
+done
+
+# dconf dump / > current_dconf.ini
+cat ~/dotfiles/misc/dconf.ini | dconf load /

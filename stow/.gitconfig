@@ -21,7 +21,7 @@
     path = ~/.gitconfig_machine
 
 [includeIf "gitdir:~/projects/work/"]
-    path = ~/projects/work/.gitconfig_work
+    path = ~/files/.gitconfig_work
 
 [push]
   autoSetupRemote = true
