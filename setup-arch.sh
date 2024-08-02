@@ -1,7 +1,7 @@
 #! /bin/bash
 
 sudo pacman -Syu
-sudo pacman -S --needed \
+sudo pacman -Sy --needed \
     base-devel\
     git \
     pass \
