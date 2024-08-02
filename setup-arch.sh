@@ -37,7 +37,7 @@ cd
 yay --version
 
 yay -Syu
-yay -Sy --needed --noconfirm --answerclean N \
+yes | LANG=C yay -Sy --needed --noconfirm --answerdiff None --answerclean None --mflags "--noconfirm" \
     git-credential-manager \
     visual-studio-code-bin \
     ulauncher \
