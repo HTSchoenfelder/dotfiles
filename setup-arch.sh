@@ -18,6 +18,7 @@ sudo pacman -Sy --needed \
     tmux \
     cifs-utils \
     ruby \
+    go \
     zoxide \
     bat \
     fzf \
@@ -25,12 +26,10 @@ sudo pacman -Sy --needed \
     starship \
     zsh
 
-mkdir /tmp/yay
-cd /tmp/yay
-curl -OJ 'https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=yay'
+git clone https://aur.archlinux.org/yay.git
+cd yay
 makepkg -si
 cd
-rm -rf /tmp/yay
 yay --version
 
 yay -Syu
