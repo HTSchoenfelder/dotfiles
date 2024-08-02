@@ -1,7 +1,7 @@
 #! /bin/bash
 
-sudo pacman -Syu
-sudo pacman -Sy --needed \
+sudo pacman -Syu --noconfirm
+sudo pacman -Sy --needed --noconfirm \
     base-devel\
     git \
     pass \
@@ -33,7 +33,7 @@ cd
 yay --version
 
 yay -Syu
-yay -Sy --needed \
+yay -Sy --needed --noconfirm \
     git-credential-manager \
     visual-studio-code-bin
 
