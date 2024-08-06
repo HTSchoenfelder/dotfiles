@@ -18,12 +18,6 @@ plugins=( \
 
 # source $ZSH/oh-my-zsh.sh
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-HISTFILE=~/.zsh_history
-HISTSIZE=10000
-SAVEHIST=10000
-setopt appendhistory
-
 alias cl='clear'
 alias d='docker'
 alias k='kubectl'
@@ -66,10 +60,41 @@ export PATH=~/.local/bin:$PATH
 export PATH=$PATH:/usr/local/go/bin
 export DOTNET_ROOT=/home/henrik/.dotnet
 
-# NVM
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+fpath=(~/.docker/completions $fpath)
+
+# Load and initialize the Zsh completion library
+autoload -Uz compinit
+compinit
+
+# zsh parameter completion for the dotnet CLI
+_dotnet_zsh_complete()
+{
+  local completions=("$(dotnet complete "$words")")
+
+  # If the completion list is empty, just continue with filename selection
+  if [ -z "$completions" ]
+  then
+    _arguments '*::arguments: _normal'
+    return
+  fi
+
+  # This is not a variable assignment, don't remove spaces!
+  _values = "${(ps:\n:)completions}"
+}
+compdef _dotnet_zsh_complete dotnet
+
+source <(fzf --zsh)
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt appendhistory
+
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
+
+source <(kubectl completion zsh)
+
+eval "$(direnv hook zsh)"
 
 eval "$(zoxide init zsh)"
 
