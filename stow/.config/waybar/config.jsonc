@@ -55,13 +55,7 @@
 		"format-icons": {
 			"active": " ",
 			"default": " "
-		},
-        "persistent_workspaces": {
-            "1": [],
-            "2": [],
-            "3": [],
-            "4": []
-        }
+		}        
     },
     "custom/power_profile": {
         //shows the current power profile and switches to next on click
