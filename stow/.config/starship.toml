@@ -1,9 +1,9 @@
-palette = "catppuccin_mocha"
+"$schema" = 'https://starship.rs/config-schema.json'
 
-[character]
-success_symbol = "[[✔](green) ➜](maroon)"
-error_symbol = "[[✗](red) ➜](maroon)"
-vimcmd_symbol = "[❮](green)"
+# Inserts a blank line between shell prompts
+add_newline = true
+
+palette = "catppuccin_mocha"
 
 [directory]
 truncation_length = 4

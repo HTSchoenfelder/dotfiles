@@ -1,47 +1,7 @@
 #! /bin/bash
 
 sudo pacman -Syu --noconfirm
-sudo pacman -Sy --needed --noconfirm \
-    base-devel\
-    git \
-    git-credential-manager \
-    pass \
-    gnupg \
-    neovim \
-    curl \
-    jq \
-    pavucontrol \
-    qpwgraph \
-    ripgrep \
-    stow \
-    hey \
-    htop \
-    tmux \
-    cifs-utils \
-    ruby \
-    go \
-    zoxide \
-    bat \
-    fzf \
-    ttf-agave-nerd \
-    starship \
-    zsh \
-    waybar \
-    dunst \
-    wireplumber \
-    tldr \
-    man-db \
-    hyprpaper \
-    direnv \
-    docker \
-    docker-compose \
-    kubectl \
-    rofi-wayland \
-    wl-clipboard \
-    wtype \
-    yazi \
-    obsidian \
-    keepassxc
+sudo pacman -Sy --needed --noconfirm - < ~/dotfiles/pacman.txt
 
 ## check if yay is installed by calling yay --version and only then install it
 if yay --version &> /dev/null; then
@@ -59,10 +19,11 @@ yay -Syu
 yes | LANG=C yay -Sy --needed --noconfirm --answerdiff None --answerclean None --mflags "--noconfirm" \
     git-credential-manager \
     visual-studio-code-bin \
-    ulauncher \
     ruby-colorls \
     google-chrome \
-    nvm
+    nvm \
+    tofi \
+    zsh-fast-syntax-highlighting
 
 if [ -d "~/dotfiles" ]; then
     echo "dotfiles already cloned ..."
@@ -90,5 +51,7 @@ rm ~/.zshrc
 rm ~/.config/hypr/hypr.conf
 
 stow stow
+
+bat cache --build
 
 chsh -s $(which zsh)
