@@ -70,26 +70,22 @@ yes | LANG=C yay -Sy --needed --noconfirm --answerdiff None --answerclean None -
 
 if [ -d ~/dotfiles ]; then
     echo "dotfiles already cloned ..."
-    git pull
+    git -C ~/dotfiles pull
 else
     echo "Cloning dotfiles ..."
     git clone https://github.com/htschoenfelder/dotfiles.git
 fi
 
-pwd
-
 mkdir -p ~/.local/bin
 
 ./scripts/setup-git.sh
-
-wget -P "$(bat --config-dir)/themes" https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20Mocha.tmTheme
 
 mkdir -p ~/.docker/completions
 docker completion zsh > ~/.docker/completions/_docker
 
 rm ~/.gitconfig
 rm ~/.zshrc
-rm ~/.config/hypr/hypr.conf
+rm ~/.config/hypr/hyprland.conf
 
 stow stow
 
