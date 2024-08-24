@@ -1,7 +1,49 @@
 #! /bin/bash
 
 sudo pacman -Syu --noconfirm
-sudo pacman -Sy --needed --noconfirm - < ~/dotfiles/pacman.txt
+sudo pacman -Sy --needed --noconfirm \
+    base-devel \
+    bat \
+    cifs-utils \
+    curl \
+    direnv \
+    docker \
+    dunst \
+    fzf \
+    git \
+    gnupg \
+    go \
+    hey \
+    htop \
+    hyprpaper \
+    jq \
+    keepassxc \
+    kubectl \
+    man-db \
+    neovim \
+    obsidian \
+    pass \
+    pavucontrol \
+    qpwgraph \
+    ripgrep \
+    ruby \
+    starship \
+    stow \
+    tldr \
+    tmux \
+    ttf-agave-nerd \
+    waybar \
+    wireplumber \
+    wl-clipboard \
+    wtype \
+    yazi \
+    zoxide \
+    zsh \
+    zsh-autosuggestions \
+    qemu-full \
+    virt-manager \
+    dnsmasq \
+    bridge-utils
 
 ## check if yay is installed by calling yay --version and only then install it
 if yay --version &> /dev/null; then
@@ -23,16 +65,15 @@ yes | LANG=C yay -Sy --needed --noconfirm --answerdiff None --answerclean None -
     google-chrome \
     nvm \
     tofi \
-    zsh-fast-syntax-highlighting
+    zsh-fast-syntax-highlighting \
+    spotify-launcher
 
-if [ -d "~/dotfiles" ]; then
+if [ -d ~/dotfiles ]; then
     echo "dotfiles already cloned ..."
-    cd dotfiles
     git pull
 else
     echo "Cloning dotfiles ..."
     git clone https://github.com/htschoenfelder/dotfiles.git
-    cd dotfiles
 fi
 
 pwd
@@ -53,5 +94,9 @@ rm ~/.config/hypr/hypr.conf
 stow stow
 
 bat cache --build
+
+sudo usermod -aG kvm $USER
+sudo usermod -aG libvirt $USER
+sudo systemctl enable --now libvirtd
 
 chsh -s $(which zsh)
