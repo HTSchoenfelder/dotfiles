@@ -32,7 +32,7 @@ alias la='ls -A'
 alias l='colorls -aog'
 alias x='exec zsh'
 
-alias code='code --profile Default'
+alias code='code --profile Default --enable-features=WebRTCPipeWireCapturer --ozone-platform-hint=wayland'
 alias proj='cd ~/projects'
 
 alias aza='az account show --output tsv --query "name"'

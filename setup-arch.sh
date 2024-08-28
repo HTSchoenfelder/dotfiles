@@ -43,7 +43,12 @@ sudo pacman -Sy --needed --noconfirm \
     qemu-full \
     virt-manager \
     dnsmasq \
-    bridge-utils
+    bridge-utils \
+    noto-fonts-emoji \
+    udiskie \
+    xdg-desktop-portal-hyprland \
+    zellij
+    
 
 ## check if yay is installed by calling yay --version and only then install it
 if yay --version &> /dev/null; then
@@ -66,7 +71,11 @@ yes | LANG=C yay -Sy --needed --noconfirm --answerdiff None --answerclean None -
     nvm \
     tofi \
     zsh-fast-syntax-highlighting \
-    spotify-launcher
+    spotify-launcher \
+    synology-drive \
+    neofetch \
+    clipse \
+    hyprpicker-git
 
 if [ -d ~/dotfiles ]; then
     echo "dotfiles already cloned ..."
@@ -94,5 +103,7 @@ bat cache --build
 sudo usermod -aG kvm $USER
 sudo usermod -aG libvirt $USER
 sudo systemctl enable --now libvirtd
+
+set-timezone Europe/Berlin
 
 chsh -s $(which zsh)
