@@ -47,7 +47,10 @@ sudo pacman -Sy --needed --noconfirm \
     noto-fonts-emoji \
     udiskie \
     xdg-desktop-portal-hyprland \
-    zellij
+    zellij \
+    azure-cli \
+    netcat \
+    terraform
     
 
 ## check if yay is installed by calling yay --version and only then install it
