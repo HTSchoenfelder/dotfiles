@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# hyprctl notify -1 5000 "rgb(ff1ea3)" "select-window"
 if [ "$#" -eq 4 ]; then
     window=$1
     class=$2

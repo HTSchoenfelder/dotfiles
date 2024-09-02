@@ -50,7 +50,8 @@ sudo pacman -Sy --needed --noconfirm \
     zellij \
     azure-cli \
     netcat \
-    terraform
+    terraform \
+    firefox
     
 
 ## check if yay is installed by calling yay --version and only then install it
