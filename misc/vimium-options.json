@@ -4,7 +4,7 @@
   "scrollStepSize": 200,
   "grabBackFocus": true,
   "searchEngines": "w: http://en.wikipedia.org/w/index.php?title=Special:Search&search=%s Wikipedia\ng: https://www.google.com/search?q=%s Google\nl: https://www.google.com/search?btnI&q=%s I'm feeling lucky...\ngm: https://www.google.com/maps?q=%s Google maps\ny: http://www.youtube.com/results?search_query=%s Youtube\nd: https://duckduckgo.com/?ia=about&q=%s DuckDuckGo\naz: http://www.amazon.de/s/?field-keywords=%s Amazon\ndw: http://www.merriam-webster.com/dictionary/%s Merriam-Webster\nb: https://www.bing.com/search?q=%s Bing",
-  "settingsVersion": "2.0.5",
+  "settingsVersion": "2.1.2",
   "exclusionRules": [
     {
       "passKeys": "",
@@ -29,6 +29,10 @@
     {
       "passKeys": "",
       "pattern": "https?://killer.sh/*"
+    },
+    {
+      "passKeys": "",
+      "pattern": "https?://www.vimified.com/*"
     }
   ]
 }
