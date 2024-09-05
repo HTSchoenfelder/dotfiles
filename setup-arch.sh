@@ -53,7 +53,6 @@ sudo pacman -Sy --needed --noconfirm \
     terraform \
     firefox
     
-
 ## check if yay is installed by calling yay --version and only then install it
 if yay --version &> /dev/null; then
     echo "yay already installed ..."
@@ -79,7 +78,9 @@ yes | LANG=C yay -Sy --needed --noconfirm --answerdiff None --answerclean None -
     synology-drive \
     neofetch \
     clipse \
-    hyprpicker-git
+    hyprpicker-git \
+    firefox-pwa-bin \
+    nvm
 
 if [ -d ~/dotfiles ]; then
     echo "dotfiles already cloned ..."

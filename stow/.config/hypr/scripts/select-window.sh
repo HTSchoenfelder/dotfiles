@@ -1,5 +1,5 @@
 #!/bin/bash
-# hyprctl notify -1 5000 "rgb(ff1ea3)" "select-window"
+[[ "$NOTIFY" == "true" ]] && hyprctl notify -1 5000 "rgb(ff1ea3)" "select-window"
 if [ "$#" -eq 4 ]; then
     window=$1
     class=$2
@@ -12,7 +12,7 @@ else
 fi
 
 addresses=$(hyprctl clients -j | jq -r ".[] | select(.class | test(\"$class\")) | .address")
-
+[[ "$NOTIFY" == "true" ]] && hyprctl notify -1 3000 "rgb(ff1ea3)" "Found Windows: $addresses"
 if [ -z "$addresses" ]
 then
     hyprctl notify -1 3000 "rgb(ff1ea3)" "No Windows found!"
@@ -23,5 +23,5 @@ for address in $addresses
 do
     hyprctl dispatch movetoworkspacesilent "special:${specialWorkspaceName},address:${address}"
 done
-
+[[ "$NOTIFY" == "true" ]] && hyprctl notify -1 3000 "rgb(ff1ea3)" "Moved windows to workspace $workspaceId $window"
 hyprctl dispatch movetoworkspace "$workspaceId,$window"

@@ -62,6 +62,8 @@ export DOTNET_ROOT=/home/henrik/.dotnet
 
 fpath=(~/.docker/completions $fpath)
 
+source /usr/share/nvm/init-nvm.sh
+
 # Load and initialize the Zsh completion library
 autoload -Uz compinit
 compinit
