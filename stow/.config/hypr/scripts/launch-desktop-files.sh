@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Name of the application to launch
-APP_NAME="$1"
-
 # Directories to search for .desktop files
 DESKTOP_DIRS=("$HOME/.local/share/applications" "/usr/share/applications")
 
@@ -20,21 +17,25 @@ launch_application() {
                     # Use Hyprland exec-once with gtk-launch
                     echo "Starting $app_name using Hyprland exec-once with $desktop_filename..."
                     hyprctl dispatch exec "gtk-launch $desktop_filename" &
-                    exit 0
+                    return 0
                 fi
             done
         fi
     done
 
     echo "Application \"$app_name\" not found."
-    exit 1
+    return 1
 }
 
-# Check if an application name was provided
-if [ -z "$APP_NAME" ]; then
-    echo "Usage: $0 \"Application Name\""
+# Check if at least one application name was provided
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 \"Application Name 1\" \"Application Name 2\" ..."
     exit 1
 fi
 
-# Launch the application
-launch_application "$APP_NAME"
+# Launch each application provided as a parameter
+for APP_NAME in "$@"; do
+    launch_application "$APP_NAME"
+    # Wait for 5 seconds before launching the next application
+    sleep 5
+done

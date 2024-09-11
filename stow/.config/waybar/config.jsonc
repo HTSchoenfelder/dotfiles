@@ -6,8 +6,8 @@
     "passthrough": false,
     "gtk-layer-shell": true,
     "height": 50,
-    "modules-left": [        
-        "hyprland/workspaces",        
+    "modules-left": [
+        "hyprland/workspaces",
         "hyprland/window"
     ],
     "modules-center": [
@@ -20,6 +20,7 @@
         "custom/power_profile",
         "battery",
         "backlight",
+        "privacy",
         "pulseaudio",
         "pulseaudio#microphone",
         "tray"
@@ -51,11 +52,11 @@
     },
     "hyprland/workspaces": {
         "disable-scroll": true,
-		"format": "{name} {icon}",
-		"format-icons": {
-			"active": " ",
-			"default": " "
-		}        
+        "format": "{name} {icon}",
+        "format-icons": {
+            "active": " ",
+            "default": " "
+        }
     },
     "custom/power_profile": {
         //shows the current power profile and switches to next on click
@@ -70,6 +71,7 @@
         "spacing": 10
     },
     "clock": {
+        "timezone": "Europe/Berlin",
         "format": "{:%d.%m.%Y %H:%M}",
         "tooltip": true,
         "tooltip-format": "{: %A, %B %e %Y}"
@@ -108,6 +110,28 @@
             "󰂁",
             "󰂂",
             "󰁹"
+        ]
+    },
+    "privacy": {
+        "icon-spacing": 4,
+        "icon-size": 18,
+        "transition-duration": 250,
+        "modules": [
+            {
+                "type": "screenshare",
+                "tooltip": true,
+                "tooltip-icon-size": 24
+            },
+            {
+                "type": "audio-out",
+                "tooltip": true,
+                "tooltip-icon-size": 24
+            },
+            {
+                "type": "audio-in",
+                "tooltip": true,
+                "tooltip-icon-size": 24
+            }
         ]
     },
     "pulseaudio": {

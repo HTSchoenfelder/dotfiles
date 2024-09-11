@@ -51,6 +51,7 @@ sudo pacman -Sy --needed --noconfirm \
     azure-cli \
     netcat \
     terraform \
+    font-manager \
     firefox
     
 ## check if yay is installed by calling yay --version and only then install it
@@ -80,7 +81,9 @@ yes | LANG=C yay -Sy --needed --noconfirm --answerdiff None --answerclean None -
     clipse \
     hyprpicker-git \
     firefox-pwa-bin \
-    nvm
+    nvm \
+    wlogout \
+    floorp-bin
 
 if [ -d ~/dotfiles ]; then
     echo "dotfiles already cloned ..."
