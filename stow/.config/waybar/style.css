@@ -62,6 +62,7 @@ tooltip label{
 #clock,
 #battery,
 #privacy,
+#custom-updates,
 #pulseaudio,
 #network,
 #tray,
@@ -78,13 +79,15 @@ tooltip label{
 }
 
 /* only left */
-#cpu, #pulseaudio{
+#cpu,
+#pulseaudio{
     border-radius: 10px 0px 0px 10px;
     margin-right: 0px;
 }
 
 /* only right */
-#disk, #pulseaudio.microphone{
+#disk,
+#pulseaudio.microphone{
     border-radius: 0px 10px 10px 0px;
     margin-left: 0px;
     margin-right: 10px;

@@ -101,3 +101,8 @@ eval "$(direnv hook zsh)"
 eval "$(zoxide init zsh)"
 
 eval "$(starship init zsh)"
+
+if [[ -z "$ZELLIJ" && "$TERM" == "xterm-kitty" ]]; then
+  zellij
+fi
+

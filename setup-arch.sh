@@ -52,7 +52,8 @@ sudo pacman -Sy --needed --noconfirm \
     netcat \
     terraform \
     font-manager \
-    firefox
+    firefox \
+    helm
     
 ## check if yay is installed by calling yay --version and only then install it
 if yay --version &> /dev/null; then
@@ -108,9 +109,14 @@ stow stow
 
 bat cache --build
 
+# Virtualization
 sudo usermod -aG kvm $USER
 sudo usermod -aG libvirt $USER
 sudo systemctl enable --now libvirtd
+
+# Docker
+sudo usermod -aG docker $USER
+sudo systemctl enable --now docker
 
 set-timezone Europe/Berlin
 
