@@ -60,6 +60,7 @@ sudo pacman -Sy --needed --noconfirm \
     kitty \
     hyprpaper \
     wl-clipboard \
+    yazi \
     wtype \
     xdg-desktop-portal \
     xdg-desktop-portal-hyprland \
@@ -118,6 +119,8 @@ rm ~/.gitconfig
 rm ~/.zshrc
 rm ~/.config/hypr/hyprland.conf
 
+stow stow --no-folding
+
 bat cache --build
 
 # Virtualization
@@ -128,6 +131,8 @@ sudo systemctl enable --now libvirtd
 # Docker
 sudo usermod -aG docker $USER
 sudo systemctl enable --now docker
+
+sudo systemctl enable --now ly
 
 set-timezone Europe/Berlin
 
