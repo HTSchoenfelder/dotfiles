@@ -138,6 +138,5 @@ mkdir -p ~/projects/temp
 mkdir -p ~/projects/work
 
 firefox --createprofile "defaultprofile $HOME/.mozilla/firefox/defaultprofile"
-alias firefox="firefox --profile defaultprofile"
 
 chsh -s $(which zsh)
