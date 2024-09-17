@@ -137,7 +137,7 @@
     },
     "custom/updates": {
         "format": "󱍷 {}",
-        "interval": 5,
+        "interval": 60,
         "exec": "yay -Qu | wc -l"
     },
     "pulseaudio": {

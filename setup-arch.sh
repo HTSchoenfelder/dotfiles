@@ -1,59 +1,81 @@
 #! /bin/bash
 
 sudo pacman -Syu --noconfirm
+
 sudo pacman -Sy --needed --noconfirm \
-    base-devel \
-    bat \
-    cifs-utils \
-    curl \
-    direnv \
-    docker \
-    dunst \
-    fzf \
     git \
-    gnupg \
+    docker \
     go \
-    hey \
-    htop \
-    hyprpaper \
-    jq \
-    keepassxc \
+    terraform \
     kubectl \
-    man-db \
-    neovim \
-    obsidian \
-    pass \
-    pavucontrol \
-    qpwgraph \
-    ripgrep \
+    base-devel \
     ruby \
+    helm \
+    lazygit \
+    azure-cli \
     starship \
-    stow \
+    direnv \
+    zsh \
+    neovim \
+    vim \
+    zsh-autosuggestions \
+    fzf \
+    curl \
+    bat \
+    ripgrep \
+    jq \
     tldr \
     tmux \
-    ttf-agave-nerd \
-    waybar \
-    wireplumber \
-    wl-clipboard \
-    wtype \
-    yazi \
+    zellij \
     zoxide \
-    zsh \
-    zsh-autosuggestions \
-    qemu-full \
-    virt-manager \
+    htop \
+    nano \
+    stow \
+    keepassxc \
+    neofetch \
+    obsidian \
+    spotify-launcher \
+    nautilus \
+    openssh \
+    wget \
+    grim \
+    slurp \
+    udiskie \
+    netcat \
+    smartmontools \
+    iwd \
+    wpa_supplicant \
     dnsmasq \
     bridge-utils \
-    noto-fonts-emoji \
-    udiskie \
+    wireless_tools \
+    cifs-utils \
+    man-db \
+    polkit-kde-agent \
+    ly \
+    hyprland \
+    waybar \
+    dunst \
+    kitty \
+    hyprpaper \
+    wl-clipboard \
+    wtype \
+    xdg-desktop-portal \
     xdg-desktop-portal-hyprland \
-    zellij \
-    azure-cli \
-    netcat \
-    terraform \
+    xdg-desktop-portal-gtk \
+    xdg-utils \
+    qt5-wayland \
+    qt6-wayland \
+    noto-fonts-emoji \
+    ttf-agave-nerd \
+    wireplumber \
+    pavucontrol \
+    qpwgraph \
+    qemu-full \
+    virt-manager \
+    desktop-file-utils \
     font-manager \
-    firefox \
-    helm
+    firefox
+
     
 ## check if yay is installed by calling yay --version and only then install it
 if yay --version &> /dev/null; then
@@ -69,22 +91,18 @@ yay --version
 
 yay -Syu
 yes | LANG=C yay -Sy --needed --noconfirm --answerdiff None --answerclean None --mflags "--noconfirm" \
-    git-credential-manager \
     visual-studio-code-bin \
     ruby-colorls \
     google-chrome \
     nvm \
     tofi \
     zsh-fast-syntax-highlighting \
-    spotify-launcher \
     synology-drive \
-    neofetch \
     clipse \
-    hyprpicker-git \
+    hyprpicker \
     firefox-pwa-bin \
     nvm \
-    wlogout \
-    floorp-bin
+    wlogout
 
 if [ -d ~/dotfiles ]; then
     echo "dotfiles already cloned ..."
@@ -119,5 +137,14 @@ sudo usermod -aG docker $USER
 sudo systemctl enable --now docker
 
 set-timezone Europe/Berlin
+
+mkdir -p ~/projects/dev
+mkdir -p ~/projects/temp
+mkdir -p ~/projects/work
+
+cp ~/dotfiles/misc/.gitconfig_template ~/.gitconfig_machine
+
+firefox --createprofile "defaultprofile $HOME/.mozilla/firefox/defaultprofile"
+alias firefox="firefox --profile defaultprofile"
 
 chsh -s $(which zsh)

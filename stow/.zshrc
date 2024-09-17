@@ -102,6 +102,10 @@ eval "$(zoxide init zsh)"
 
 eval "$(starship init zsh)"
 
+bindkey "^[[3~" delete-char
+bindkey "^[[1;5C" forward-word
+bindkey "^[[1;5D" backward-word
+
 if [[ -z "$ZELLIJ" && "$TERM" == "xterm-kitty" ]]; then
   zellij
 fi
