@@ -1,23 +1,3 @@
-export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="henrik"
-
-zstyle ':omz:update' mode reminder  # just remind me to update when it's time
-
-plugins=( \
-          git \
-          docker \
-          docker-compose \
-          dotnet \
-          dotenv \
-          kubectl \
-          zsh-autosuggestions \
-          # zsh-autocomplete \
-          zsh-syntax-highlighting \
-          fast-syntax-highlighting\
-          )
-
-# source $ZSH/oh-my-zsh.sh
-
 alias cl='clear'
 alias d='docker'
 alias k='kubectl'
