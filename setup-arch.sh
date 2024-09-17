@@ -82,6 +82,7 @@ if yay --version &> /dev/null; then
     echo "yay already installed ..."
 else
     echo "Installing yay ..."
+    rm -rf yay
     git clone https://aur.archlinux.org/yay.git
     cd yay
     yes | makepkg -si
