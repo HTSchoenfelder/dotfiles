@@ -104,17 +104,8 @@ yes | LANG=C yay -Sy --needed --noconfirm --answerdiff None --answerclean None -
     nvm \
     wlogout
 
-if [ -d ~/dotfiles ]; then
-    echo "dotfiles already cloned ..."
-    git -C ~/dotfiles pull
-else
-    echo "Cloning dotfiles ..."
-    git clone https://github.com/htschoenfelder/dotfiles.git
-fi
 
 mkdir -p ~/.local/bin
-
-./scripts/setup-git.sh
 
 mkdir -p ~/.docker/completions
 docker completion zsh > ~/.docker/completions/_docker
@@ -141,8 +132,6 @@ set-timezone Europe/Berlin
 mkdir -p ~/projects/dev
 mkdir -p ~/projects/temp
 mkdir -p ~/projects/work
-
-cp ~/dotfiles/misc/.gitconfig_template ~/.gitconfig_machine
 
 firefox --createprofile "defaultprofile $HOME/.mozilla/firefox/defaultprofile"
 alias firefox="firefox --profile defaultprofile"
