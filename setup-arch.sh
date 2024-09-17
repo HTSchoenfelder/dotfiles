@@ -31,6 +31,8 @@ sudo pacman -Sy --needed --noconfirm \
     htop \
     nano \
     stow \
+    gnupg \
+    pass \
     keepassxc \
     neofetch \
     obsidian \
@@ -82,6 +84,7 @@ if yay --version &> /dev/null; then
     echo "yay already installed ..."
 else
     echo "Installing yay ..."
+    cd /tmp
     rm -rf yay
     git clone https://aur.archlinux.org/yay.git
     cd yay
