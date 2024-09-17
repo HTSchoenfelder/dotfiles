@@ -118,8 +118,6 @@ rm ~/.gitconfig
 rm ~/.zshrc
 rm ~/.config/hypr/hyprland.conf
 
-stow stow
-
 bat cache --build
 
 # Virtualization
@@ -140,3 +138,5 @@ mkdir -p ~/projects/work
 firefox --createprofile "defaultprofile $HOME/.mozilla/firefox/defaultprofile"
 
 chsh -s $(which zsh)
+
+echo "Execute stow stow"
