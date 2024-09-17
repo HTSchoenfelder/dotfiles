@@ -131,7 +131,7 @@ sudo systemctl enable --now libvirtd
 sudo usermod -aG docker $USER
 sudo systemctl enable --now docker
 
-sudo systemctl enable --now ly
+sudo systemctl enable ly
 
 set-timezone Europe/Berlin
 
