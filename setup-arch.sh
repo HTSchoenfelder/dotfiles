@@ -90,7 +90,7 @@ else
     git clone https://aur.archlinux.org/yay.git
     cd yay
     yes | makepkg -si
-    cd
+    cd ~/dotfiles
 fi
 yay --version
 
@@ -108,7 +108,6 @@ yes | LANG=C yay -Sy --needed --noconfirm --answerdiff None --answerclean None -
     firefox-pwa-bin \
     nvm \
     wlogout
-
 
 mkdir -p ~/.local/bin
 
