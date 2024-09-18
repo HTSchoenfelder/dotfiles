@@ -139,8 +139,4 @@ mkdir -p ~/projects/dev
 mkdir -p ~/projects/temp
 mkdir -p ~/projects/work
 
-firefox --createprofile "defaultprofile $HOME/.mozilla/firefox/defaultprofile"
-
 chsh -s $(which zsh)
-
-echo "Execute stow stow"
