@@ -29,6 +29,3 @@ fc-cache -fv
 
 # colorls
 sudo gem install colorls
-
-# chsh -s $(which zsh)
-# exec zsh

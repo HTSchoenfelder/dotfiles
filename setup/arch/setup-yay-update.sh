@@ -1,4 +1,5 @@
 #!/bin/bash
+# For displaying in waybar
 
 # 1. Create the Bash script that runs yay -Sy
 echo "Creating /usr/local/bin/update_yay_db.sh..."

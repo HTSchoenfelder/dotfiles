@@ -24,5 +24,3 @@ git config --global credential.credentialStore gpg
 mkdir -p ~/projects/dev
 mkdir -p ~/projects/temp
 mkdir -p ~/projects/work
-
-cp ~/dotfiles/misc/.gitconfig_template ~/.gitconfig_machine

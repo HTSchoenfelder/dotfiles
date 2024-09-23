@@ -118,6 +118,8 @@ rm ~/.gitconfig
 rm ~/.zshrc
 rm ~/.config/hypr/hyprland.conf
 
+
+cd ~/dotfiles
 stow home --no-folding
 
 bat cache --build
@@ -138,5 +140,3 @@ set-timezone Europe/Berlin
 mkdir -p ~/projects/dev
 mkdir -p ~/projects/temp
 mkdir -p ~/projects/work
-
-chsh -s $(which zsh)
