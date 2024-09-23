@@ -118,7 +118,7 @@ rm ~/.gitconfig
 rm ~/.zshrc
 rm ~/.config/hypr/hyprland.conf
 
-stow stow --no-folding
+stow home --no-folding
 
 bat cache --build
 

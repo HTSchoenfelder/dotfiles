@@ -24,6 +24,5 @@ mkdir -p ~/.local/bin
 
 rm ~/.gitconfig
 rm ~/.zshrc
-stow stow
-
+stow home --no-folding
 sudo chsh -s $(which zsh)
