@@ -1,0 +1,50 @@
+{
+  "version": 5,
+  "lastUserContextId": 16,
+  "identities": [
+    {
+      "public": false,
+      "icon": "",
+      "color": "",
+      "name": "userContextIdInternal.thumbnail",
+      "accessKey": "",
+      "userContextId": 5
+    },
+    {
+      "userContextId": 4294967295,
+      "public": false,
+      "icon": "",
+      "color": "",
+      "name": "userContextIdInternal.webextStorageLocal",
+      "accessKey": ""
+    },
+    {
+      "userContextId": 1,
+      "public": true,
+      "icon": "circle",
+      "color": "blue",
+      "name": "Default"
+    },
+    {
+      "userContextId": 2,
+      "public": true,
+      "icon": "circle",
+      "color": "red",
+      "name": "Work"
+    },
+    {
+      "userContextId": 3,
+      "public": true,
+      "icon": "circle",
+      "color": "turquoise",
+      "name": "P1"
+    },
+    {
+      "userContextId": 4,
+      "public": true,
+      "icon": "circle",
+      "color": "yellow",
+      "name": "P2"
+    }
+  ]
+}

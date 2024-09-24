@@ -1,8 +1,22 @@
 {
   "containers": {
+    "firefox-container-1": {
+      "id": "firefox-container-1",
+      "cookieStoreId": "firefox-container-1",
+      "name": "Default",
+      "icon": "circle",
+      "color": "blue",
+      "colorCode": "#37adff",
+      "proxified": false,
+      "proxy": null,
+      "reopenRulesActive": false,
+      "reopenRules": [],
+      "userAgentActive": false,
+      "userAgent": ""
+    },
     "firefox-container-2": {
       "id": "firefox-container-2",
-      "cookieStoreId": "firefox-container-7",
+      "cookieStoreId": "firefox-container-2",
       "name": "Work",
       "icon": "circle",
       "color": "red",
@@ -16,7 +30,7 @@
     },
     "firefox-container-3": {
       "id": "firefox-container-3",
-      "cookieStoreId": "firefox-container-8",
+      "cookieStoreId": "firefox-container-3",
       "name": "P1",
       "icon": "circle",
       "color": "turquoise",
@@ -30,7 +44,7 @@
     },
     "firefox-container-4": {
       "id": "firefox-container-4",
-      "cookieStoreId": "firefox-container-9",
+      "cookieStoreId": "firefox-container-4",
       "name": "P2",
       "icon": "circle",
       "color": "yellow",
@@ -108,7 +122,7 @@
     "tabsReloadLimitNotif": true,
     "showNewTabBtns": true,
     "newTabBarPosition": "after_tabs",
-    "tabsPanelSwitchActMove": false,
+    "tabsPanelSwitchActMove": true,
     "tabsPanelSwitchActMoveAuto": true,
     "tabsUrlInTooltip": "full",
     "newTabCtxReopen": true,
@@ -126,7 +140,7 @@
     "pinnedForcedDiscard": false,
     "tabsTree": true,
     "groupOnOpen": true,
-    "tabsTreeLimit": "none",
+    "tabsTreeLimit": 2,
     "autoFoldTabs": false,
     "autoFoldTabsExcept": "none",
     "autoExpandTabs": false,
@@ -249,32 +263,48 @@
     "selectActiveTabFirst": true
   },
   "sidebar": {
+    "nav": [
+      "girtApSPnVh6",
+      "GEEHmzO0pFe6",
+      "fN9NB1zIMXi6",
+      "aySdYWMvmZi6",
+      "sp-0",
+      "add_tp",
+      "create_snapshot",
+      "lritJlmMp2L7",
+      "settings"
+    ],
     "panels": {
       "girtApSPnVh6": {
         "type": 2,
         "id": "girtApSPnVh6",
         "name": "Default",
-        "color": "toolbar",
+        "color": "blue",
         "iconSVG": "circle",
         "iconIMGSrc": "",
         "iconIMG": "",
         "lockedPanel": false,
         "skipOnSwitching": false,
         "noEmpty": true,
-        "newTabCtx": "none",
-        "dropTabCtx": "firefox-default",
+        "newTabCtx": "firefox-container-1",
+        "dropTabCtx": "firefox-container-1",
         "moveRules": [
           { "id": "vnh4ZXGwa0w6", "active": false },
+          { "id": "C2JdUvNX5Xde", "active": false, "topLvlOnly": false },
           {
-            "id": "C2JdUvNX5Xde",
+            "id": "ejaBQ2xdm33I",
             "active": true,
-            "containerId": "firefox-default",
-            "topLvlOnly": false
+            "containerId": "firefox-default"
+          },
+          {
+            "id": "cZ5yVpbLU43I",
+            "active": true,
+            "containerId": "firefox-container-1"
           }
         ],
         "moveExcludedTo": -1,
         "bookmarksFolderId": -1,
-        "newTabBtns": ["P2, google.de"],
+        "newTabBtns": [],
         "srcPanelConfig": null
       },
       "GEEHmzO0pFe6": {
@@ -294,12 +324,19 @@
           {
             "id": "FktH_hzu7uw6",
             "active": true,
-            "containerId": "firefox-container-2"
+            "containerId": "firefox-container-6",
+            "topLvlOnly": false
+          },
+          {
+            "id": "WddhcKr1BD4I",
+            "active": true,
+            "containerId": "firefox-container-2",
+            "topLvlOnly": false
           }
         ],
         "moveExcludedTo": -1,
         "bookmarksFolderId": -1,
-        "newTabBtns": ["Work, https://portal.azure.com/"],
+        "newTabBtns": [],
         "srcPanelConfig": null
       },
       "fN9NB1zIMXi6": {
@@ -314,10 +351,16 @@
         "skipOnSwitching": false,
         "noEmpty": true,
         "newTabCtx": "firefox-container-3",
-        "dropTabCtx": "none",
+        "dropTabCtx": "firefox-container-3",
         "moveRules": [
           {
             "id": "5_9uz_c5DIx6",
+            "active": true,
+            "containerId": "firefox-container-7",
+            "topLvlOnly": false
+          },
+          {
+            "id": "VeQ6lRRmNX4I",
             "active": true,
             "containerId": "firefox-container-3"
           }
@@ -337,12 +380,18 @@
         "iconIMG": "",
         "lockedPanel": false,
         "skipOnSwitching": false,
-        "noEmpty": false,
+        "noEmpty": true,
         "newTabCtx": "firefox-container-4",
         "dropTabCtx": "firefox-container-4",
         "moveRules": [
           {
-            "id": "H9W-NAhrvkce",
+            "id": "FMcREEo1GQ0I",
+            "active": true,
+            "containerId": "firefox-container-8",
+            "topLvlOnly": false
+          },
+          {
+            "id": "P7xhT9qLOf5I",
             "active": true,
             "containerId": "firefox-container-4"
           }
@@ -368,18 +417,7 @@
         "autoConvert": false,
         "srcPanelConfig": null
       }
-    },
-    "nav": [
-      "girtApSPnVh6",
-      "GEEHmzO0pFe6",
-      "fN9NB1zIMXi6",
-      "aySdYWMvmZi6",
-      "sp-0",
-      "add_tp",
-      "create_snapshot",
-      "lritJlmMp2L7",
-      "settings"
-    ]
+    }
   },
   "contextMenu": {
     "tabs": [
@@ -524,6 +562,7 @@
     "next_panel": "Alt+Period",
     "prev_panel": "Alt+Comma",
     "new_tab_on_panel": "Ctrl+Space",
+    "new_tab_in_group": "Ctrl+Shift+Space",
     "up": "Alt+Up",
     "down": "Alt+Down",
     "up_shift": "Alt+Shift+Up",
