@@ -7,7 +7,14 @@ else
     exit 1
 fi
 
-chosen=$(hyprctl clients -j | jq -r '.[].title' | grep "${title}" | tofi | xargs | sed 's/|/\\|/g' )
+chosen=$( \
+    hyprctl clients -j \
+    | jq -r '. | sort_by(.focusHistoryID) | .[].title' \
+    | grep "${title}" \
+    | tofi --prompt-text focus: \
+    | xargs \
+    | sed 's/[.|\\-]/\\&/g' \
+    )
 
 [ -z "$chosen" ] && exit
 

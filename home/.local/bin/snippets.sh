@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Get user selection via tofi from emoji file.
-chosen=$(cat $HOME/dotfiles/misc/snippets.txt | tofi | awk '{print $1}')
+chosen=$(cat $HOME/dotfiles/misc/snippets.txt | tofi --prompt-text select: | awk '{print $1}')
 
 # Exit if none chosen.
 [ -z "$chosen" ] && exit
