@@ -11,7 +11,10 @@
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       # NOTE: Change this to aarch64-linux if you are on ARM
       system = "x86_64-linux";
-      modules = [ ./configuration.nix ];
+      modules = [ 
+        ./configuration.nix
+        ./hardware-configuration.nix
+        ];
     };
   };
 }

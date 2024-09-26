@@ -85,6 +85,7 @@
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
        vscode
+       synology-drive-client
     ];
   };
   users.defaultUserShell = pkgs.zsh;
@@ -114,6 +115,9 @@
     kubectl
     colorls
     kitty
+    keepassxc
+    zsh-fast-syntax-highlighting
+    zsh-autosuggestions
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
