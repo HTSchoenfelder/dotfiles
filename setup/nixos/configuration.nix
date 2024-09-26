@@ -87,6 +87,7 @@
        vscode
        synology-drive-client
     ];
+    defaultUserShell = pkgs.zsh;
   };
 
   programs.zsh = {
@@ -104,6 +105,8 @@
   
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   
+  environment.shells = [ pkgs.zsh ];
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
