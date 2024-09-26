@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # List all partitions and store them in an array
 partitions=($(lsblk -lnpo NAME,TYPE | grep part | awk '{print $1}'))
