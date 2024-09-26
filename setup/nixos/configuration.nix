@@ -15,7 +15,6 @@
   boot.loader.grub.device = "/dev/vda";
   boot.loader.grub.useOSProber = true;
 
-
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
