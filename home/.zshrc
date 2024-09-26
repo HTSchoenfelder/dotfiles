@@ -44,8 +44,6 @@ export DOTNET_ROOT=/home/henrik/.dotnet
 
 fpath=(~/.docker/completions $fpath)
 
-source /usr/share/nvm/init-nvm.sh
-
 # Load and initialize the Zsh completion library
 autoload -Uz compinit
 compinit
@@ -73,8 +71,11 @@ HISTSIZE=10000
 SAVEHIST=10000
 setopt appendhistory
 
-source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
+if [ ! command -v nix-env &> /dev/null ]; then
+  source /usr/share/nvm/init-nvm.sh
+  source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+  source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
+fi
 
 source <(kubectl completion zsh)
 
