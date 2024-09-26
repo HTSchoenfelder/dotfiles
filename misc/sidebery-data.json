@@ -105,11 +105,11 @@
     "searchHistoryShortcut": "",
     "warnOnMultiTabClose": "collapsed",
     "activateLastTabOnPanelSwitching": true,
-    "activateLastTabOnPanelSwitchingLoadedOnly": true,
+    "activateLastTabOnPanelSwitchingLoadedOnly": false,
     "switchPanelAfterSwitchingTab": "always",
     "tabRmBtn": "hover",
     "activateAfterClosing": "next",
-    "activateAfterClosingStayInPanel": false,
+    "activateAfterClosingStayInPanel": true,
     "activateAfterClosingGlobal": false,
     "activateAfterClosingNoFolded": true,
     "activateAfterClosingNoDiscarded": true,
@@ -129,9 +129,9 @@
     "tabWarmupOnHover": true,
     "tabSwitchDelay": 0,
     "moveNewTabPin": "start",
-    "moveNewTabParent": "last_child",
+    "moveNewTabParent": "default",
     "moveNewTabParentActPanel": false,
-    "moveNewTab": "end",
+    "moveNewTab": "after",
     "moveNewTabActivePin": "start",
     "pinnedTabsPosition": "panel",
     "pinnedTabsList": true,
@@ -140,7 +140,7 @@
     "pinnedForcedDiscard": false,
     "tabsTree": true,
     "groupOnOpen": true,
-    "tabsTreeLimit": 2,
+    "tabsTreeLimit": 1,
     "autoFoldTabs": false,
     "autoFoldTabsExcept": "none",
     "autoExpandTabs": false,
@@ -263,17 +263,6 @@
     "selectActiveTabFirst": true
   },
   "sidebar": {
-    "nav": [
-      "girtApSPnVh6",
-      "GEEHmzO0pFe6",
-      "fN9NB1zIMXi6",
-      "aySdYWMvmZi6",
-      "sp-0",
-      "add_tp",
-      "create_snapshot",
-      "lritJlmMp2L7",
-      "settings"
-    ],
     "panels": {
       "girtApSPnVh6": {
         "type": 2,
@@ -417,7 +406,20 @@
         "autoConvert": false,
         "srcPanelConfig": null
       }
-    }
+    },
+    "nav": [
+      "girtApSPnVh6",
+      "GEEHmzO0pFe6",
+      "fN9NB1zIMXi6",
+      "aySdYWMvmZi6",
+      "sp-0",
+      "add_tp",
+      "create_snapshot",
+      "lritJlmMp2L7",
+      "fYIcIdgVdriT",
+      "hmSsgOs6tviT",
+      "settings"
+    ]
   },
   "contextMenu": {
     "tabs": [
