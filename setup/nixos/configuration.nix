@@ -87,8 +87,9 @@
        vscode
        synology-drive-client
     ];
-    defaultUserShell = pkgs.zsh;
   };
+
+  users.defaultUserShell = pkgs.zsh;
 
   programs.zsh = {
     enable = true;
