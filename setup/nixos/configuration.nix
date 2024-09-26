@@ -15,6 +15,11 @@
   boot.loader.grub.device = "/dev/vda";
   boot.loader.grub.useOSProber = true;
 
+  programs.hyprland = {
+    enable = true;
+    xwayland.enable = true;
+  };
+
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -127,6 +132,8 @@
     zsh-fast-syntax-highlighting
     zsh-autosuggestions
     gparted
+    waybar
+    zellij
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
