@@ -1,10 +1,10 @@
-#!/bin/bash
+#! /usr/bin/env bash
 # For displaying in waybar
 
 # 1. Create the Bash script that runs yay -Sy
 echo "Creating /usr/local/bin/update_yay_db.sh..."
 sudo bash -c 'cat > /usr/local/bin/update_yay_db.sh <<EOF
-#!/bin/bash
+#! /usr/bin/env bash
 yay -Sy
 EOF'
 

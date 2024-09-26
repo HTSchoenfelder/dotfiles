@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /usr/bin/env bash
 
 # Directories to search for .desktop files
 DESKTOP_DIRS=("$HOME/.local/share/applications" "/usr/share/applications")

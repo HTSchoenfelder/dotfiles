@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /usr/bin/env bash
 
 nohup google-chrome --profile-directory="Default" &> /dev/null &
 disown

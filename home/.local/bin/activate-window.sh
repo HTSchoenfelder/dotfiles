@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /usr/bin/env bash
 
 shortcutsFile="${HOME}/files/window-shortcuts.json"
 

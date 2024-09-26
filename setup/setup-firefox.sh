@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 pkill -x firefox
 firefox --createprofile "defaultprofile $HOME/.mozilla/firefox/defaultprofile"

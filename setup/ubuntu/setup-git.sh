@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 KEY_ID="Henrik Schönfelder <mail@henrikschoenfelder.de>"
 
