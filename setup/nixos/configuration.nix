@@ -118,6 +118,7 @@
     keepassxc
     zsh-fast-syntax-highlighting
     zsh-autosuggestions
+    gparted
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
