@@ -1,0 +1,1 @@
+setup/nixos/setup-nixos.sh
