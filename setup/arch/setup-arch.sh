@@ -36,7 +36,6 @@ sudo pacman -Sy --needed --noconfirm \
     keepassxc \
     neofetch \
     obsidian \
-    spotify-launcher \
     nautilus \
     openssh \
     wget \
@@ -107,7 +106,8 @@ yes | LANG=C yay -Sy --needed --noconfirm --answerdiff None --answerclean None -
     hyprpicker \
     firefox-pwa-bin \
     nvm \
-    wlogout
+    wlogout \
+    spotify
 
 mkdir -p ~/.local/bin
 

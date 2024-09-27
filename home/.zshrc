@@ -71,7 +71,7 @@ HISTSIZE=10000
 SAVEHIST=10000
 setopt appendhistory
 
-if [ ! command -v nix-env &> /dev/null ]; then
+if ! nix-env --version &> /dev/null; then
   source /usr/share/nvm/init-nvm.sh
   source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
   source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
