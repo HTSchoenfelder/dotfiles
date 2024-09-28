@@ -104,7 +104,10 @@
   };
 
   # Install firefox.
-  programs.firefox.enable = true;
+  programs.firefox = {
+    enable = true;
+    nativeMessagingHosts.packages = [ pkgs.firefoxpwa ];
+  };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -164,7 +167,7 @@
     qpwgraph
     desktop-file-utils
     font-manager
-    firefox    
+    firefoxpwa
     vscode
     synology-drive-client
     gparted
