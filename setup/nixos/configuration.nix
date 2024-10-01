@@ -186,11 +186,12 @@ xdg.portal = {
     teams-for-linux
     colorls
     tofi
-    clips
+    clipse
     spotify
     wlogout
     usbutils
     playerctl
+    mlocate
   ];
 
   # Some programs need SUID wrappers, can be configured further or are

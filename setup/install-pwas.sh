@@ -15,7 +15,7 @@ install_pwa() {
         --profile "$profileId"
 }
 
-install_pwa "https://teams.microsoft.com/v2/manifest.json" "Teams 1"
-install_pwa "https://teams.microsoft.com/v2/manifest.json" "Teams 2"
+# install_pwa "https://teams.microsoft.com/v2/manifest.json" "Teams 1"
+# install_pwa "https://teams.microsoft.com/v2/manifest.json" "Teams 2"
 install_pwa "https://outlook.office.com/mail/manifests/pwa.json?culture=en" "Outlook 1"
 install_pwa "https://outlook.office.com/mail/manifests/pwa.json?culture=en" "Outlook 2"
