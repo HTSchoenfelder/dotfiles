@@ -129,7 +129,7 @@
     "tabWarmupOnHover": true,
     "tabSwitchDelay": 0,
     "moveNewTabPin": "start",
-    "moveNewTabParent": "default",
+    "moveNewTabParent": "none",
     "moveNewTabParentActPanel": false,
     "moveNewTab": "after",
     "moveNewTabActivePin": "start",
@@ -138,7 +138,7 @@
     "pinnedAutoGroup": false,
     "pinnedNoUnload": true,
     "pinnedForcedDiscard": false,
-    "tabsTree": true,
+    "tabsTree": false,
     "groupOnOpen": true,
     "tabsTreeLimit": 1,
     "autoFoldTabs": false,
@@ -280,11 +280,7 @@
         "moveRules": [
           { "id": "vnh4ZXGwa0w6", "active": false },
           { "id": "C2JdUvNX5Xde", "active": false, "topLvlOnly": false },
-          {
-            "id": "ejaBQ2xdm33I",
-            "active": true,
-            "containerId": "firefox-default"
-          },
+          { "id": "ejaBQ2xdm33I", "active": false },
           {
             "id": "cZ5yVpbLU43I",
             "active": true,
@@ -310,12 +306,7 @@
         "newTabCtx": "firefox-container-2",
         "dropTabCtx": "firefox-container-2",
         "moveRules": [
-          {
-            "id": "FktH_hzu7uw6",
-            "active": true,
-            "containerId": "firefox-container-6",
-            "topLvlOnly": false
-          },
+          { "id": "FktH_hzu7uw6", "active": false, "topLvlOnly": false },
           {
             "id": "WddhcKr1BD4I",
             "active": true,
@@ -342,12 +333,7 @@
         "newTabCtx": "firefox-container-3",
         "dropTabCtx": "firefox-container-3",
         "moveRules": [
-          {
-            "id": "5_9uz_c5DIx6",
-            "active": true,
-            "containerId": "firefox-container-7",
-            "topLvlOnly": false
-          },
+          { "id": "5_9uz_c5DIx6", "active": false, "topLvlOnly": false },
           {
             "id": "VeQ6lRRmNX4I",
             "active": true,
@@ -373,12 +359,7 @@
         "newTabCtx": "firefox-container-4",
         "dropTabCtx": "firefox-container-4",
         "moveRules": [
-          {
-            "id": "FMcREEo1GQ0I",
-            "active": true,
-            "containerId": "firefox-container-8",
-            "topLvlOnly": false
-          },
+          { "id": "FMcREEo1GQ0I", "active": false, "topLvlOnly": false },
           {
             "id": "P7xhT9qLOf5I",
             "active": true,
@@ -565,6 +546,7 @@
     "prev_panel": "Alt+Comma",
     "new_tab_on_panel": "Ctrl+Space",
     "new_tab_in_group": "Ctrl+Shift+Space",
+    "rm_tabs_other_in_panel": "Ctrl+Alt+W",
     "up": "Alt+Up",
     "down": "Alt+Down",
     "up_shift": "Alt+Shift+Up",
