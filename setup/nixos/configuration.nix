@@ -7,7 +7,7 @@
 {
   imports =
     [
-      ./hardware-qemu.nix
+      ./hardware-desktop.nix
     ];
 
   # Bootloader.
@@ -24,9 +24,9 @@
 
 xdg.portal = {
   enable = true;
-  extraPortals = [
-      pkgs.xdg-desktop-portal-gtk
-    ];
+  #extraPortals = [
+  #    pkgs.xdg-desktop-portal-gtk
+  #  ];
 };
 
   networking.hostName = "nixos"; # Define your hostname.
