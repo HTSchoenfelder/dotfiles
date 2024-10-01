@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
 
-echo "Label partitions with \"nixos\" and  \"boot\".
+if [ "$#" -eq 1 ]; then
+    label=$1
+else
+    # Prompt user to type label
+    read -p "Enter the label: " label
+fi
 
+echo "Label: $label"
+read -p "(Press Enter to continue)" enter
+echo
 lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT
+echo
 
 # List all partitions and store them in an array
 partitions=($(lsblk -lnpo NAME,TYPE | grep part | awk '{print $1}'))
@@ -20,7 +29,7 @@ for i in "${!partitions[@]}"; do
 done
 
 # Prompt user to choose a partition
-read -p "Enter the number of the partition you want to label 'nixos': " partition_number
+read -p "Enter the number of the partition you want to label $label: " partition_number
 
 # Check if the input is a valid number
 if ! [[ "$partition_number" =~ ^[0-9]+$ ]] || [ "$partition_number" -lt 1 ] || [ "$partition_number" -gt "${#partitions[@]}" ]; then
@@ -36,9 +45,6 @@ echo "Selected partition: $selected_partition"
 
 # Get the file system type of the selected partition
 fs_type=$(lsblk -lno FSTYPE "$selected_partition")
-
-# Prompt user to type label
-read -p "Enter the label: " label
 
 # Label the partition according to its file system
 case $fs_type in
@@ -67,5 +73,4 @@ case $fs_type in
 esac
 
 # Confirm label change
-echo "The label of partition $selected_partition has been successfully set to"
-
+echo "The label of partition $selected_partition has been successfully set to $label"
