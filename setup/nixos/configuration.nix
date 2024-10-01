@@ -90,9 +90,7 @@
     isNormalUser = true;
     description = "Henrik";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-       vscode
-       synology-drive-client
+    packages = with pkgs; [       
     ];
   };
 
@@ -106,7 +104,10 @@
   };
 
   # Install firefox.
-  programs.firefox.enable = true;
+  programs.firefox = {
+    enable = true;
+    nativeMessagingHosts.packages = [ pkgs.firefoxpwa ];
+  };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -118,28 +119,65 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    vim
-    wget
     git
-    curl
-    stow
-    fzf
-    direnv
-    zoxide
-    starship
+    docker
+    go
+    terraform
     kubectl
-    colorls
-    kitty
-    keepassxc
-    zsh-fast-syntax-highlighting
-    zsh-autosuggestions
-    gparted
-    waybar
+    helm
+    lazygit
+    azure-cli
+    starship
+    direnv
+    neovim
+    fzf
+    curl
+    bat
+    ripgrep
+    jq
+    tldr
+    tmux
     zellij
-    tofi
+    zoxide
+    htop
+    btop
+    nano
+    stow
+    keepassxc
+    neofetch
+    obsidian
+    nautilus
+    wget
+    grim
+    slurp
+    udiskie
+    smartmontools
+    dnsmasq
+    wirelesstools
+    cifs-utils
+    waybar
     dunst
+    kitty
     hyprpaper
+    wl-clipboard
+    yazi
+    wtype
+    wireplumber
+    pavucontrol
+    qpwgraph
+    desktop-file-utils
+    font-manager
+    firefoxpwa
+    vscode
+    synology-drive-client
+    gparted
     nerdfonts
+    teams-for-linux
+    colorls
+    tofi
+    clips
+    spotify
+    wlogout
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
