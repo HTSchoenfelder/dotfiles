@@ -189,6 +189,8 @@ xdg.portal = {
     clips
     spotify
     wlogout
+    usbutils
+    playerctl
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
