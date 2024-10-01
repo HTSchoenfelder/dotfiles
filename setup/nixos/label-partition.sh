@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+echo "Label partitions with \"nixos\" and  \"boot\".
+
+lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT
+
 # List all partitions and store them in an array
 partitions=($(lsblk -lnpo NAME,TYPE | grep part | awk '{print $1}'))
 
@@ -31,27 +35,30 @@ selected_partition="${partitions[$((partition_number-1))]}"
 echo "Selected partition: $selected_partition"
 
 # Get the file system type of the selected partition
-fs_type=$(blkid -s TYPE -o value "$selected_partition")
+fs_type=$(lsblk -lno FSTYPE "$selected_partition")
+
+# Prompt user to type label
+read -p "Enter the label: " label
 
 # Label the partition according to its file system
 case $fs_type in
   ext[2-4])
-    sudo e2label "$selected_partition" nixos
+    sudo e2label "$selected_partition" $label
     ;;
   btrfs)
-    sudo btrfs filesystem label "$selected_partition" nixos
+    sudo btrfs filesystem label "$selected_partition" $label
     ;;
   xfs)
-    sudo xfs_admin -L nixos "$selected_partition"
+    sudo xfs_admin -L $label "$selected_partition"
     ;;
   vfat)
-    sudo fatlabel "$selected_partition" nixos
+    sudo fatlabel "$selected_partition" $label
     ;;
   ntfs)
-    sudo ntfslabel "$selected_partition" nixos
+    sudo ntfslabel "$selected_partition" $label
     ;;
   exfat)
-    sudo exfatlabel "$selected_partition" nixos
+    sudo exfatlabel "$selected_partition" $label
     ;;
   *)
     echo "Unknown or unsupported file system: $fs_type"
@@ -60,4 +67,5 @@ case $fs_type in
 esac
 
 # Confirm label change
-echo "The label of partition $selected_partition has been successfully set to 'nixos'."
+echo "The label of partition $selected_partition has been successfully set to"
+
