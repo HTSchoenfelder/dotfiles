@@ -26,3 +26,5 @@ nix --extra-experimental-features 'nix-command flakes' flake show
 echo "Applying nixos configuration..."
 read -p "(Press Enter to continue)" enter
 sudo NIXOS_EXTRA_EXPERIMENTAL_FEATURES="nix-command flakes" nixos-rebuild switch --flake .
+
+mkdir $HOME/screenshots/

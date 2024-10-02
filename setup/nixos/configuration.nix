@@ -128,6 +128,9 @@ xdg.portal = {
   
   environment.shells = [ pkgs.zsh ];
 
+  security.polkit.enable = true;
+  services.udisks2.enable = true;
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
