@@ -4,7 +4,15 @@
   imports =
     [
       ./hardware-desktop.nix
+      inputs.home-manager.nixosModules.home-manager
     ];
+
+  home-manager = {
+    extraSpecialArgs = { inherit inputs; };
+    users = {
+      henrik = import ./home.nix;
+    };
+  };
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -101,7 +109,7 @@ xdg.portal = {
   users.users.henrik = {
     isNormalUser = true;
     description = "Henrik";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" ];    
     packages = with pkgs; [       
     ];
   };
@@ -134,6 +142,7 @@ xdg.portal = {
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    home-manager
     git
     docker
     go
