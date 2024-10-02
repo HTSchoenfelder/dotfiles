@@ -28,9 +28,9 @@
 
 xdg.portal = {
   enable = true;
-  #extraPortals = [
-  #    pkgs.xdg-desktop-portal-gtk
-  #  ];
+  extraPortals = [
+     pkgs.xdg-desktop-portal-gtk
+   ];
 };
 
   networking.hostName = "nixos"; # Define your hostname.
@@ -201,6 +201,7 @@ xdg.portal = {
     usbutils
     playerctl
     mlocate
+    libsForQt5.qt5ct
   ];
 
   fonts.packages = with pkgs; [
