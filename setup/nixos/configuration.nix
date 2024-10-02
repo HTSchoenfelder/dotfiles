@@ -193,6 +193,7 @@ xdg.portal = {
     playerctl
     mlocate
     libsForQt5.qt5ct
+    catppuccin-cursors.mochaMauve
   ];
 
   fonts.packages = with pkgs; [
