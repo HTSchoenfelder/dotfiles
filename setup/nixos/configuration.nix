@@ -10,7 +10,12 @@
   home-manager = {
     extraSpecialArgs = { inherit inputs; };
     users = {
-      henrik = import ./home.nix;
+      henrik = {
+         imports = [ 
+          ./home.nix
+          inputs.catppuccin.homeManagerModules.catppuccin
+         ];
+      };        
     };
   };
 
