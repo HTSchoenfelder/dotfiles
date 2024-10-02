@@ -64,14 +64,24 @@ xdg.portal = {
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
-  # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
-
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
     variant = "altgr-intl";
+  };
+
+  # Enable the GNOME Desktop Environment.
+  # services.xserver.displayManager.gdm.enable = true;
+  # services.xserver.desktopManager.gnome.enable = true;
+
+ services.greetd = {
+    enable = true;
+    settings = {
+      default_session = {
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
+        user = "henrik";
+      };
+    };
   };
 
   # Enable CUPS to print documents.
@@ -181,8 +191,7 @@ xdg.portal = {
     firefoxpwa
     vscode
     synology-drive-client
-    gparted
-    nerdfonts
+    gparted    
     teams-for-linux
     colorls
     tofi
@@ -193,6 +202,13 @@ xdg.portal = {
     playerctl
     mlocate
   ];
+
+  fonts.packages = with pkgs; [
+  noto-fonts
+  noto-fonts-cjk
+  noto-fonts-emoji
+  nerdfonts
+];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
