@@ -5,7 +5,6 @@
     [
       ./hardware-desktop.nix
       inputs.home-manager.nixosModules.home-manager
-      inputs.catppuccin.nixosModules.catppuccin
     ];
 
   home-manager = {
@@ -14,7 +13,6 @@
       henrik = {
          imports = [ 
           ./home.nix
-          inputs.catppuccin.homeManagerModules.catppuccin
          ];
       };        
     };

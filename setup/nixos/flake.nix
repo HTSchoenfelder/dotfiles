@@ -6,7 +6,6 @@
     # upgrade.
     nixpkgs.url = "git+https://github.com/NixOS/nixpkgs?ref=nixos-unstable";
     hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
-    catppuccin.url = "github:catppuccin/nix";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
