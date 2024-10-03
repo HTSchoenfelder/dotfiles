@@ -89,6 +89,12 @@ xdg.portal = {
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
+  services.printing.drivers = with pkgs; [ hplip gutenprint foo2zjs ];
+  hardware.sane.enable = true;
+  services.avahi = {
+    enable = true;
+    nssmdns = true;
+  };
 
   # Enable sound with pipewire.
   hardware.pulseaudio.enable = false;
@@ -210,6 +216,9 @@ xdg.portal = {
     mlocate
     libsForQt5.qt5ct
     catppuccin-cursors.mochaMauve
+    libreoffice
+    simple-scan
+    system-config-printer
   ];
 
   fonts.packages = with pkgs; [
