@@ -14,8 +14,7 @@ $HOME/dotfiles/setup/nixos/label-partition.sh "boot"
 $HOME/dotfiles/setup/nixos/label-partition.sh "nixos"
 
 ### Check if git is available
-if ! command -v git &> /dev/null
-then
+if ! command -v git &>/dev/null; then
     echo "Git is not available."
     exit 1
 fi

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 if [ "$#" -eq 1 ]; then
-    label=$1
+  label=$1
 else
-    # Prompt user to type label
-    read -p "Enter the label: " label
+  # Prompt user to type label
+  read -p "Enter the label: " label
 fi
 
 echo "Label: $label"
@@ -25,7 +25,7 @@ fi
 # Display partitions with numbers
 echo "Available partitions:"
 for i in "${!partitions[@]}"; do
-  echo "$((i+1)). ${partitions[i]}"
+  echo "$((i + 1)). ${partitions[i]}"
 done
 
 # Prompt user to choose a partition
@@ -38,7 +38,7 @@ if ! [[ "$partition_number" =~ ^[0-9]+$ ]] || [ "$partition_number" -lt 1 ] || [
 fi
 
 # Get the selected partition
-selected_partition="${partitions[$((partition_number-1))]}"
+selected_partition="${partitions[$((partition_number - 1))]}"
 
 # Display selected partition
 echo "Selected partition: $selected_partition"
@@ -48,28 +48,28 @@ fs_type=$(lsblk -lno FSTYPE "$selected_partition")
 
 # Label the partition according to its file system
 case $fs_type in
-  ext[2-4])
-    sudo e2label "$selected_partition" $label
-    ;;
-  btrfs)
-    sudo btrfs filesystem label "$selected_partition" $label
-    ;;
-  xfs)
-    sudo xfs_admin -L $label "$selected_partition"
-    ;;
-  vfat)
-    sudo fatlabel "$selected_partition" $label
-    ;;
-  ntfs)
-    sudo ntfslabel "$selected_partition" $label
-    ;;
-  exfat)
-    sudo exfatlabel "$selected_partition" $label
-    ;;
-  *)
-    echo "Unknown or unsupported file system: $fs_type"
-    exit 1
-    ;;
+ext[2-4])
+  sudo e2label "$selected_partition" $label
+  ;;
+btrfs)
+  sudo btrfs filesystem label "$selected_partition" $label
+  ;;
+xfs)
+  sudo xfs_admin -L $label "$selected_partition"
+  ;;
+vfat)
+  sudo fatlabel "$selected_partition" $label
+  ;;
+ntfs)
+  sudo ntfslabel "$selected_partition" $label
+  ;;
+exfat)
+  sudo exfatlabel "$selected_partition" $label
+  ;;
+*)
+  echo "Unknown or unsupported file system: $fs_type"
+  exit 1
+  ;;
 esac
 
 # Confirm label change

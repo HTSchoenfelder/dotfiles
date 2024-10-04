@@ -2,20 +2,11 @@
 
 {
   imports =
-    [
-      ./hardware-desktop.nix
-      inputs.home-manager.nixosModules.home-manager
-    ];
+    [ ./hardware-desktop.nix inputs.home-manager.nixosModules.home-manager ];
 
   home-manager = {
     extraSpecialArgs = { inherit inputs; };
-    users = {
-      henrik = {
-         imports = [ 
-          ./home.nix
-         ];
-      };        
-    };
+    users = { henrik = { imports = [ ./home.nix ]; }; };
   };
 
   # Bootloader.
@@ -25,16 +16,16 @@
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
-    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;    
-};
+    package =
+      inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    portalPackage =
+      inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+  };
 
-xdg.portal = {
-  enable = true;
-  extraPortals = [
-     pkgs.xdg-desktop-portal-gtk
-   ];
-};
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  };
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -77,7 +68,7 @@ xdg.portal = {
   # services.xserver.displayManager.gdm.enable = true;
   # services.xserver.desktopManager.gnome.enable = true;
 
- services.greetd = {
+  services.greetd = {
     enable = true;
     settings = {
       default_session = {
@@ -119,9 +110,8 @@ xdg.portal = {
   users.users.henrik = {
     isNormalUser = true;
     description = "Henrik";
-    extraGroups = [ "networkmanager" "wheel" ];    
-    packages = with pkgs; [       
-    ];
+    extraGroups = [ "networkmanager" "wheel" ];
+    packages = with pkgs; [ ];
   };
 
   users.defaultUserShell = pkgs.zsh;
@@ -141,9 +131,9 @@ xdg.portal = {
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-  
+
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  
+
   environment.shells = [ pkgs.zsh ];
 
   security.polkit.enable = true;
@@ -204,7 +194,7 @@ xdg.portal = {
     firefoxpwa
     vscode
     synology-drive-client
-    gparted    
+    gparted
     teams-for-linux
     colorls
     tofi
@@ -224,14 +214,18 @@ xdg.portal = {
     nodejs
     gcc
     clang
+    dotnet-sdk
+    nixfmt
   ];
 
   fonts.packages = with pkgs; [
-  noto-fonts
-  noto-fonts-cjk
-  noto-fonts-emoji
-  nerdfonts
-];
+    noto-fonts
+    noto-fonts-cjk
+    noto-fonts-emoji
+    nerdfonts
+  ];
+
+  environment.sessionVariables = { DOTNET_ROOT = "${pkgs.dotnet-sdk}"; };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
