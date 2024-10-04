@@ -219,6 +219,11 @@ xdg.portal = {
     libreoffice
     simple-scan
     system-config-printer
+    azure-cli
+    terraform
+    nodejs
+    gcc
+    clang
   ];
 
   fonts.packages = with pkgs; [

@@ -28,3 +28,6 @@ read -p "(Press Enter to continue)" enter
 sudo NIXOS_EXTRA_EXPERIMENTAL_FEATURES="nix-command flakes" nixos-rebuild switch --flake .
 
 mkdir $HOME/screenshots/
+mkdir -p ~/projects/dev
+mkdir -p ~/projects/temp
+mkdir -p ~/projects/work

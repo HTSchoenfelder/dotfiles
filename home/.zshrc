@@ -4,14 +4,14 @@ alias k='kubectl'
 alias dotnet-install='curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin'
 # use without arguments to install latest sdk and runtime
 # dotnet-install --runtime dotnet --channel 7.0
-
 alias dps='docker ps --format "table {{printf \"%.20s\" .Names}}\t{{.Image}}\t{{.Command}}\t{{.ID}}\t{{printf \"%.15s\" .Status}}"'
-
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='colorls -aog'
 alias x='exec zsh'
 alias lsdev='lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT'
+alias cd="z"
+alias cdc="cd"
 
 alias code='code --profile Default --enable-features=WebRTCPipeWireCapturer --ozone-platform-hint=wayland'
 alias proj='cd ~/projects'
