@@ -28,11 +28,7 @@
     ],
     "hyprland/workspaces": {
         "disable-scroll": true,
-        "format": "{name} {icon}",
-        "format-icons": {
-            "active": " ",
-            "default": " "
-        }
+        "format": " {name}  "   
     },
     "hyprland/window": {
         "format": "{}"

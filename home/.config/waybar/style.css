@@ -4,7 +4,7 @@
     border: none;
     border-radius: 0;
     font-family: "Agave Nerd Font";
-    font-weight: bold;
+    font-weight: normal;
     font-size: 18px;
     min-height: 0;
 }
@@ -17,7 +17,7 @@ window#waybar {
 tooltip {
     background: #1e1e2e;
     opacity: 0.8;
-    border-radius: 10px;
+    border-radius: 5px;
     border-width: 2px;
     border-style: solid;
     border-color: #11111b;
@@ -40,19 +40,19 @@ tooltip label{
 #workspaces button.focused {
     color: #a6adc8;
     background: #eba0ac;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 
 #workspaces button.urgent {
     color: #11111b;
     background: #a6e3a1;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 
 #workspaces button:hover {
     background: #11111b;
     color: #cdd6f4;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 
 #window,
@@ -73,7 +73,7 @@ tooltip label{
     padding: 0px 10px;
     margin: 3px 0px;
     border: 0px;
-    border-radius: 10px;
+    border-radius: 5px;
     margin-right: 10px;
     margin-left: 10px;
 }
@@ -81,14 +81,14 @@ tooltip label{
 /* only left */
 #cpu,
 #pulseaudio{
-    border-radius: 10px 0px 0px 10px;
+    border-radius: 5px 0px 0px 5px;
     margin-right: 0px;
 }
 
 /* only right */
 #disk,
 #pulseaudio.microphone{
-    border-radius: 0px 10px 10px 0px;
+    border-radius: 0px 5px 5px 0px;
     margin-left: 0px;
     margin-right: 10px;
 }

@@ -67,6 +67,7 @@
   # Enable the GNOME Desktop Environment.
   # services.xserver.displayManager.gdm.enable = true;
   # services.xserver.desktopManager.gnome.enable = true;
+  services.gnome.gnome-keyring.enable = true;
 
   services.greetd = {
     enable = true;
@@ -84,7 +85,7 @@
   hardware.sane.enable = true;
   services.avahi = {
     enable = true;
-    nssmdns = true;
+    nssmdns4 = true;
   };
 
   # Enable sound with pipewire.
@@ -215,7 +216,9 @@
     gcc
     clang
     dotnet-sdk
-    nixfmt
+    nixfmt-rfc-style
+    seahorse
+    google-chrome
   ];
 
   fonts.packages = with pkgs; [
@@ -223,9 +226,11 @@
     noto-fonts-cjk
     noto-fonts-emoji
     nerdfonts
+    font-awesome
   ];
 
-  environment.sessionVariables = { DOTNET_ROOT = "${pkgs.dotnet-sdk}"; };
+  environment.sessionVariables = { DOTNET_ROOT = "${pkgs.dotnet-sdk}"; NIXOS_OZONE_WL = "1"; };
+
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
