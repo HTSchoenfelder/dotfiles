@@ -7,7 +7,7 @@ if [[ ! -f "$file" ]]; then
   exit 1
 fi
 
-chosen=$(awk -F'|' '{print $0}' "$file" | tofi --prompt-text "Snippet:")
+chosen=$(awk -F'|' '{print $0}' "$file" | tofi --prompt-text "paste: ")
 
 if [[ -z "$chosen" ]]; then
   exit 0
@@ -15,4 +15,5 @@ fi
 
 snippet=$(awk -F'|' -v output="$chosen" '$0 ~ output {print $1}' "$file")
 
-wtype -d 50 "$snippet"
+wl-copy "$snippet"
+wtype "$snippet"

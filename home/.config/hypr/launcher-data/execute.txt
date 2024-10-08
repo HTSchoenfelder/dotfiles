@@ -1,2 +1,2 @@
-pkill -SIGUSR2 waybar | Restart Waybar
-wlogout | wlogout
+pkill -SIGUSR2 waybar|restart waybar
+wlogout|wlogout
