@@ -15,4 +15,5 @@ if [ -z "$window" ]; then
     exit 1
 fi
 
-hyprctl dispatch focuswindow "$window"
+# hyprctl dispatch focuswindow "$window"
+$HOME/.config/hypr/scripts/focus-code-window.sh "$window"

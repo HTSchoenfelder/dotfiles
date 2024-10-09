@@ -21,4 +21,8 @@ chosen=$( \
 window="title:${chosen}"
 echo "window:${window}"
 
-hyprctl dispatch focuswindow "$window"
+if [ -z "${title}" ]; then
+  hyprctl dispatch focuswindow "$window"
+else
+  $HOME/.config/hypr/scripts/focus-code-window.sh "$window"
+fi
