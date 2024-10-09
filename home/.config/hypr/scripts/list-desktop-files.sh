@@ -4,8 +4,7 @@ DESKTOP_DIRS=("$HOME/.local/share/applications" "/usr/share/applications" "/run/
 
 for dir in "${DESKTOP_DIRS[@]}"; do
   if [ -d "$dir" ]; then
-    for desktop_file in "$dir"/*.desktop; do
-      echo "$desktop_file"
-    done
+    #  echo $dir
+     ls $dir | grep .desktop
   fi
 done
