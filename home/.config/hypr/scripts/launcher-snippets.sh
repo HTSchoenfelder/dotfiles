@@ -15,5 +15,4 @@ fi
 
 snippet=$(awk -F'|' -v output="$chosen" '$0 ~ output {print $1}' "$file")
 
-wl-copy "$snippet"
 wtype "$snippet"

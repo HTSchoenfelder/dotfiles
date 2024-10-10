@@ -6,5 +6,7 @@ chosen=$(cat $HOME/.config/hypr/launcher-data/emoji.txt | tofi --prompt-text "se
 # Exit if none chosen.
 [ -z "$chosen" ] && exit
 
+echo $chosen
 # Type the chosen emoji.
-wtype -d 50 $chosen
+wtype $chosen
+
