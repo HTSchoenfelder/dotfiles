@@ -1,2 +1,4 @@
 pkill -SIGUSR2 waybar|restart waybar
 wlogout|wlogout
+remmina|rdp
+obs|obs

@@ -19,6 +19,11 @@ alias proj='cd ~/projects'
 alias aza='az account show --output tsv --query "name"'
 alias azas='az account set --subscription'
 
+alias nixb='sudo nixos-rebuild switch --flake $HOME/dotfiles/setup/nixos'
+alias nixbv='sudo nixos-rebuild switch --flake $HOME/dotfiles/setup/nixos --show-trace --print-build-logs --verbose'
+alias nixsh='nix-shell --command zsh -p'
+alias nixrepl='nix repl -f flake:nixpkgs'
+
 mc() {
     mkdir -p $@ && cd ${@:$#}
 }
@@ -90,7 +95,6 @@ bindkey "^[[3~" delete-char
 bindkey "^[[1;5C" forward-word
 bindkey "^[[1;5D" backward-word
 
-if [[ -z "$ZELLIJ" && "$TERM" == "xterm-kitty" ]]; then
-  zellij
+if [[ "$TERM" == "xterm-kitty" ]]; then
+  eval "$(zellij setup --generate-auto-start zsh)"
 fi
-

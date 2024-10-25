@@ -1,4 +1,4 @@
-{ inputs, config, pkgs, ... }:
+{ inputs, config, pkgs, lib, ... }:
 
 {
   imports =
@@ -65,8 +65,10 @@
   };
 
   # Enable the GNOME Desktop Environment.
-  # services.xserver.displayManager.gdm.enable = true;
-  # services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.displayManager.gdm.wayland = false;
+  services.xserver.displayManager.startx.enable = true;
   services.gnome.gnome-keyring.enable = true;
 
   services.greetd = {
@@ -140,12 +142,42 @@
   security.polkit.enable = true;
   services.udisks2.enable = true;
 
+  services.flatpak.enable = true;
+
+  systemd.services.flatpak-repo = {
+    wantedBy = [ "multi-user.target" ];
+    path = [ pkgs.flatpak ];
+    script = ''
+      flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    '';
+  };
+  
+  # https://nixos-and-flakes.thiscute.world/best-practices/nix-path-and-flake-registry#custom-nix-path-and-flake-registry-1
+  # make `nix run nixpkgs#nixpkgs` use the same nixpkgs as the one used by this flake.
+  nix.registry.nixpkgs.flake = inputs.nixpkgs;
+  nix.channel.enable = false; # remove nix-channel related tools & configs, we use flakes instead.
+
+  # but NIX_PATH is still used by many useful tools, so we set it to the same value as the one used by this flake.
+  # Make `nix repl '<nixpkgs>'` use the same nixpkgs as the one used by this flake.
+  environment.etc."nix/inputs/nixpkgs".source = "${inputs.nixpkgs}";
+  # https://github.com/NixOS/nix/issues/9574
+  nix.settings.nix-path = lib.mkForce "nixpkgs=/etc/nix/inputs/nixpkgs";
+
+  programs.obs-studio = {
+    enable = true;
+    enableVirtualCamera = true;
+  };
+
+  virtualisation.docker = {
+    enable = true;
+    enableOnBoot = true;
+  };
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     home-manager
     git
-    docker
     go
     terraform
     kubectl
@@ -173,8 +205,6 @@
     obsidian
     nautilus
     wget
-    grim
-    slurp
     udiskie
     smartmontools
     dnsmasq
@@ -196,7 +226,6 @@
     vscode
     synology-drive-client
     gparted
-    teams-for-linux
     colorls
     tofi
     clipse
@@ -215,10 +244,22 @@
     nodejs
     gcc
     clang
-    dotnet-sdk
+    dotnet-sdk_8
     nixfmt-rfc-style
     seahorse
     google-chrome
+    nomacs
+    gthumb
+    geeqie
+    synergy
+    wev
+    tree
+    hyprshot
+    libnotify
+    hyprlock
+    hypridle
+    brightnessctl
+    remmina
   ];
 
   fonts.packages = with pkgs; [
