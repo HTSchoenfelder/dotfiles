@@ -181,9 +181,8 @@
     go
     terraform
     kubectl
-    helm
+    kubernetes-helm
     lazygit
-    azure-cli
     starship
     direnv
     neovim
@@ -239,7 +238,6 @@
     libreoffice
     simple-scan
     system-config-printer
-    azure-cli
     terraform
     nodejs
     gcc
@@ -264,7 +262,7 @@
 
   fonts.packages = with pkgs; [
     noto-fonts
-    noto-fonts-cjk
+    noto-fonts-cjk-sans
     noto-fonts-emoji
     nerdfonts
     font-awesome
