@@ -7,8 +7,8 @@ else
     exit 1
 fi
 
-class="code-url-handler"
-addresses=$(hyprctl clients -j | jq -r ".[] | select(.class | test(\"$class\")) | .address")
+class="code"
+addresses=$(hyprctl clients -j | jq -r ".[] | select(.class | test(\"$class\")) | select(.workspace.id == 2 or .workspace.id == 11) | .address")
 [[ "$NOTIFY" == "true" ]] && hyprctl notify -1 3000 "rgb(ff1ea3)" "Found Windows: $addresses"
 if [ -z "$addresses" ]
 then

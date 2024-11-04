@@ -214,7 +214,7 @@
     kitty
     hyprpaper
     wl-clipboard
-    yazi
+    # yazi
     wtype
     wireplumber
     pavucontrol
@@ -227,6 +227,7 @@
     gparted
     colorls
     tofi
+    wofi
     clipse
     spotify
     wlogout
@@ -258,6 +259,7 @@
     hypridle
     brightnessctl
     remmina
+    azure-cli
   ];
 
   fonts.packages = with pkgs; [

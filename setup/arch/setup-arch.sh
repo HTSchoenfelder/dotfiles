@@ -99,7 +99,7 @@ yes | LANG=C yay -Sy --needed --noconfirm --answerdiff None --answerclean None -
     ruby-colorls \
     google-chrome \
     nvm \
-    tofi \
+    wofi \
     zsh-fast-syntax-highlighting \
     synology-drive \
     clipse \

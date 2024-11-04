@@ -7,7 +7,7 @@ if [[ ! -f "$file" ]]; then
   exit 1
 fi
 
-chosen=$(awk -F'|' '{print $2}' "$file" | tofi --prompt-text "execute: ")
+chosen=$(awk -F'|' '{print $2}' "$file" | wofi --show dmenu --insensitive --prompt "execute")
 
 if [[ -z "$chosen" ]]; then
   exit 0

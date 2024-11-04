@@ -7,7 +7,7 @@ else
     exit 1
 fi
 
-chosen=$(hyprctl clients -j | jq -r '.[].title' | tofi)
+chosen=$(hyprctl clients -j | jq -r '.[].title' | wofi --show dmenu --insensitive --prompt "set shortcut")
 
 [ -z "$chosen" ] && exit
 

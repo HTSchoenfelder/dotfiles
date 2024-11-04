@@ -7,7 +7,7 @@ if [[ ! -f "$file" ]]; then
   exit 1
 fi
 
-chosen=$(awk -F'|' '{print $0}' "$file" | tofi --prompt-text "paste: ")
+chosen=$(awk -F'|' '{print $0}' "$file" | wofi --show dmenu --insensitive --prompt "paste")
 
 if [[ -z "$chosen" ]]; then
   exit 0
