@@ -19,9 +19,9 @@ alias proj='cd ~/projects'
 alias aza='az account show --output tsv --query "name"'
 alias azas='az account set --subscription'
 
-alias nixb='sudo nixos-rebuild switch --flake $HOME/dotfiles/setup/nixos'
-alias nixbv='sudo nixos-rebuild switch --flake $HOME/dotfiles/setup/nixos --show-trace --print-build-logs --verbose'
-alias nixsh='nix-shell --command zsh -p'
+alias nixbuild='sudo nixos-rebuild switch --flake $HOME/dotfiles/setup/nixos'
+alias nixbuildv='sudo nixos-rebuild switch --flake $HOME/dotfiles/setup/nixos --show-trace --print-build-logs --verbose'
+alias nixupdate='nix flake update --flake $HOME/dotfiles/setup/nixos'
 alias nixrepl='nix repl -f flake:nixpkgs'
 
 mc() {
@@ -46,7 +46,7 @@ export PATH=~/.local/bin:$PATH
 export PATH=$PATH:/usr/local/go/bin
 export PATH=$PATH:/home/henrik/.dapr/bin
 
-export DOTNET_ROOT=/home/henrik/.dotnet
+# export DOTNET_ROOT=/home/henrik/.dotnet
 
 fpath=(~/.docker/completions $fpath)
 

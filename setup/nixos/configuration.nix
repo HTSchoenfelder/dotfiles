@@ -235,6 +235,7 @@
     playerctl
     mlocate
     libsForQt5.qt5ct
+    libsForQt5.qt5.qtwayland
     catppuccin-cursors.mochaMauve
     libreoffice
     simple-scan
@@ -260,6 +261,9 @@
     brightnessctl
     remmina
     azure-cli
+    icu76
+    nix-tree
+    ansible
   ];
 
   fonts.packages = with pkgs; [
@@ -270,8 +274,14 @@
     font-awesome
   ];
 
-  environment.sessionVariables = { DOTNET_ROOT = "${pkgs.dotnet-sdk}"; NIXOS_OZONE_WL = "1"; };
+  environment.sessionVariables = { DOTNET_ROOT = "${pkgs.dotnet-sdk_8}"; NIXOS_OZONE_WL = "1"; };
 
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [
+      icu76
+    ];
+  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
