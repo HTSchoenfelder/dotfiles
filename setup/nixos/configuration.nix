@@ -1,5 +1,4 @@
 { inputs, config, pkgs, lib, ... }:
-
 {
   imports =
     [ ./hardware-desktop.nix inputs.home-manager.nixosModules.home-manager ];
@@ -214,7 +213,7 @@
     kitty
     hyprpaper
     wl-clipboard
-    # yazi
+    yazi
     wtype
     wireplumber
     pavucontrol

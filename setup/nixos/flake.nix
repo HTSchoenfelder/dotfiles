@@ -1,10 +1,7 @@
-# /etc/nixos/flake.nix
 {
   inputs = {
-    # NOTE: Replace "nixos-23.11" with that which is in system.stateVersion of
-    # configuration.nix. You can also use latter versions if you wish to
-    # upgrade.
     nixpkgs.url = "git+https://github.com/NixOS/nixpkgs?ref=nixos-unstable";
+    nixpkgs-stable.url = "git+https://github.com/NixOS/nixpkgs?ref=nixos-24.05";
     hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
     home-manager = {
       url = "github:nix-community/home-manager";
