@@ -55,7 +55,7 @@
   };
 
   # Enable the X11 windowing system.
-  # services.xserver.enable = true;
+  services.xserver.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -246,7 +246,7 @@
     dotnet-sdk_8
     nixfmt-rfc-style
     seahorse
-    #google-chrome
+    google-chrome
     nomacs
     gthumb
     geeqie
@@ -269,7 +269,7 @@
     noto-fonts
     noto-fonts-cjk-sans
     noto-fonts-emoji
-    #nerdfonts
+    nerdfonts
     font-awesome
   ];
 
