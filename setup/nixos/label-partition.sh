@@ -8,7 +8,6 @@ else
 fi
 
 echo "Label: $label"
-read -p "(Press Enter to continue)" enter
 echo
 lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT
 echo
