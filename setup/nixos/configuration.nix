@@ -1,4 +1,10 @@
 { inputs, config, pkgs, lib, ... }:
+let
+  stablePkgs = import inputs.nixpkgs-stable {
+    system = pkgs.system;
+    config = { allowUnfree = true; };
+  };
+in
 {
   imports =
     [ ./hardware-desktop.nix inputs.home-manager.nixosModules.home-manager ];
@@ -222,13 +228,13 @@
     font-manager
     firefoxpwa
     vscode
-    synology-drive-client
+    stablePkgs.synology-drive-client
     gparted
     colorls
     tofi
     wofi
     clipse
-    spotify
+    stablePkgs.spotify
     wlogout
     usbutils
     playerctl
