@@ -5,14 +5,21 @@
   ...
 }:
 let
-  stablePkgs = import inputs.nixpkgs-stable {
-    system = pkgs.system;
-    config = {
-      allowUnfree = true;
-    };
-  };
+  userName = "henrik";
+  userDescription = "Henrik";
 in
 {
+  users.users."${userName}" = {
+    isNormalUser = true;
+    description = userDescription;
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "docker"
+    ];
+    packages = with pkgs; [ ];
+  };
+
   home-manager = {
     extraSpecialArgs = {
       inherit inputs;
@@ -24,7 +31,6 @@ in
     };
   };
 
-  # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
@@ -76,8 +82,8 @@ in
     };
 
     desktopManager.gnome.enable = true;
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
+    # Enable touchpad support (enabled default in most desktopManager).
+    # services.xserver.libinput.enable = true;
   };
 
   services.gnome.gnome-keyring.enable = true;
@@ -116,18 +122,6 @@ in
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-  };
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.henrik = {
-    isNormalUser = true;
-    description = "Henrik";
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-      "docker"
-    ];
-    packages = with pkgs; [ ];
   };
 
   users.defaultUserShell = pkgs.zsh;

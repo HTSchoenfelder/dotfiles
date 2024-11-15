@@ -8,20 +8,34 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
+
   outputs =
-    { self, nixpkgs, ... }@inputs:
     {
-      # NOTE: 'nixos' is the default hostname set by the installer
+      self,
+      nixpkgs,
+      nixpkgs-stable,
+      home-manager,
+      ...
+    }@inputs:
+    let
+      stablePkgs = import nixpkgs-stable {
+        system = "x86_64-linux";
+        config = {
+          allowUnfree = true;
+        };
+      };
+    in
+    {
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         specialArgs = {
-          inherit inputs;
-        }; # this is the important part
+          inherit inputs stablePkgs;
+        };
         system = "x86_64-linux";
         modules = [
           ./configuration.nix
           ./hardware-desktop.nix
           ./packages.nix
-          inputs.home-manager.nixosModules.home-manager
+          home-manager.nixosModules.home-manager
         ];
       };
     };
