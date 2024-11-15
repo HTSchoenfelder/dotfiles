@@ -8,12 +8,21 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = { self, nixpkgs, ... }@inputs: {
-    # NOTE: 'nixos' is the default hostname set by the installer
-    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-      specialArgs = { inherit inputs; }; # this is the important part
-      system = "x86_64-linux";
-      modules = [ ./configuration.nix ];
+  outputs =
+    { self, nixpkgs, ... }@inputs:
+    {
+      # NOTE: 'nixos' is the default hostname set by the installer
+      nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          inherit inputs;
+        }; # this is the important part
+        system = "x86_64-linux";
+        modules = [
+          ./configuration.nix
+          ./hardware-desktop.nix
+          ./packages.nix
+          inputs.home-manager.nixosModules.home-manager
+        ];
+      };
     };
-  };
 }

@@ -1,17 +1,27 @@
-{ inputs, config, pkgs, lib, ... }:
+{
+  inputs,
+  pkgs,
+  lib,
+  ...
+}:
 let
   stablePkgs = import inputs.nixpkgs-stable {
     system = pkgs.system;
-    config = { allowUnfree = true; };
+    config = {
+      allowUnfree = true;
+    };
   };
 in
 {
-  imports =
-    [ ./hardware-desktop.nix inputs.home-manager.nixosModules.home-manager ];
-
   home-manager = {
-    extraSpecialArgs = { inherit inputs; };
-    users = { henrik = { imports = [ ./home.nix ]; }; };
+    extraSpecialArgs = {
+      inherit inputs;
+    };
+    users = {
+      henrik = {
+        imports = [ ./home.nix ];
+      };
+    };
   };
 
   # Bootloader.
@@ -21,8 +31,7 @@ in
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
-    package =
-      inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
     portalPackage =
       inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
   };
@@ -32,22 +41,13 @@ in
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
 
-  networking.hostName = "nixos"; # Define your hostname.
+  networking.networkmanager.enable = true;
+  networking.hostName = "nixos";
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
-  networking.networkmanager.enable = true;
-
-  # Set your time zone.
   time.timeZone = "Europe/Berlin";
 
-  # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
-
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "de_DE.UTF-8";
     LC_IDENTIFICATION = "de_DE.UTF-8";
@@ -60,20 +60,26 @@ in
     LC_TIME = "de_DE.UTF-8";
   };
 
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
+  services.xserver = {
+    enable = true;
+    xkb = {
+      layout = "us";
+      variant = "altgr-intl";
+    };
 
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "altgr-intl";
+    displayManager = {
+      gdm = {
+        enable = true;
+        wayland = false;
+      };
+      startx.enable = true;
+    };
+
+    desktopManager.gnome.enable = true;
+  # Enable touchpad support (enabled default in most desktopManager).
+  # services.xserver.libinput.enable = true;
   };
 
-  # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
-  services.xserver.displayManager.gdm.wayland = false;
-  services.xserver.displayManager.startx.enable = true;
   services.gnome.gnome-keyring.enable = true;
 
   services.greetd = {
@@ -87,8 +93,15 @@ in
   };
 
   # Enable CUPS to print documents.
-  services.printing.enable = true;
-  services.printing.drivers = with pkgs; [ hplip gutenprint foo2zjs ];
+  services.printing = {
+    enable = true;
+    drivers = with pkgs; [
+      hplip
+      gutenprint
+      foo2zjs
+    ];
+  };
+
   hardware.sane.enable = true;
   services.avahi = {
     enable = true;
@@ -103,22 +116,17 @@ in
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
   };
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.henrik = {
     isNormalUser = true;
     description = "Henrik";
-    extraGroups = [ "networkmanager" "wheel" "docker"];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "docker"
+    ];
     packages = with pkgs; [ ];
   };
 
@@ -131,16 +139,17 @@ in
     syntaxHighlighting.enable = true;
   };
 
-  # Install firefox.
   programs.firefox = {
     enable = true;
     nativeMessagingHosts.packages = [ pkgs.firefoxpwa ];
   };
 
-  # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   environment.shells = [ pkgs.zsh ];
 
@@ -156,7 +165,7 @@ in
       flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     '';
   };
-  
+
   # https://nixos-and-flakes.thiscute.world/best-practices/nix-path-and-flake-registry#custom-nix-path-and-flake-registry-1
   # make `nix run nixpkgs#nixpkgs` use the same nixpkgs as the one used by this flake.
   nix.registry.nixpkgs.flake = inputs.nixpkgs;
@@ -178,108 +187,10 @@ in
     enableOnBoot = true;
   };
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    home-manager
-    git
-    go
-    terraform
-    kubectl
-    kubernetes-helm
-    lazygit
-    starship
-    direnv
-    neovim
-    fzf
-    curl
-    bat
-    ripgrep
-    jq
-    tldr
-    tmux
-    zellij
-    zoxide
-    htop
-    btop
-    nano
-    stow
-    keepassxc
-    neofetch
-    obsidian
-    nautilus
-    wget
-    udiskie
-    smartmontools
-    dnsmasq
-    wirelesstools
-    cifs-utils
-    waybar
-    dunst
-    kitty
-    hyprpaper
-    wl-clipboard
-    yazi
-    wtype
-    wireplumber
-    pavucontrol
-    qpwgraph
-    desktop-file-utils
-    font-manager
-    firefoxpwa
-    vscode
-    stablePkgs.synology-drive-client
-    gparted
-    colorls
-    tofi
-    wofi
-    clipse
-    stablePkgs.spotify
-    wlogout
-    usbutils
-    playerctl
-    mlocate
-    libsForQt5.qt5ct
-    libsForQt5.qt5.qtwayland
-    catppuccin-cursors.mochaMauve
-    libreoffice
-    simple-scan
-    system-config-printer
-    terraform
-    nodejs
-    gcc
-    clang
-    dotnet-sdk_8
-    nixfmt-rfc-style
-    seahorse
-    google-chrome
-    nomacs
-    gthumb
-    geeqie
-    synergy
-    wev
-    tree
-    hyprshot
-    libnotify
-    hyprlock
-    hypridle
-    brightnessctl
-    remmina
-    azure-cli
-    icu76
-    nix-tree
-    ansible
-  ];
-
-  fonts.packages = with pkgs; [
-    noto-fonts
-    noto-fonts-cjk-sans
-    noto-fonts-emoji
-    nerdfonts
-    font-awesome
-  ];
-
-  environment.sessionVariables = { DOTNET_ROOT = "${pkgs.dotnet-sdk_8}"; NIXOS_OZONE_WL = "1"; };
+  environment.sessionVariables = {
+    DOTNET_ROOT = "${pkgs.dotnet-sdk_8}";
+    NIXOS_OZONE_WL = "1";
+  };
 
   programs.nix-ld = {
     enable = true;
@@ -301,17 +212,9 @@ in
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
 
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  networking.firewall.allowedTCPPorts = [ ];
+  networking.firewall.allowedUDPPorts = [ ];
+  networking.firewall.enable = true;
 
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "24.05"; # Did you read the comment?
+  system.stateVersion = "24.05";
 }
