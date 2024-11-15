@@ -16,6 +16,7 @@ in
       "networkmanager"
       "wheel"
       "docker"
+      "libvirtd"
     ];
     packages = with pkgs; [ ];
   };
@@ -25,7 +26,7 @@ in
       inherit inputs;
     };
     users = {
-      henrik = {
+      "${userName}" = {
         imports = [ ./home.nix ];
       };
     };
@@ -93,7 +94,7 @@ in
     settings = {
       default_session = {
         command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
-        user = "henrik";
+        user = "${userName}";
       };
     };
   };
@@ -170,6 +171,10 @@ in
   environment.etc."nix/inputs/nixpkgs".source = "${inputs.nixpkgs}";
   # https://github.com/NixOS/nix/issues/9574
   nix.settings.nix-path = lib.mkForce "nixpkgs=/etc/nix/inputs/nixpkgs";
+  systemd.tmpfiles.rules = [
+    "r /root/.nix-defexpr/channels"
+    "r /nix/var/nix/profiles/per-user/root/channels"
+  ];
 
   programs.obs-studio = {
     enable = true;
@@ -180,6 +185,9 @@ in
     enable = true;
     enableOnBoot = true;
   };
+
+  virtualisation.libvirtd.enable = true;
+  programs.virt-manager.enable = true;
 
   environment.sessionVariables = {
     DOTNET_ROOT = "${pkgs.dotnet-sdk_8}";
