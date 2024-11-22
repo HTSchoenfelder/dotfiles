@@ -14,6 +14,9 @@
     lazygit
     starship
     direnv
+    envsubst
+    kustomize
+    just
     neovim
     fzf
     curl
@@ -73,7 +76,7 @@
     nodejs
     gcc
     clang
-    dotnet-sdk_8
+    dotnetCorePackages.sdk_9_0
     nixfmt-rfc-style
     seahorse
     google-chrome

@@ -190,7 +190,7 @@ in
   programs.virt-manager.enable = true;
 
   environment.sessionVariables = {
-    DOTNET_ROOT = "${pkgs.dotnet-sdk_8}";
+    DOTNET_ROOT = "${pkgs.dotnetCorePackages.sdk_9_0}";
     NIXOS_OZONE_WL = "1";
   };
 

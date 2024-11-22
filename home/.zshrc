@@ -12,6 +12,7 @@ alias x='exec zsh'
 alias lsdev='lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT'
 alias cd="z"
 alias cdc="cd"
+alias c="wl-copy"
 
 alias code='code --profile Default --enable-features=WebRTCPipeWireCapturer --ozone-platform-hint=wayland'
 alias proj='cd ~/projects'
@@ -23,6 +24,10 @@ alias nixbuild='sudo nixos-rebuild switch --flake $HOME/dotfiles/setup/nixos'
 alias nixbuildv='sudo nixos-rebuild switch --flake $HOME/dotfiles/setup/nixos --show-trace --print-build-logs --verbose'
 alias nixupdate='nix flake update --flake $HOME/dotfiles/setup/nixos'
 alias nixrepl='nix repl -f flake:nixpkgs'
+
+alias nclisten='echo "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\nHello World" | nc -l -N 8080'
+alias pythonweb='python3 -m http.server 8080'
+alias ncsw='nc towel.blinkenlights.nl 23'
 
 mc() {
     mkdir -p $@ && cd ${@:$#}

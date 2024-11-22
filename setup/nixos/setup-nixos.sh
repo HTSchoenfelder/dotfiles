@@ -30,3 +30,5 @@ mkdir $HOME/screenshots/
 mkdir -p ~/projects/dev
 mkdir -p ~/projects/temp
 mkdir -p ~/projects/work
+
+bat cache --build
