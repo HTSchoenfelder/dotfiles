@@ -96,6 +96,9 @@
     icu76
     nix-tree
     ansible
+    traceroute
+    hey
+    openssl
   ];
 
   fonts.packages = with pkgs; [
