@@ -13,6 +13,7 @@ alias lsdev='lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT'
 alias cd="z"
 alias cdc="cd"
 alias c="wl-copy"
+alias tfarm="export ARM_SUBSCRIPTION_ID=$(az account show | jq -r .id)"
 
 alias code='code --profile Default --enable-features=WebRTCPipeWireCapturer --ozone-platform-hint=wayland'
 alias proj='cd ~/projects'
@@ -28,6 +29,8 @@ alias nixrepl='nix repl -f flake:nixpkgs'
 alias nclisten='echo "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\nHello World" | nc -l -N 8080'
 alias pythonweb='python3 -m http.server 8080'
 alias ncsw='nc towel.blinkenlights.nl 23'
+
+alias gitlc='export LATEST_COMMIT=$(git rev-parse HEAD)'
 
 mc() {
     mkdir -p $@ && cd ${@:$#}

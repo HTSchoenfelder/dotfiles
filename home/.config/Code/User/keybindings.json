@@ -1,0 +1,117 @@
+[
+    {
+        "command": "editor.action.scrollLeftHover",
+        "key": "h",
+        "when": "editorHoverFocused"
+    },
+    {
+        "command": "editor.action.scrollDownHover",
+        "key": "j",
+        "when": "editorHoverFocused"
+    },
+    {
+        "command": "editor.action.scrollUpHover",
+        "key": "k",
+        "when": "editorHoverFocused"
+    },
+    {
+        "command": "editor.action.scrollRightHover",
+        "key": "l",
+        "when": "editorHoverFocused"
+    },
+    {
+        "command": "explorer.newFile",
+        "key": "n",
+        "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+    },
+    {
+        "command": "explorer.newFolder",
+        "key": "f",
+        "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+    },
+    {
+        "command": "renameFile",
+        "key": "r",
+        "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+    },
+    {
+        "command": "filesExplorer.cut",
+        "key": "x",
+        "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+    },
+    {
+        "command": "filesExplorer.copy",
+        "key": "y",
+        "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus"
+    },
+    {
+        "command": "filesExplorer.paste",
+        "key": "p",
+        "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceReadonly && !inputFocus"
+    },
+    {
+        "command": "saveAll",
+        "key": "ctrl+s"
+    },
+    {
+        "command": "-workbench.action.files.save",
+        "key": "ctrl+s"
+    },
+    {
+        "command": "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup",
+        "key": "ctrl+,",
+        "when": "!activeEditorGroupEmpty"
+    },
+    {
+        "command": "workbench.action.quickOpenNavigateNextInEditorPicker",
+        "key": "ctrl+,",
+        "when": "inEditorsPicker && inQuickOpen"
+    },
+    {
+        "command": "workbench.action.quickOpenLeastRecentlyUsedEditorInGroup",
+        "key": "ctrl+shift+,",
+        "when": "!activeEditorGroupEmpty"
+    },
+    {
+        "command": "workbench.action.quickOpenNavigatePreviousInEditorPicker",
+        "key": "ctrl+shift+,",
+        "when": "inEditorsPicker && inQuickOpen"
+    },
+    {
+        "command": "-workbench.action.openSettings",
+        "key": "ctrl+,"
+    },
+    {
+        "command": "workbench.action.focusActiveEditorGroup",
+        "key": "ctrl+e"
+    },
+    {
+        "command": "workbench.action.terminal.toggleTerminal",
+        "key": "ctrl+j",
+        "when": "terminal.active"
+    },
+    {
+        "command": "-workbench.action.terminal.toggleTerminal",
+        "key": "ctrl+`",
+        "when": "terminal.active"
+    },
+    {
+        "command": "-extension.vim_ctrl+j",
+        "key": "ctrl+j",
+        "when": "editorTextFocus && vim.active && vim.use<C-j> && !inDebugRepl"
+    },
+    {
+        "command": "workbench.action.terminal.new",
+        "key": "ctrl+shift+j",
+        "when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
+    },
+    {
+        "command": "-workbench.action.terminal.new",
+        "key": "ctrl+shift+`",
+        "when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
+    },
+    {
+        "command": "workbench.action.toggleMaximizedPanel",
+        "key": "ctrl+'"
+    }
+]
