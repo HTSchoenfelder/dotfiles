@@ -93,6 +93,7 @@
     "505cca53-5750-4134-9501-8d52d5df3cd1/a7d0e7dd-951a-476a-a7e3-2a20a5754e96"
   ],
   "azureFunctions.showProjectWarning": false,
+  "azureTerraform.terminal": "integrated",
   "bicep.enableSurveys": false,
   "commands.commands": {
     "editor.action.findReferences_500": {
@@ -152,6 +153,9 @@
   "gitTreeCompare.showCheckboxes": false,
   "github.copilot.advanced": {},
   "github.copilot.editor.enableAutoCompletions": true,
+  "github.copilot.enable": {
+    "markdown": true
+  },
   "gitlens.codeLens.enabled": false,
   "gitlens.currentLine.enabled": false,
   "gitlens.hovers.currentLine.over": "line",

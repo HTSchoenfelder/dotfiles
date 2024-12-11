@@ -5,6 +5,7 @@ alias dotnet-install='curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev
 # use without arguments to install latest sdk and runtime
 # dotnet-install --runtime dotnet --channel 7.0
 alias dps='docker ps --format "table {{printf \"%.20s\" .Names}}\t{{.Image}}\t{{.Command}}\t{{.ID}}\t{{printf \"%.15s\" .Status}}"'
+alias dv='curl --unix-socket /var/run/docker.sock http://localhost/version | jq'
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='colorls -aog'
