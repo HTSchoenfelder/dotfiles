@@ -105,7 +105,9 @@
     noto-fonts
     noto-fonts-cjk-sans
     noto-fonts-emoji
-    nerdfonts
+    nerd-fonts._0xproto
+    nerd-fonts.agave
     font-awesome
   ];
+
 }
