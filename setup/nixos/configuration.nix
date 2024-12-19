@@ -130,6 +130,7 @@ in
     pulse.enable = true;
   };
 
+  environment.shells = [ pkgs.zsh ];
   users.defaultUserShell = pkgs.zsh;
 
   programs.zsh = {
@@ -150,8 +151,6 @@ in
     "nix-command"
     "flakes"
   ];
-
-  environment.shells = [ pkgs.zsh ];
 
   security.polkit.enable = true;
   services.udisks2.enable = true;
@@ -213,8 +212,6 @@ in
     enable = true;
     enableSSHSupport = false;
   };
-
-  # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;

@@ -468,6 +468,19 @@
     }
   ],
   "vim.smartRelativeLine": true,
+  "vim.statusBarColorControl": true,
+  "vim.statusBarColors.insert": [
+    "#f38ba8",
+    "#000000"
+  ],
+  "vim.statusBarColors.normal": [
+    "#11111B",
+    "#ffffff"
+  ],
+  "vim.statusBarColors.visual": [
+    "#fab387",
+    "#000000"
+  ],
   "vim.visualModeKeyBindings": [
     {
       "before": [
@@ -555,6 +568,11 @@
   "window.menuBarVisibility": "toggle",
   "window.title": "${rootPath} | Code",
   "workbench.colorCustomizations": {
+    "statusBar.background": "#11111B",
+    "statusBar.debuggingBackground": "#11111B",
+    "statusBar.debuggingForeground": "#ffffff",
+    "statusBar.foreground": "#ffffff",
+    "statusBar.noFolderBackground": "#11111B",
     "tab.activeBorderTop": "#ffc400"
   },
   "workbench.colorTheme": "Catppuccin Mocha",

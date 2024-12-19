@@ -99,6 +99,7 @@
     traceroute
     hey
     openssl
+    hyprpicker
   ];
 
   fonts.packages = with pkgs; [

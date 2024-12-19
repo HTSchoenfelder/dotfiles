@@ -14,7 +14,6 @@ alias lsdev='lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT'
 alias cd="z"
 alias cdc="cd"
 alias c="wl-copy"
-alias tfarm="export ARM_SUBSCRIPTION_ID=$(az account show | jq -r .id)"
 
 alias code='code --profile Default --enable-features=WebRTCPipeWireCapturer --ozone-platform-hint=wayland'
 alias proj='cd ~/projects'
@@ -47,6 +46,11 @@ function lg() {
     echo -e "Group-ID Groupname"
     echo "---------------------------"
     getent group | awk -F':' '{ printf "%-8s %s\n", $3, $1 }' | sort -n -k 1
+}
+
+tfarm() {
+  export ARM_SUBSCRIPTION_ID=$(az account show | jq -r .id)
+  echo "ARM_SUBSCRIPTION_ID set to: $ARM_SUBSCRIPTION_ID"
 }
 
 export PATH=~/.dotnet:$PATH
