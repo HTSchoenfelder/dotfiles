@@ -20,13 +20,13 @@
       ...
     }@inputs:
     let
-      stablePkgs = import nixpkgs-stable {
+      pkgsStable = import nixpkgs-stable {
         system = "x86_64-linux";
         config = {
           allowUnfree = true;
         };
       };
-      latestPkgs = import nixpkgs-latest {
+      pkgsLatest = import nixpkgs-latest {
         system = "x86_64-linux";
         config = {
           allowUnfree = true;
@@ -36,7 +36,7 @@
     {
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         specialArgs = {
-          inherit inputs stablePkgs latestPkgs;
+          inherit inputs pkgsStable pkgsLatest;
         };
         system = "x86_64-linux";
         modules = [

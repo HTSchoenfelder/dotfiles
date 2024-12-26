@@ -1,14 +1,15 @@
 {
   pkgs,
-  stablePkgs,
-  latestPkgs,
+  pkgsStable,
+  pkgsLatest,
   ...
 }:
 {
   environment.systemPackages = with pkgs; [
-    latestPkgs.vscode
-    stablePkgs.synology-drive-client
-    stablePkgs.spotify
+    pkgsLatest.vscode
+    pkgsStable.synology-drive-client
+    pkgsStable.spotify
+    pkgsStable.hyprpaper
     home-manager
     git
     go
@@ -48,7 +49,6 @@
     waybar
     dunst
     kitty
-    hyprpaper
     wl-clipboard
     yazi
     wtype
