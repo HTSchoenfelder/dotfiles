@@ -1,10 +1,14 @@
 {
   pkgs,
   stablePkgs,
+  latestPkgs,
   ...
 }:
 {
   environment.systemPackages = with pkgs; [
+    latestPkgs.vscode
+    stablePkgs.synology-drive-client
+    stablePkgs.spotify
     home-manager
     git
     go
@@ -54,14 +58,11 @@
     desktop-file-utils
     font-manager
     firefoxpwa
-    vscode
-    stablePkgs.synology-drive-client
     gparted
     colorls
     tofi
     wofi
     clipse
-    stablePkgs.spotify
     wlogout
     usbutils
     playerctl
@@ -100,6 +101,7 @@
     hey
     openssl
     hyprpicker
+    k9s
   ];
 
   fonts.packages = with pkgs; [
