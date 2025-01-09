@@ -1,14 +1,16 @@
 alias cl='clear'
 alias d='docker'
+alias dps='docker ps --format "table {{printf \"%.20s\" .Names}}\t{{.Image}}\t{{.Command}}\t{{.ID}}\t{{printf \"%.15s\" .Status}}"'
+alias dv='curl --unix-socket /var/run/docker.sock http://localhost/version | jq'
 alias k='kubectl'
+alias kns='kubectl config set-context --current --namespace='
 alias dotnet-install='curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin'
 # use without arguments to install latest sdk and runtime
 # dotnet-install --runtime dotnet --channel 7.0
-alias dps='docker ps --format "table {{printf \"%.20s\" .Names}}\t{{.Image}}\t{{.Command}}\t{{.ID}}\t{{printf \"%.15s\" .Status}}"'
-alias dv='curl --unix-socket /var/run/docker.sock http://localhost/version | jq'
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='colorls -aog'
+alias ls='eza --icons --group-directories-first'
+alias ll='eza -algF --icons --group-directories-first'
+alias l='eza -alF --no-user --icons --group-directories-first'
+
 alias x='exec zsh'
 alias lsdev='lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT'
 alias cd="z"
@@ -25,6 +27,9 @@ alias nixbuild='sudo nixos-rebuild switch --flake $HOME/dotfiles/setup/nixos'
 alias nixbuildv='sudo nixos-rebuild switch --flake $HOME/dotfiles/setup/nixos --show-trace --print-build-logs --verbose'
 alias nixupdate='nix flake update --flake $HOME/dotfiles/setup/nixos'
 alias nixrepl='nix repl -f flake:nixpkgs'
+nixsh() {
+    nix shell $(printf "nixpkgs#%s " "$@")
+}
 
 alias nclisten='echo "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\nHello World" | nc -l -N 8080'
 alias pythonweb='python3 -m http.server 8080'

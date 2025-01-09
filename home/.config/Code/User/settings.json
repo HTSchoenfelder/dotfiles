@@ -603,5 +603,17 @@
   "workbench.editor.showTabs": "single",
   "workbench.iconTheme": "catppuccin-mocha",
   "workbench.startupEditor": "none",
-  "workbench.tree.enableStickyScroll": false
+  "workbench.tree.enableStickyScroll": false,
+  "azureResourceGroups.selectedSubscriptions": [
+    "be4e3f5e-4841-426f-96f3-e2dbe0b106b1/638e83f3-f008-4039-a5fa-b8bce9a9df54"
+  ],
+  "azureResourceGroups.groupBy": "resourceGroup",
+  "vs-kubernetes": {
+    "vs-kubernetes.knownKubeconfigs": [
+      "/home/henrik/.kube/config.k3s"
+    ],
+    "vs-kubernetes.kubeconfig": "/home/henrik/.kube/config.k3s"
+  },
+  "dotfiles.installCommand": "stow home --no-folding",
+  "dotfiles.repository": "https://github.com/htschoenfelder/dotfiles.git"
 }

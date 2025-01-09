@@ -133,5 +133,29 @@
         "command": "-editor.action.moveLinesUpAction",
         "key": "alt+up",
         "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "command": "workbench.action.terminal.focusNext",
+        "key": "ctrl+numpad4",
+        "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
+    },
+    {
+        "command": "-workbench.action.terminal.focusNext",
+        "key": "ctrl+pagedown",
+        "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
+    },
+    {
+        "command": "workbench.action.terminal.focusPrevious",
+        "key": "ctrl+numpad5",
+        "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
+    },
+    {
+        "command": "-workbench.action.terminal.focusPrevious",
+        "key": "ctrl+pageup",
+        "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
+    },
+    {
+        "command": "workbench.action.nextPanelView",
+        "key": "ctrl+numpad6"
     }
 ]

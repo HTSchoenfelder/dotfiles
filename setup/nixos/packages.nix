@@ -59,7 +59,6 @@
     font-manager
     firefoxpwa
     gparted
-    colorls
     tofi
     wofi
     clipse
@@ -102,6 +101,16 @@
     openssl
     hyprpicker
     k9s
+    cmatrix
+    eza
+    nmap
+    tcpdump
+    iperf3
+    kubectx
+    strace
+    fd
+    ripgrep
+    microsoft-edge
   ];
 
   fonts.packages = with pkgs; [
