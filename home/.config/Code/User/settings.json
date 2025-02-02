@@ -615,5 +615,7 @@
     "vs-kubernetes.kubeconfig": "/home/henrik/.kube/config.k3s"
   },
   "dotfiles.installCommand": "stow home --no-folding",
-  "dotfiles.repository": "https://github.com/htschoenfelder/dotfiles.git"
+  "dotfiles.repository": "https://github.com/htschoenfelder/dotfiles.git",
+  "workbench.panel.showLabels": false,
+  "vim.useSystemClipboard": true
 }

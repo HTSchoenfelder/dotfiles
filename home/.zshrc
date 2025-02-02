@@ -26,6 +26,8 @@ alias azas='az account set --subscription'
 alias nixbuild='sudo nixos-rebuild switch --flake $HOME/dotfiles/setup/nixos'
 alias nixbuildv='sudo nixos-rebuild switch --flake $HOME/dotfiles/setup/nixos --show-trace --print-build-logs --verbose'
 alias nixupdate='nix flake update --flake $HOME/dotfiles/setup/nixos'
+alias nixupdatelatest='nix flake update nixpkgs-latest --flake $HOME/dotfiles/setup/nixos'
+alias nixupdatestable='nix flake update nixpkgs-stable --flake $HOME/dotfiles/setup/nixos'
 alias nixrepl='nix repl -f flake:nixpkgs'
 nixsh() {
     nix shell $(printf "nixpkgs#%s " "$@")
@@ -102,7 +104,7 @@ HISTSIZE=10000
 SAVEHIST=10000
 setopt appendhistory
 
-if ! nix-env --version &> /dev/null; then
+if ! nix --version &> /dev/null; then
   source /usr/share/nvm/init-nvm.sh
   source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
   source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh

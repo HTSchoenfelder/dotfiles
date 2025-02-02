@@ -111,6 +111,10 @@
     fd
     ripgrep
     microsoft-edge
+    linphone
+    audacity
+    usbview
+    v4l-utils
   ];
 
   fonts.packages = with pkgs; [
