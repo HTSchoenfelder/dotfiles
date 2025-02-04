@@ -24,7 +24,7 @@ echo "Git is available, continuing..."
 nix --extra-experimental-features 'nix-command flakes' flake show
 echo "Applying nixos configuration..."
 read -p "(Press Enter to continue)" enter
-sudo nixos-rebuild switch --flake .
+sudo nixos-rebuild switch --flake .#notebook
 
 mkdir $HOME/screenshots/
 mkdir -p ~/projects/dev
