@@ -34,7 +34,7 @@
       };
     in
     {
-      nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.desktop = nixpkgs.lib.nixosSystem {
         specialArgs = {
           inherit inputs pkgsStable pkgsLatest;
         };
@@ -42,6 +42,18 @@
         modules = [
           ./configuration.nix
           ./desktop/hardware.nix
+          ./packages.nix
+          home-manager.nixosModules.home-manager
+        ];
+      };
+      nixosConfigurations.notebook = nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          inherit inputs pkgsStable pkgsLatest;
+        };
+        system = "x86_64-linux";
+        modules = [
+          ./configuration.nix
+          ./notebook/hardware.nix
           ./packages.nix
           home-manager.nixosModules.home-manager
         ];

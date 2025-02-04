@@ -25,18 +25,31 @@ alias proj='cd ~/projects'
 alias aza='az account show --output tsv --query "name"'
 alias azas='az account set --subscription'
 
-alias nixbuild='sudo nixos-rebuild switch --flake $HOME/dotfiles/setup/nixos'
 alias nixbuildv='sudo nixos-rebuild switch --flake $HOME/dotfiles/setup/nixos --show-trace --print-build-logs --verbose'
 alias nixupdate='nix flake update --flake $HOME/dotfiles/setup/nixos'
 alias nixupdatelatest='nix flake update nixpkgs-latest --flake $HOME/dotfiles/setup/nixos'
 alias nixupdatestable='nix flake update nixpkgs-stable --flake $HOME/dotfiles/setup/nixos'
 alias nixrepl='nix repl -f flake:nixpkgs'
+
 nixsh() {
     nix shell $(printf "nixpkgs#%s " "$@")
 }
 
-alias sshcp='echo "source <(wget -qO- sh.gagelpuh.de/sh)" | wl-copy'
+nixbuild() {
+    if [ -z "$1" ]; then
+        echo "Error: No target specified. Usage: nixbuild <target> [-v]" >&2
+        return 1
+    fi
 
+    local flags=()
+    if [ "$2" = "-v" ]; then
+        flags=(--show-trace --print-build-logs --verbose)
+    fi
+
+    sudo nixos-rebuild switch --flake "$HOME/dotfiles/setup/nixos#$1" "${flags[@]}"
+}
+
+alias sshcp='echo "source <(wget -qO- gagelpuh.de/sh)" | wl-copy'
 alias gitlc='export LATEST_COMMIT=$(git rev-parse HEAD)'
 
 
