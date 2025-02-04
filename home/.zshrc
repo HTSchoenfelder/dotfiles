@@ -16,6 +16,7 @@ alias lsdev='lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT'
 alias cd="z"
 alias cdc="cd"
 alias c="wl-copy"
+alias myip="curl -s ifconfig.io | tee >(wl-copy)"
 
 alias code='code --profile Default --enable-features=WebRTCPipeWireCapturer --ozone-platform-hint=wayland'
 alias proj='cd ~/projects'
@@ -39,21 +40,7 @@ alias ncsw='nc towel.blinkenlights.nl 23'
 
 alias gitlc='export LATEST_COMMIT=$(git rev-parse HEAD)'
 
-mc() {
-    mkdir -p $@ && cd ${@:$#}
-}
-
-function lu() {
-    echo -e "User-ID Username"
-    echo "---------------------------"
-    getent passwd | awk -F':' '{ printf "%-8s %s\n", $3, $1 }' | sort -n -k 1
-}
-
-function lg() {
-    echo -e "Group-ID Groupname"
-    echo "---------------------------"
-    getent group | awk -F':' '{ printf "%-8s %s\n", $3, $1 }' | sort -n -k 1
-}
+source $HOME/core.sh
 
 tfarm() {
   export ARM_SUBSCRIPTION_ID=$(az account show | jq -r .id)

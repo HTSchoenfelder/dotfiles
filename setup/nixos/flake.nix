@@ -41,7 +41,7 @@
         system = "x86_64-linux";
         modules = [
           ./configuration.nix
-          ./hardware-desktop.nix
+          ./desktop/hardware.nix
           ./packages.nix
           home-manager.nixosModules.home-manager
         ];
