@@ -1,5 +1,11 @@
 #!/bin/env bash
 
+alias l='ls -alF --color=auto'
+alias cl='clear'
+alias nclisten='echo "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\nHello World" | nc -l -N 8080'
+alias pythonweb='python3 -m http.server 8080'
+alias ncsw='nc towel.blinkenlights.nl 23'
+
 function lu() {
   printf "%-20s %-6s %-6s %-25s %-20s\n" "User" "UID" "GID" "Home" "Shell"
   echo "----------------------------------------------------------------------------------------------"

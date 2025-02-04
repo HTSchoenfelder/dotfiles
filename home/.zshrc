@@ -1,4 +1,5 @@
-alias cl='clear'
+source $HOME/core.sh
+
 alias d='docker'
 alias dps='docker ps --format "table {{printf \"%.20s\" .Names}}\t{{.Image}}\t{{.Command}}\t{{.ID}}\t{{printf \"%.15s\" .Status}}"'
 alias dv='curl --unix-socket /var/run/docker.sock http://localhost/version | jq'
@@ -34,13 +35,10 @@ nixsh() {
     nix shell $(printf "nixpkgs#%s " "$@")
 }
 
-alias nclisten='echo "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\nHello World" | nc -l -N 8080'
-alias pythonweb='python3 -m http.server 8080'
-alias ncsw='nc towel.blinkenlights.nl 23'
+alias sshcp='echo "source <(wget -qO- sh.gagelpuh.de/sh)" | wl-copy'
 
 alias gitlc='export LATEST_COMMIT=$(git rev-parse HEAD)'
 
-source $HOME/core.sh
 
 tfarm() {
   export ARM_SUBSCRIPTION_ID=$(az account show | jq -r .id)
