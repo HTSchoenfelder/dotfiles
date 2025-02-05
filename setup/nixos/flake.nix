@@ -48,7 +48,7 @@
       };
       nixosconfigurations.notebook = nixpkgs.lib.nixossystem {
         specialargs = {
-          inherit inputs pkgsstable pkgslatest;
+          inherit inputs pkgsStable pkgsLatest;
         };
         system = "x86_64-linux";
         modules = [
@@ -60,7 +60,7 @@
       };
       nixosconfigurations.qemu = nixpkgs.lib.nixossystem {
         specialargs = {
-          inherit inputs pkgsstable pkgslatest;
+          inherit inputs pkgsStable pkgsLatest;
         };
         system = "x86_64-linux";
         modules = [
