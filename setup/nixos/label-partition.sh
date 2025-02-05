@@ -5,6 +5,9 @@ if [ "$#" -eq 1 ]; then
 else
   # Prompt user to type label
   read -p "Enter the label: " label
+  if [ -z "$label" ]; then
+    echo "Label cannot be empty."
+    exit 1
 fi
 
 echo "Label: $label"

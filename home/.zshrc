@@ -1,4 +1,4 @@
-source $HOME/core.sh
+source $HOME/.zshrc_core
 
 alias d='docker'
 alias dps='docker ps --format "table {{printf \"%.20s\" .Names}}\t{{.Image}}\t{{.Command}}\t{{.ID}}\t{{printf \"%.15s\" .Status}}"'

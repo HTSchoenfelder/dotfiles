@@ -41,21 +41,33 @@
         system = "x86_64-linux";
         modules = [
           ./configuration.nix
-          ./desktop/hardware.nix
+          ./configurations/desktop/hardware.nix
           ./packages.nix
           home-manager.nixosModules.home-manager
         ];
       };
-      nixosConfigurations.notebook = nixpkgs.lib.nixosSystem {
-        specialArgs = {
-          inherit inputs pkgsStable pkgsLatest;
+      nixosconfigurations.notebook = nixpkgs.lib.nixossystem {
+        specialargs = {
+          inherit inputs pkgsstable pkgslatest;
         };
         system = "x86_64-linux";
         modules = [
           ./configuration.nix
-          ./notebook/hardware.nix
+          ./configurations/notebook/hardware.nix
           ./packages.nix
-          home-manager.nixosModules.home-manager
+          home-manager.nixosmodules.home-manager
+        ];
+      };
+      nixosconfigurations.qemu = nixpkgs.lib.nixossystem {
+        specialargs = {
+          inherit inputs pkgsstable pkgslatest;
+        };
+        system = "x86_64-linux";
+        modules = [
+          ./configuration.nix
+          ./configurations/qemu/hardware.nix
+          ./packages.nix
+          home-manager.nixosmodules.home-manager
         ];
       };
     };
