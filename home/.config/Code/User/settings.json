@@ -617,5 +617,5 @@
   "dotfiles.installCommand": "stow home --no-folding",
   "dotfiles.repository": "https://github.com/htschoenfelder/dotfiles.git",
   "workbench.panel.showLabels": false,
-  "vim.useSystemClipboard": true
+  "vim.useSystemClipboard": false
 }
