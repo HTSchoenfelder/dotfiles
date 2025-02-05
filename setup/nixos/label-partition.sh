@@ -8,6 +8,7 @@ else
   if [ -z "$label" ]; then
     echo "Label cannot be empty."
     exit 1
+  fi
 fi
 
 echo "Label: $label"

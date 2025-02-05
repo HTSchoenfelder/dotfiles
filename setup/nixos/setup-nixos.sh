@@ -28,11 +28,11 @@ echo "Git is available, continuing..."
 
 ### Applying nixos configuration
 nix --extra-experimental-features 'nix-command flakes' flake show
-echo "Applying nixos configuration..."
+echo "Applying nixos configuration $configuration..."
 read -p "(Press Enter to continue)" enter
 sudo nixos-rebuild switch --flake .#$configuration
 
-ln -sf ~/dotfiles/home/.config/hypr/$configuration/monitor.conf ~/.config/hypr/hyprland.monitor.conf
+ln -sf ~/dotfiles/home/.config/hypr/configurations/$configuration/monitor.conf ~/.config/hypr/hyprland.monitor.conf
 
 mkdir $HOME/screenshots/
 mkdir -p ~/projects/dev

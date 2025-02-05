@@ -46,8 +46,8 @@
           home-manager.nixosModules.home-manager
         ];
       };
-      nixosconfigurations.notebook = nixpkgs.lib.nixossystem {
-        specialargs = {
+      nixosConfigurations.notebook = nixpkgs.lib.nixosSystem {
+        specialArgs = {
           inherit inputs pkgsStable pkgsLatest;
         };
         system = "x86_64-linux";
@@ -55,11 +55,11 @@
           ./configuration.nix
           ./configurations/notebook/hardware.nix
           ./packages.nix
-          home-manager.nixosmodules.home-manager
+          home-manager.nixosModules.home-manager
         ];
       };
-      nixosconfigurations.qemu = nixpkgs.lib.nixossystem {
-        specialargs = {
+      nixosConfigurations.qemu = nixpkgs.lib.nixosSystem {
+        specialArgs = {
           inherit inputs pkgsStable pkgsLatest;
         };
         system = "x86_64-linux";
@@ -67,7 +67,7 @@
           ./configuration.nix
           ./configurations/qemu/hardware.nix
           ./packages.nix
-          home-manager.nixosmodules.home-manager
+          home-manager.nixosModules.home-manager
         ];
       };
     };
