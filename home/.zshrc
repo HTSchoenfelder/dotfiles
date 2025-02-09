@@ -63,8 +63,8 @@ export PATH=~/.dotnet/tools:$PATH
 export PATH=~/.local/bin:$PATH
 export PATH=$PATH:/usr/local/go/bin
 export PATH=$PATH:/home/henrik/.dapr/bin
-
 # export DOTNET_ROOT=/home/henrik/.dotnet
+export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
 
 fpath=(~/.docker/completions $fpath)
 
