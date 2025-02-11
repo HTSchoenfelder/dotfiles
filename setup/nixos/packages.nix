@@ -115,6 +115,7 @@
     audacity
     usbview
     v4l-utils
+    networkmanagerapplet
   ];
 
   fonts.packages = with pkgs; [
