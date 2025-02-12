@@ -7,9 +7,10 @@
 {
   environment.systemPackages = with pkgs; [
     pkgsLatest.vscode
-    pkgsStable.synology-drive-client
     pkgsStable.spotify
     pkgsStable.hyprpaper
+    pkgsStable.azure-cli
+    synology-drive-client
     home-manager
     git
     go
@@ -92,7 +93,6 @@
     hypridle
     brightnessctl
     remmina
-    azure-cli
     icu76
     nix-tree
     ansible
