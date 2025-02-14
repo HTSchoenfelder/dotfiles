@@ -47,7 +47,6 @@
     dnsmasq
     wirelesstools
     cifs-utils
-    waybar
     dunst
     kitty
     wl-clipboard
@@ -116,6 +115,10 @@
     usbview
     v4l-utils
     networkmanagerapplet
+    qrencode
+    zbar
+    yubioath-flutter
+    gimp
   ];
 
   fonts.packages = with pkgs; [
@@ -126,5 +129,4 @@
     nerd-fonts.agave
     font-awesome
   ];
-
 }

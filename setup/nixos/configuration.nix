@@ -93,6 +93,7 @@ in
   };
 
   services.gnome.gnome-keyring.enable = true;
+  services.pcscd.enable = true;
 
   services.greetd = {
     enable = true;
@@ -149,6 +150,7 @@ in
     nativeMessagingHosts.packages = [ pkgs.firefoxpwa ];
   };
 
+  programs.waybar.enable = true;
   nixpkgs.config.allowUnfree = true;
 
   nix.settings.experimental-features = [
