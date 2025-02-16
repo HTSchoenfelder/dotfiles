@@ -56,10 +56,8 @@ in
 
   networking.networkmanager.enable = true;
   networking.hostName = "nixos";
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   time.timeZone = "Europe/Berlin";
-
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "de_DE.UTF-8";
@@ -73,41 +71,21 @@ in
     LC_TIME = "de_DE.UTF-8";
   };
 
-  services.xserver = {
-    enable = true;
-    xkb = {
-      layout = "us";
-      variant = "altgr-intl";
-    };
-
-    displayManager = {
-      gdm = {
-        enable = true;
-        wayland = false;
-      };
-      startx.enable = true;
-    };
-
-    desktopManager.gnome.enable = true;
-    # Enable touchpad support (enabled default in most desktopManager).
-    # services.xserver.libinput.enable = true;
-  };
-
   services.gnome.gnome-keyring.enable = true;
   services.pcscd.enable = true;
 
-  services.greetd = {
-    enable = true;
+  # services.greetd = {
+    # enable = true;
     # settings = {
     #   default_session = {
     #     command = "${pkgs.greetd.regreet}/bin/regreet";
     #     user = "${userName}";
     #   };
     # };
-  };
-  programs.regreet.enable = true;
+  # };
+  # programs.regreet.enable = true;
 
-  # Enable CUPS to print documents.
+  # Scanning / Printing (CUPS)
   services.printing = {
     enable = true;
     drivers = with pkgs; [
@@ -116,15 +94,15 @@ in
       foo2zjs
     ];
   };
-
   hardware.sane.enable = true;
   services.avahi = {
     enable = true;
     nssmdns4 = true;
   };
 
-  hardware.bluetooth.enable = true; # enables support for Bluetooth
-  hardware.bluetooth.powerOnBoot = true; # powers up the default Bluetooth controller on boot
+  # Bluetooth
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true;
   services.blueman.enable = true;
 
   # Enable sound with pipewire.
@@ -164,7 +142,6 @@ in
   services.udisks2.enable = true;
 
   services.flatpak.enable = true;
-
   systemd.services.flatpak-repo = {
     wantedBy = [ "multi-user.target" ];
     path = [ pkgs.flatpak ];
@@ -220,9 +197,6 @@ in
     enable = true;
     enableSSHSupport = false;
   };
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
 
   networking.firewall.allowedTCPPorts = [ ];
   networking.firewall.allowedUDPPorts = [ ];
