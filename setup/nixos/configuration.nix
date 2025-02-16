@@ -8,7 +8,8 @@ let
   userName = "henrik";
   userDescription = "Henrik";
   hyprlandPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-  hyprlandPortalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+  hyprlandPortalPackage =
+    inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
 in
 {
   users.users."${userName}" = {
@@ -73,17 +74,6 @@ in
 
   services.gnome.gnome-keyring.enable = true;
   services.pcscd.enable = true;
-
-  # services.greetd = {
-    # enable = true;
-    # settings = {
-    #   default_session = {
-    #     command = "${pkgs.greetd.regreet}/bin/regreet";
-    #     user = "${userName}";
-    #   };
-    # };
-  # };
-  # programs.regreet.enable = true;
 
   # Scanning / Printing (CUPS)
   services.printing = {

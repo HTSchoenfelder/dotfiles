@@ -468,7 +468,7 @@
     }
   ],
   "vim.smartRelativeLine": true,
-  "vim.statusBarColorControl": true,
+  "vim.statusBarColorControl": false,
   "vim.statusBarColors.commandlineinprogress": [
     "#007acc",
     "#ffffff"
