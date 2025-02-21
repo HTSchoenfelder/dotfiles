@@ -24,17 +24,6 @@ in
     packages = with pkgs; [ ];
   };
 
-  home-manager = {
-    extraSpecialArgs = {
-      inherit inputs;
-    };
-    users = {
-      "${userName}" = {
-        imports = [ ./home.nix ];
-      };
-    };
-  };
-
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
