@@ -2,3 +2,4 @@ pkill -SIGUSR2 waybar|restart waybar
 wlogout|wlogout
 remmina|rdp
 obs|obs
+notify-send "Hallo"|notify hallo

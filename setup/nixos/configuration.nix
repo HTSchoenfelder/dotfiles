@@ -75,6 +75,18 @@ in
   services.gnome.gnome-keyring.enable = true;
   services.pcscd.enable = true;
 
+  boot.kernelParams = [ "console=tty1" ];
+  services.greetd = {
+    enable = true;
+    vt = 2;
+    settings = {
+      default_session = {
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --asterisks --cmd Hyprland";
+        user = "${userName}";
+      };
+    };
+  };
+
   # Scanning / Printing (CUPS)
   services.printing = {
     enable = true;
@@ -89,6 +101,8 @@ in
     enable = true;
     nssmdns4 = true;
   };
+
+  services.gvfs.enable = true;
 
   # Bluetooth
   hardware.bluetooth.enable = true;

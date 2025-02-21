@@ -1,16 +1,12 @@
 #! /usr/bin/env bash
 
-nohup google-chrome-stable --force-dark-mode --profile-directory="Default" &> /dev/null &
-disown
+./launch-chrome.sh "Default"
 sleep 1
 
-nohup google-chrome-stable --force-dark-mode --profile-directory="Profile 1" &> /dev/null &
-disown
+./launch-chrome.sh "Profile 1"
 sleep 1
 
-nohup google-chrome-stable --force-dark-mode --profile-directory="Profile 2" &> /dev/null &
-disown
+./launch-chrome.sh "Profile 2"
 sleep 1
 
-nohup google-chrome-stable --force-dark-mode --profile-directory="Profile 3" &> /dev/null &
-disown
+./launch-chrome.sh "Profile 3"

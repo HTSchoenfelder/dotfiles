@@ -119,6 +119,9 @@
     zbar
     yubioath-flutter
     gimp
+    cage
+    lazydocker
+    gnome-text-editor
   ];
 
   fonts.packages = with pkgs; [
