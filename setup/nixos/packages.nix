@@ -122,6 +122,7 @@
     cage
     lazydocker
     gnome-text-editor
+    spotify-player
   ];
 
   fonts.packages = with pkgs; [
