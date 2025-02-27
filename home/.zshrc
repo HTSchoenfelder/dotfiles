@@ -120,6 +120,6 @@ bindkey "^[[3~" delete-char
 bindkey "^[[1;5C" forward-word
 bindkey "^[[1;5D" backward-word
 
-if [[ "$TERM" == "xterm-kitty" ]]; then
+if [[ "$START_ZELLIJ" == 1 ]]; then
   eval "$(zellij setup --generate-auto-start zsh)"
 fi

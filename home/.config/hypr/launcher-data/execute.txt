@@ -1,3 +1,4 @@
+kitty --class kitty_spotify --title Spotify spotify_player|spotify player
 pkill -SIGUSR2 waybar|restart waybar
 wlogout|wlogout
 remmina|rdp
