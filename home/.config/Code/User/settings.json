@@ -617,5 +617,13 @@
   "dotfiles.installCommand": "stow home --no-folding",
   "dotfiles.repository": "https://github.com/htschoenfelder/dotfiles.git",
   "workbench.panel.showLabels": false,
-  "vim.useSystemClipboard": false
+  "vim.useSystemClipboard": false,
+  "workbench.preferredDarkColorTheme": "Catppuccin Mocha",
+  "workbench.preferredLightColorTheme": "Catppuccin Frappé",
+  "workbench.sideBar.location": "right",
+  "catppuccin.customUIColors": {
+    "mocha": {
+      "editor.selectionBackground": "#1e66f5",
+    }
+  }
 }
