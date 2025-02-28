@@ -93,8 +93,18 @@
     "505cca53-5750-4134-9501-8d52d5df3cd1/a7d0e7dd-951a-476a-a7e3-2a20a5754e96"
   ],
   "azureFunctions.showProjectWarning": false,
+  "azureResourceGroups.groupBy": "resourceGroup",
+  "azureResourceGroups.selectedSubscriptions": [
+    "be4e3f5e-4841-426f-96f3-e2dbe0b106b1/638e83f3-f008-4039-a5fa-b8bce9a9df54"
+  ],
   "azureTerraform.terminal": "integrated",
   "bicep.enableSurveys": false,
+  "catppuccin.customUIColors": {
+    "mocha": {
+      "editor.selectionBackground": "#a9dc7660"
+    }
+  },
+  "catppuccin.extraBordersEnabled": true,
   "commands.commands": {
     "editor.action.findReferences_500": {
       "command": "editor.action.findReferences"
@@ -124,6 +134,8 @@
   "docker.images.groupBy": "None",
   "docker.images.label": "FullTag",
   "docker.images.sortBy": "CreatedTime",
+  "dotfiles.installCommand": "stow home --no-folding",
+  "dotfiles.repository": "https://github.com/htschoenfelder/dotfiles.git",
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
   },
@@ -135,6 +147,7 @@
   "editor.lineNumbers": "relative",
   "editor.linkedEditing": true,
   "editor.minimap.enabled": false,
+  "editor.scrollbar.verticalScrollbarSize": 6,
   "editor.stickyScroll.enabled": false,
   "editor.stickyScroll.scrollWithEditor": false,
   "editor.suggest.insertMode": "replace",
@@ -149,8 +162,6 @@
   "git.confirmSync": false,
   "git.enableSmartCommit": true,
   "git.openRepositoryInParentFolders": "always",
-  "gitTreeCompare.diffMode": "full",
-  "gitTreeCompare.showCheckboxes": false,
   "github.copilot.advanced": {},
   "github.copilot.editor.enableAutoCompletions": true,
   "github.copilot.enable": {
@@ -160,6 +171,8 @@
   "gitlens.currentLine.enabled": false,
   "gitlens.hovers.currentLine.over": "line",
   "gitlens.hovers.enabled": false,
+  "gitTreeCompare.diffMode": "full",
+  "gitTreeCompare.showCheckboxes": false,
   "javascript.updateImportsOnFileMove.enabled": "always",
   "launch": {
     "compounds": [],
@@ -175,6 +188,8 @@
   },
   "rest-client.logLevel": "verbose",
   "rest-client.requestNameAsResponseTabTitle": true,
+  "scm.diffDecorations": "gutter",
+  "scm.diffDecorationsGutterWidth": 2,
   "security.workspace.trust.untrustedFiles": "open",
   "settingsSync.keybindingsPerPlatform": false,
   "terminal.integrated.defaultProfile.windows": "PowerShell",
@@ -505,6 +520,7 @@
     "#005f87",
     "#ffffff"
   ],
+  "vim.useSystemClipboard": false,
   "vim.visualModeKeyBindings": [
     {
       "before": [
@@ -589,41 +605,29 @@
     }
   ],
   "vim.visualModeKeyBindingsNonRecursive": [],
-  "window.menuBarVisibility": "toggle",
-  "window.title": "${rootPath} | Code",
-  "workbench.colorCustomizations": {
-    "tab.activeBorderTop": "#ffc400",
-    "statusBar.background": "#11111B",
-    "statusBar.noFolderBackground": "#11111B",
-    "statusBar.debuggingBackground": "#11111B",
-    "statusBar.foreground": "#ffffff",
-    "statusBar.debuggingForeground": "#ffffff"
-  },
-  "workbench.colorTheme": "Catppuccin Mocha",
-  "workbench.editor.showTabs": "single",
-  "workbench.iconTheme": "catppuccin-mocha",
-  "workbench.startupEditor": "none",
-  "workbench.tree.enableStickyScroll": false,
-  "azureResourceGroups.selectedSubscriptions": [
-    "be4e3f5e-4841-426f-96f3-e2dbe0b106b1/638e83f3-f008-4039-a5fa-b8bce9a9df54"
-  ],
-  "azureResourceGroups.groupBy": "resourceGroup",
   "vs-kubernetes": {
     "vs-kubernetes.knownKubeconfigs": [
       "/home/henrik/.kube/config.k3s"
     ],
     "vs-kubernetes.kubeconfig": "/home/henrik/.kube/config.k3s"
   },
-  "dotfiles.installCommand": "stow home --no-folding",
-  "dotfiles.repository": "https://github.com/htschoenfelder/dotfiles.git",
+  "window.menuBarVisibility": "toggle",
+  "window.title": "${rootPath} | Code",
+  "workbench.colorCustomizations": {
+    "statusBar.background": "#11111B",
+    "statusBar.debuggingBackground": "#11111B",
+    "statusBar.debuggingForeground": "#ffffff",
+    "statusBar.foreground": "#ffffff",
+    "statusBar.noFolderBackground": "#11111B",
+    "tab.activeBorderTop": "#ffc400"
+  },
+  "workbench.colorTheme": "Catppuccin Mocha",
+  "workbench.editor.showTabs": "single",
+  "workbench.iconTheme": "catppuccin-mocha",
   "workbench.panel.showLabels": false,
-  "vim.useSystemClipboard": false,
   "workbench.preferredDarkColorTheme": "Catppuccin Mocha",
   "workbench.preferredLightColorTheme": "Catppuccin Frappé",
   "workbench.sideBar.location": "right",
-  "catppuccin.customUIColors": {
-    "mocha": {
-      "editor.selectionBackground": "#1e66f5",
-    }
-  }
+  "workbench.startupEditor": "none",
+  "workbench.tree.enableStickyScroll": false
 }

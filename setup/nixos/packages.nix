@@ -123,6 +123,7 @@
     lazydocker
     gnome-text-editor
     spotify-player
+    gnome-calculator
   ];
 
   fonts.packages = with pkgs; [
