@@ -80,9 +80,7 @@
     nixfmt-rfc-style
     seahorse
     google-chrome
-    nomacs
     gthumb
-    geeqie
     synergy
     wev
     tree
@@ -124,6 +122,20 @@
     gnome-text-editor
     spotify-player
     gnome-calculator
+    arduino-cli
+    arduino-ide
+    arduino-create-agent
+    pdfsam-basic
+    socat
+    python313
+    python313Packages.west
+    python313Packages.pykwalify
+    python313Packages.pykwalify
+    python313Packages.ruamel-yaml
+    python313Packages.pyocd
+    python313Packages.cmsis-pack-manager
+    cmake
+    spice
   ];
 
   fonts.packages = with pkgs; [

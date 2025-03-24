@@ -8,7 +8,7 @@ else
 fi
 
 class="code"
-addresses=$(hyprctl clients -j | jq -r ".[] | select(.class | test(\"$class\")) | select(.workspace.id == 2 or .workspace.id == 11) | .address")
+addresses=$(hyprctl clients -j | jq -r ".[] | select(.class | test(\"$class\")) | select(.workspace.id == 2 or .workspace.name == \"special:code\") | .address")
 [[ "$NOTIFY" == "true" ]] && hyprctl notify -1 3000 "rgb(ff1ea3)" "Found Windows: $addresses"
 if [ -z "$addresses" ]
 then
@@ -18,7 +18,7 @@ fi
 
 for address in $addresses
 do
-    hyprctl dispatch movetoworkspacesilent "11,address:${address}"
+    hyprctl dispatch movetoworkspacesilent "special:code,address:${address}"
 done
 
 hyprctl dispatch movetoworkspace "2,$window"

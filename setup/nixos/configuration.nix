@@ -20,6 +20,7 @@ in
       "wheel"
       "docker"
       "libvirtd"
+      "dialout"
     ];
     packages = with pkgs; [ ];
   };
@@ -168,9 +169,12 @@ in
     enableOnBoot = true;
   };
 
-  virtualisation.libvirtd.enable = true;
-  programs.virt-manager.enable = true;
+  virtualisation = {
+    libvirtd.enable = true;
+    spiceUSBRedirection.enable = true;
+  };
 
+  programs.virt-manager.enable = true;
   environment.sessionVariables = {
     DOTNET_ROOT = "${pkgs.dotnetCorePackages.sdk_9_0}";
     NIXOS_OZONE_WL = "1";

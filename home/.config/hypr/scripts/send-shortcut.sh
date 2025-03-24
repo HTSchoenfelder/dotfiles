@@ -14,6 +14,8 @@ if [ "$ACTIVEWINDOW" == "google-chrome" ]; then
         ["CTRL, m"]="CTRL SHIFT, a"
         ["CTRL, j"]="CTRL SHIFT, TAB"
         ["CTRL, k"]="CTRL, TAB"
+        ["CTRL, h"]="ALT, LEFT"
+        ["CTRL, l"]="ALT, RIGHT"
     )
 
     if [[ -n "${SHORTCUT_MAP[$SHORTCUT]}" ]]; then

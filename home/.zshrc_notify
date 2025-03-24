@@ -1,0 +1,52 @@
+# Load Zsh datetime module for timing
+zmodload zsh/datetime || return
+
+# Function to execute the command normally and send a notification
+n_run_command() {
+    local cmd=$BUFFER  # Get the current command from the buffer
+    BUFFER=""          # Clear the buffer so it doesn’t appear in history
+    print -s -- "$cmd" # Save only the original command in history
+
+    # Ensure command is immediately available in history
+    fc -W # Write history to disk
+    fc -R # Reload history into memory
+
+    # Force prompt redraw to fix missing first-line output issue
+    zle -I
+
+    # Measure execution time
+    local start_time=$EPOCHSECONDS
+
+    # Execute the command normally while preserving stdout & stderr
+    # { eval "$cmd"; } 2>&1              # Ensure errors are printed in the shell
+    eval $cmd
+    local exit_code=$?
+
+    local end_time=$EPOCHSECONDS
+    local duration=$((end_time - start_time))
+
+    # Define notification properties
+    local title="✅ Success"
+    local message="💡 Command: $cmd\n⏳ Duration: ${duration}s"
+    local urgency="normal"
+    local icon="dialog-information"
+
+    if [[ $exit_code -ne 0 ]]; then
+        title="❌ Error ($exit_code)"
+        message="⚠️ Command: $cmd\n⏳ Duration: ${duration}s"
+        urgency="critical"
+        icon="dialog-error"
+    fi
+
+    # Send notification
+    notify-send -u "$urgency" -i "$icon" "$title" "$message"
+
+    # Refresh the shell prompt
+    zle reset-prompt
+}
+
+# Register `n_run_command` as a ZLE widget
+zle -N n_run_command
+
+# Bind CTRL+J to execute commands with notification
+bindkey '^J' n_run_command

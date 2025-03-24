@@ -1,4 +1,5 @@
 source $HOME/.zshrc_core
+source $HOME/.zshrc_notify
 
 alias d='docker'
 alias dps='docker ps --format "table {{printf \"%.20s\" .Names}}\t{{.Image}}\t{{.Command}}\t{{.ID}}\t{{printf \"%.15s\" .Status}}"'
@@ -51,7 +52,7 @@ nixbuild() {
 
 alias sshcp='echo "source <(wget -qO- gagelpuh.de/sh)" | wl-copy'
 alias gitlc='export LATEST_COMMIT=$(git rev-parse HEAD)'
-
+alias hyprevents='socat - UNIX-CONNECT:$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket2.sock'
 
 tfarm() {
   export ARM_SUBSCRIPTION_ID=$(az account show | jq -r .id)
