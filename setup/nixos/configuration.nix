@@ -80,6 +80,9 @@ in
   # Scanning / Printing (CUPS)
   services.printing = {
     enable = true;
+    browsed = {
+      enable = false;
+    };
     drivers = with pkgs; [
       hplip
       gutenprint
@@ -122,6 +125,10 @@ in
   programs.firefox = {
     enable = true;
     nativeMessagingHosts.packages = [ pkgs.firefoxpwa ];
+  };
+
+  programs.file-roller = {
+    enable = true;
   };
 
   programs.waybar.enable = true;

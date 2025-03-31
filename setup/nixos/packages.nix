@@ -136,6 +136,8 @@
     python313Packages.cmsis-pack-manager
     cmake
     spice
+    gnumake
+    vlc
   ];
 
   fonts.packages = with pkgs; [
