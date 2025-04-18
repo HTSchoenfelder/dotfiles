@@ -8,10 +8,9 @@ fi
 SHORTCUT=$1
 ACTIVEWINDOW=$(hyprctl -j activewindow | jq -r '.class')
 NEW_SHORTCUT=$SHORTCUT
-
 if [ "$ACTIVEWINDOW" == "google-chrome" ]; then
     declare -A SHORTCUT_MAP=(
-        ["CTRL, m"]="CTRL SHIFT, a"
+        ["CTRL, p"]="CTRL SHIFT, a"
         ["CTRL, j"]="CTRL SHIFT, TAB"
         ["CTRL, k"]="CTRL, TAB"
         ["CTRL, h"]="ALT, LEFT"
@@ -24,3 +23,4 @@ if [ "$ACTIVEWINDOW" == "google-chrome" ]; then
 fi
 
 hyprctl dispatch sendshortcut "$NEW_SHORTCUT, activewindow"
+# hyprctl notify -1 5000 "rgb(ff1ea3)" "Sending shortcut: $NEW_SHORTCUT"

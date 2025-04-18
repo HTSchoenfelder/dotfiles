@@ -25,8 +25,10 @@ in
     packages = with pkgs; [ ];
   };
 
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader = {
+    systemd-boot.enable = true;    efi.canTouchEfiVariables = true;
+    timeout = 2; 
+  };
 
   programs.hyprland = {
     enable = true;
