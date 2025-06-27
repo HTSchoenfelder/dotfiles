@@ -13,7 +13,6 @@
     configuration = { pkgs, ... }: {
       environment.systemPackages = with pkgs;
         [
-          darwin-rebuild
           kitty
           vim
           git
@@ -62,7 +61,8 @@
   in
   {
     # Build darwin flake using:
-    # $ darwin-rebuild build --flake .#SIT-SMBP-YF0X2F
+    # sudo darwin-rebuild build --flake .#SIT-SMBP-YF0X2F
+    # sudo darwin-rebuild switch --flake .#SIT-SMBP-YF0X2F
     darwinConfigurations."SIT-SMBP-YF0X2F" = nix-darwin.lib.darwinSystem {
       modules = [ configuration ];
       system.defaults.NSGlobalDomain._HIHideMenuBar = true;
