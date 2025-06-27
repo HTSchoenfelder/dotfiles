@@ -1,0 +1,50 @@
+{
+  pkgs,
+  pkgsStable,
+  pkgsLatest,
+  pkgsDarwin
+  ...
+}:
+{
+  environment.systemPackages = with pkgs; [
+          kitty
+          vim
+          git
+          vscode
+          stow
+          stackit-cli
+          utm
+          fzf
+          zoxide
+          direnv
+          starship
+          eza
+          yazi
+          podman
+          podman-desktop
+          kubectl 
+          direnv
+          terraform
+          zellij
+          neovim
+          tmux
+          nodejs
+          bat
+          yabai
+          aerospace
+          keepassxc
+          spotify
+          obsidian
+          gnumake
+          logseq
+  ];
+
+  fonts.packages = with pkgs; [
+    noto-fonts
+    noto-fonts-cjk-sans
+    noto-fonts-emoji
+    nerd-fonts._0xproto
+    nerd-fonts.agave
+    font-awesome
+  ];
+}

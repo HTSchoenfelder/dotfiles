@@ -1,62 +1,38 @@
-# sudo nix run nix-darwin/master#darwin-rebuild -- switch 
 {
-  description = "Example nix-darwin system flake";
-
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs-latest.url = "git+https://github.com/nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs-stable.url = "git+https://github.com/nixos/nixpkgs?ref=nixos-24.11";
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
-
-  outputs = inputs@{ self, nix-darwin, nixpkgs }:
+  outputs = 
+    {
+      self, 
+      nixpkgs,
+      nixpkgs-stable,
+      nixpkgs-latest,
+      nix-darwin, 
+      ...
+    }@inputs:
   let
-    configuration = { pkgs, ... }: {
-      environment.systemPackages = with pkgs;
-        [
-          kitty
-          vim
-          git
-          vscode
-          stow
-          stackit-cli
-          utm
-          fzf
-          zoxide
-          direnv
-          starship
-          eza
-          yazi
-          podman
-          podman-desktop
-          kubectl 
-          direnv
-          terraform
-          zellij
-          neovim
-          tmux
-          nodejs
-          bat
-          yabai
-          aerospace
-          keepassxc
-          spotify
-          obsidian
-          gnumake
-          logseq
-        ];
-
-      nix.settings.experimental-features = "nix-command flakes";
-      nixpkgs.config.allowUnfree = true;
-
-      # Set Git commit hash for darwin-version.
-      system.configurationRevision = self.rev or self.dirtyRev or null;
-
-      # Used for backwards compatibility, please read the changelog before changing.
-      # $ darwin-rebuild changelog
-      system.stateVersion = 6;
-
-      # The platform the configuration will be used on.
-      nixpkgs.hostPlatform = "aarch64-darwin";
+    pkgsStable = import nixpkgs-stable {
+        system = "aarch64-darwin";
+        config = {
+          allowUnfree = true;
+        };
+      };
+    pkgsLatest = import nixpkgs-latest {
+      system = "aarch64-darwin";
+      config = {
+        allowUnfree = true;
+      };
+    };
+      pkgsDarwin = import nix-darwin {
+      system = "aarch64-darwin";
+      config = {
+        allowUnfree = true;
+      };
     };
   in
   {
@@ -64,8 +40,10 @@
     # sudo darwin-rebuild build --flake .#SIT-SMBP-YF0X2F
     # sudo darwin-rebuild switch --flake .#SIT-SMBP-YF0X2F
     darwinConfigurations."SIT-SMBP-YF0X2F" = nix-darwin.lib.darwinSystem {
-      modules = [ configuration ];
-      system.defaults.NSGlobalDomain._HIHideMenuBar = true;
+      modules = [ 
+        ./configuration.nix
+        ./packages.nix
+       ];
     };
   };
 }

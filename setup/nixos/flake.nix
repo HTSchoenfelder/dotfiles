@@ -1,8 +1,8 @@
 {
   inputs = {
     nixpkgs.url = "git+https://github.com/NixOS/nixpkgs?ref=nixos-unstable";
-    nixpkgs-latest.url = "git+https://github.com/NixOS/nixpkgs?ref=nixos-unstable";
-    nixpkgs-stable.url = "git+https://github.com/NixOS/nixpkgs?ref=nixos-24.11";
+    nixpkgs-latest.url = "git+https://github.com/nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs-stable.url = "git+https://github.com/nixos/nixpkgs?ref=nixos-24.11";
     hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
     home-manager = {
       url = "github:nix-community/home-manager";
