@@ -2,7 +2,7 @@
   pkgs,
   pkgsStable,
   pkgsLatest,
-  pkgsDarwin
+  pkgsDarwin,
   ...
 }:
 {
