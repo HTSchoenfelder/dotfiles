@@ -630,5 +630,12 @@
   "workbench.sideBar.location": "right",
   "workbench.startupEditor": "none",
   "workbench.tree.enableStickyScroll": false,
-  "makefile.configureOnOpen": true
+  "makefile.configureOnOpen": true,
+  "[toml]": {
+    "editor.defaultFormatter": "tamasfe.even-better-toml"
+  },
+  "azureTerraform.survey": {
+    "surveyPromptDate": "2025-06-27T15:00:48.974Z",
+    "surveyPromptIgnoredCount": 0
+  }
 }

@@ -1,25 +1,5 @@
 [
     {
-        "command": "editor.action.scrollLeftHover",
-        "key": "h",
-        "when": "editorHoverFocused"
-    },
-    {
-        "command": "editor.action.scrollDownHover",
-        "key": "j",
-        "when": "editorHoverFocused"
-    },
-    {
-        "command": "editor.action.scrollUpHover",
-        "key": "k",
-        "when": "editorHoverFocused"
-    },
-    {
-        "command": "editor.action.scrollRightHover",
-        "key": "l",
-        "when": "editorHoverFocused"
-    },
-    {
         "command": "explorer.newFile",
         "key": "n",
         "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
@@ -59,7 +39,7 @@
     },
     {
         "command": "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup",
-        "key": "ctrl+,",
+        "key": "cmd+,",
         "when": "!activeEditorGroupEmpty"
     },
     {
@@ -69,7 +49,7 @@
     },
     {
         "command": "workbench.action.quickOpenLeastRecentlyUsedEditorInGroup",
-        "key": "ctrl+shift+,",
+        "key": "shift+cmd+,",
         "when": "!activeEditorGroupEmpty"
     },
     {
@@ -83,11 +63,11 @@
     },
     {
         "command": "workbench.action.focusActiveEditorGroup",
-        "key": "ctrl+e"
+        "key": "cmd+e"
     },
     {
         "command": "workbench.action.terminal.toggleTerminal",
-        "key": "ctrl+j",
+        "key": "cmd+j",
         "when": "terminal.active"
     },
     {
@@ -112,7 +92,7 @@
     },
     {
         "command": "workbench.action.toggleMaximizedPanel",
-        "key": "ctrl+'"
+        "key": "cmd+'"
     },
     {
         "command": "editor.action.moveLinesDownAction",
@@ -135,27 +115,19 @@
         "when": "editorTextFocus && !editorReadonly"
     },
     {
-        "command": "workbench.action.terminal.focusNext",
-        "key": "ctrl+numpad4",
-        "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
-    },
-    {
-        "command": "-workbench.action.terminal.focusNext",
-        "key": "ctrl+pagedown",
-        "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
-    },
-    {
-        "command": "workbench.action.terminal.focusPrevious",
-        "key": "ctrl+numpad5",
-        "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
-    },
-    {
-        "command": "-workbench.action.terminal.focusPrevious",
-        "key": "ctrl+pageup",
-        "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
-    },
-    {
         "command": "workbench.action.nextPanelView",
         "key": "ctrl+numpad6"
-    }
+    },
+    {
+        "key": "cmd+s",
+        "command": "saveAll"
+},
+{
+    "key": "ctrl+alt+cmd+p",
+    "command": "workbench.action.switchWindow"
+},
+{
+    "key": "ctrl+w",
+    "command": "-workbench.action.switchWindow"
+}
 ]
