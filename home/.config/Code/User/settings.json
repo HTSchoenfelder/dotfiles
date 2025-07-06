@@ -199,13 +199,7 @@
   "update.showReleaseNotes": false,
   "vim.commandLineModeKeyBindingsNonRecursive": [],
   "vim.handleKeys": {
-    "<C-a>": false,
-    "<C-d>": true,
-    "<C-k>": false,
-    "<C-p>": false,
-    "<C-s>": false,
-    "<C-w>": true,
-    "<C-z>": false
+   
   },
   "vim.highlightedyank.color": "#a9dc7660",
   "vim.highlightedyank.duration": 800,

@@ -38,6 +38,7 @@
           gnumake
           logseq
           sketchybar
+          karabiner-elements
   ];
 
   fonts.packages = with pkgs; [

@@ -30,10 +30,6 @@
         "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceReadonly && !inputFocus"
     },
     {
-        "command": "saveAll",
-        "key": "ctrl+s"
-    },
-    {
         "command": "-workbench.action.files.save",
         "key": "ctrl+s"
     },
@@ -44,7 +40,7 @@
     },
     {
         "command": "workbench.action.quickOpenNavigateNextInEditorPicker",
-        "key": "ctrl+,",
+        "key": "cmd+,",
         "when": "inEditorsPicker && inQuickOpen"
     },
     {
@@ -54,16 +50,12 @@
     },
     {
         "command": "workbench.action.quickOpenNavigatePreviousInEditorPicker",
-        "key": "ctrl+shift+,",
+        "key": "shift+cmd+,",
         "when": "inEditorsPicker && inQuickOpen"
     },
     {
         "command": "-workbench.action.openSettings",
         "key": "ctrl+,"
-    },
-    {
-        "command": "workbench.action.focusActiveEditorGroup",
-        "key": "cmd+e"
     },
     {
         "command": "workbench.action.terminal.toggleTerminal",
@@ -74,11 +66,6 @@
         "command": "-workbench.action.terminal.toggleTerminal",
         "key": "ctrl+`",
         "when": "terminal.active"
-    },
-    {
-        "command": "-extension.vim_ctrl+j",
-        "key": "ctrl+j",
-        "when": "editorTextFocus && vim.active && vim.use<C-j> && !inDebugRepl"
     },
     {
         "command": "workbench.action.terminal.new",
@@ -95,39 +82,19 @@
         "key": "cmd+'"
     },
     {
-        "command": "editor.action.moveLinesDownAction",
-        "key": "alt+j",
-        "when": "editorTextFocus && !editorReadonly"
-    },
-    {
-        "command": "-editor.action.moveLinesDownAction",
-        "key": "alt+down",
-        "when": "editorTextFocus && !editorReadonly"
-    },
-    {
-        "command": "editor.action.moveLinesUpAction",
-        "key": "alt+k",
-        "when": "editorTextFocus && !editorReadonly"
-    },
-    {
-        "command": "-editor.action.moveLinesUpAction",
-        "key": "alt+up",
-        "when": "editorTextFocus && !editorReadonly"
-    },
-    {
-        "command": "workbench.action.nextPanelView",
-        "key": "ctrl+numpad6"
-    },
-    {
         "key": "cmd+s",
         "command": "saveAll"
 },
 {
-    "key": "ctrl+alt+cmd+p",
+    "key": "ctrl+cmd+p",
     "command": "workbench.action.switchWindow"
 },
 {
     "key": "ctrl+w",
     "command": "-workbench.action.switchWindow"
+},
+{
+    "key": "cmd+e",
+    "command": "workbench.action.focusActiveEditorGroup"
 }
 ]
