@@ -635,7 +635,7 @@
     "editor.defaultFormatter": "tamasfe.even-better-toml"
   },
   "azureTerraform.survey": {
-    "surveyPromptDate": "2025-06-27T15:00:48.974Z",
-    "surveyPromptIgnoredCount": 0
+    "surveyPromptDate": "2025-07-09T15:41:26.466Z",
+    "surveyPromptIgnoredCount": 1
   }
 }

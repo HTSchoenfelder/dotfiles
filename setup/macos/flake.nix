@@ -44,6 +44,7 @@
         ./configuration.nix
         ./packages.nix
        ];
+       specialArgs = { inherit inputs; };
     };
   };
 }

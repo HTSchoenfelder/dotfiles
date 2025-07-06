@@ -37,6 +37,7 @@
           obsidian
           gnumake
           logseq
+          sketchybar
   ];
 
   fonts.packages = with pkgs; [
