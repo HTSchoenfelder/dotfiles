@@ -5,5 +5,6 @@ sudo apt update && sudo apt install -y \
     jq \
     bat \
     netcat \
-    zsh \
-    starship
+    zsh 
+
+curl -sS https://starship.rs/install.sh | sh
