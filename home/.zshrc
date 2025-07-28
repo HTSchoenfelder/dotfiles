@@ -34,6 +34,7 @@ alias nixupdatestable='nix flake update nixpkgs-stable --flake $HOME/dotfiles/se
 alias nixrepl='nix repl -f flake:nixpkgs'
 
 nixsh() {
+    export NIXPKGS_ALLOW_UNFREE=1
     nix shell $(printf "nixpkgs#%s " "$@")
 }
 

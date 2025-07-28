@@ -31,7 +31,6 @@
           nodejs
           bat
           yabai
-          aerospace
           keepassxc
           spotify
           obsidian
@@ -39,6 +38,11 @@
           logseq
           sketchybar
           karabiner-elements
+          zsh-autosuggestions
+          zsh-fast-syntax-highlighting
+          neofetch
+          cyberduck
+          albert
   ];
 
   fonts.packages = with pkgs; [
