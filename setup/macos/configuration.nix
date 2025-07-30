@@ -19,9 +19,9 @@ in
     stateVersion = 6;
 
     defaults = {
-      NSGlobalDomain._HIHideMenuBar = true;
-      dock.orientation = "right";
-      dock.autohide = true;
+      NSGlobalDomain._HIHideMenuBar = false;
+      dock.orientation = "bottom";
+      dock.autohide = false;
       controlcenter.NowPlaying = true;
       # other macOS's defaults configuration.
       # .....

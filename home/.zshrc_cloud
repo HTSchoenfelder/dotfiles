@@ -1,0 +1,7 @@
+#!/bin/env sh
+
+function stackit_delete_unused_volumes() {
+  stackit volume list -o json \
+  | jq -r '.[] | select((.status == "AVAILABLE") and (has("name") | not)) | .id' \
+  | xargs -I {} stackit volume delete -y {}
+}

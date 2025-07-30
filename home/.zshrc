@@ -1,4 +1,5 @@
 source $HOME/.zshrc_core
+source $HOME/.zshrc_cloud
 source $HOME/.zshrc_notify
 
 alias d='docker'

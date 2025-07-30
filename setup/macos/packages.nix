@@ -30,19 +30,17 @@
           tmux
           nodejs
           bat
-          yabai
           keepassxc
           spotify
           obsidian
           gnumake
           logseq
           sketchybar
-          karabiner-elements
           zsh-autosuggestions
           zsh-fast-syntax-highlighting
           neofetch
           cyberduck
-          albert
+          cowsay
   ];
 
   fonts.packages = with pkgs; [
