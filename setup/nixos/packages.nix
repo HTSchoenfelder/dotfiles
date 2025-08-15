@@ -108,7 +108,7 @@
     fd
     ripgrep
     microsoft-edge
-    linphone
+    # linphone
     audacity
     usbview
     v4l-utils
