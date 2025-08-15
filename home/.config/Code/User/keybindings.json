@@ -82,19 +82,25 @@
         "key": "cmd+'"
     },
     {
-        "key": "cmd+s",
-        "command": "saveAll"
-},
-{
-    "key": "ctrl+cmd+p",
-    "command": "workbench.action.switchWindow"
-},
-{
-    "key": "ctrl+w",
-    "command": "-workbench.action.switchWindow"
-},
-{
-    "key": "cmd+e",
-    "command": "workbench.action.focusActiveEditorGroup"
-}
+        "key": "meta+s",
+        "command": "saveAll",
+        "when": "isMac"
+    },
+    {
+        "key": "ctrl+s",
+        "command": "saveAll",
+        "when": "!isMac"
+    },
+    {
+        "key": "ctrl+cmd+p",
+        "command": "workbench.action.switchWindow"
+    },
+    {
+        "key": "ctrl+w",
+        "command": "-workbench.action.switchWindow"
+    },
+    {
+        "key": "cmd+e",
+        "command": "workbench.action.focusActiveEditorGroup"
+    }
 ]

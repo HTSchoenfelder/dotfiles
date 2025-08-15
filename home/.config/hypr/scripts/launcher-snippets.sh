@@ -14,5 +14,5 @@ if [[ -z "$chosen" ]]; then
 fi
 
 snippet=$(awk -F'|' -v output="$chosen" '$0 ~ output {print $1}' "$file")
-
+snippet=$(echo "$snippet" | sed 's/\\n/\n/g')
 wtype "$snippet"
