@@ -74,6 +74,7 @@ in
   boot.kernelParams = [ "console=tty1" ];
   services.greetd = {
     enable = true;
+    vt = 2;
     settings = {
       default_session = {
         command = "${pkgs.tuigreet}/bin/tuigreet --time --asterisks --cmd Hyprland";
