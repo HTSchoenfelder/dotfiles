@@ -26,7 +26,11 @@ in
   };
 
   boot.loader = {
-    systemd-boot.enable = true;    efi.canTouchEfiVariables = true;
+    systemd-boot = {
+      enable = true;
+      configurationLimit = 3;
+    };
+    efi.canTouchEfiVariables = true;
     timeout = 2; 
   };
 
@@ -72,7 +76,7 @@ in
     enable = true;
     settings = {
       default_session = {
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --asterisks --cmd Hyprland";
+        command = "${pkgs.tuigreet}/bin/tuigreet --time --asterisks --cmd Hyprland";
         user = "${userName}";
       };
     };
