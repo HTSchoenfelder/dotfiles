@@ -28,13 +28,13 @@ alias aza='az account show --output tsv --query "name"'
 alias azas='az account set --subscription'
 
 alias nixbuildv='sudo nixos-rebuild switch --flake $HOME/dotfiles/setup/nixos --show-trace --print-build-logs --verbose'
-# alias nixupdate='nix flake update --flake $HOME/dotfiles/setup/nixos'
-alias nixupdate='sudo nix flake update --flake ~/dotfiles/setup/macos/'
+alias nixupdate='nix flake update --flake $HOME/dotfiles/setup/nixos'
+alias nixupdatemac='sudo nix flake update --flake ~/dotfiles/setup/macos/'
 alias nixupdatelatest='nix flake update nixpkgs-latest --flake $HOME/dotfiles/setup/nixos'
 alias nixupdatestable='nix flake update nixpkgs-stable --flake $HOME/dotfiles/setup/nixos'
 alias nixrepl='nix repl -f flake:nixpkgs'
 
-nixsh() {
+nixsh() 
     export NIXPKGS_ALLOW_UNFREE=1
     nix shell $(printf "nixpkgs#%s " "$@")
 }
