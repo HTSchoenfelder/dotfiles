@@ -1,4 +1,5 @@
 source $HOME/.zshrc_core
+source $HOME/.zshrc_cloud
 source $HOME/.zshrc_notify
 
 alias d='docker'
@@ -34,6 +35,7 @@ alias nixupdatestable='nix flake update nixpkgs-stable --flake $HOME/dotfiles/se
 alias nixrepl='nix repl -f flake:nixpkgs'
 
 nixsh() {
+    export NIXPKGS_ALLOW_UNFREE=1
     nix shell $(printf "nixpkgs#%s " "$@")
 }
 
@@ -105,7 +107,6 @@ SAVEHIST=10000
 setopt appendhistory
 
 if ! nix --version &> /dev/null; then
-  source /usr/share/nvm/init-nvm.sh
   source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
   source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
 fi
