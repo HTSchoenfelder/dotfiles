@@ -199,7 +199,13 @@
   "update.showReleaseNotes": false,
   "vim.commandLineModeKeyBindingsNonRecursive": [],
   "vim.handleKeys": {
-   
+    "<C-a>": false,
+    "<C-k>": false,
+    "<C-p>": false,
+    "<C-s>": false,
+    "<C-w>": true,
+    "<C-z>": false,
+    "<C-y>": false
   },
   "vim.highlightedyank.color": "#a9dc7660",
   "vim.highlightedyank.duration": 800,
@@ -631,5 +637,6 @@
   "azureTerraform.survey": {
     "surveyPromptDate": "2025-08-09T08:52:23.393Z",
     "surveyPromptIgnoredCount": 2
-  }
+  },
+  "editor.autoClosingBrackets": "never"
 }

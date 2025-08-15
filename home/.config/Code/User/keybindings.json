@@ -35,22 +35,22 @@
     },
     {
         "command": "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup",
-        "key": "cmd+,",
+        "key": "ctrl+,",
         "when": "!activeEditorGroupEmpty"
     },
     {
         "command": "workbench.action.quickOpenNavigateNextInEditorPicker",
-        "key": "cmd+,",
+        "key": "ctrl+,",
         "when": "inEditorsPicker && inQuickOpen"
     },
     {
         "command": "workbench.action.quickOpenLeastRecentlyUsedEditorInGroup",
-        "key": "shift+cmd+,",
+        "key": "shift+ctrl+,",
         "when": "!activeEditorGroupEmpty"
     },
     {
         "command": "workbench.action.quickOpenNavigatePreviousInEditorPicker",
-        "key": "shift+cmd+,",
+        "key": "shift+ctrl+,",
         "when": "inEditorsPicker && inQuickOpen"
     },
     {
@@ -59,7 +59,7 @@
     },
     {
         "command": "workbench.action.terminal.toggleTerminal",
-        "key": "cmd+j",
+        "key": "ctrl+j",
         "when": "terminal.active"
     },
     {
@@ -79,7 +79,7 @@
     },
     {
         "command": "workbench.action.toggleMaximizedPanel",
-        "key": "cmd+'"
+        "key": "ctrl+'"
     },
     {
         "key": "meta+s",
@@ -92,15 +92,11 @@
         "when": "!isMac"
     },
     {
-        "key": "ctrl+cmd+p",
-        "command": "workbench.action.switchWindow"
-    },
-    {
         "key": "ctrl+w",
         "command": "-workbench.action.switchWindow"
     },
     {
-        "key": "cmd+e",
+        "key": "ctrl+e",
         "command": "workbench.action.focusActiveEditorGroup"
     }
 ]
