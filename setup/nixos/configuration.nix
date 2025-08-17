@@ -68,10 +68,9 @@ in
     LC_TIME = "de_DE.UTF-8";
   };
 
-  services.gnome.gnome-keyring.enable = true;
+  # services.gnome.gnome-keyring.enable = true;
   services.pcscd.enable = true;
 
-  boot.kernelParams = [ "console=tty1" ];
   services.greetd = {
     enable = true;
     settings = {
@@ -174,6 +173,10 @@ in
   programs.obs-studio = {
     enable = true;
     enableVirtualCamera = true;
+  };
+
+  programs.ssh = {
+    startAgent = true;
   };
 
   virtualisation.docker = {
