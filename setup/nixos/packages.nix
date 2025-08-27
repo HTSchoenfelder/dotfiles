@@ -138,6 +138,8 @@
     spice
     gnumake
     vlc
+    ncdu
+    unison
   ];
 
   fonts.packages = with pkgs; [

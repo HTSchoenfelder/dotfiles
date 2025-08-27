@@ -26,7 +26,11 @@ in
   };
 
   boot.loader = {
-    systemd-boot.enable = true;    efi.canTouchEfiVariables = true;
+    systemd-boot = {
+      enable = true;
+      configurationLimit = 3;
+    };
+    efi.canTouchEfiVariables = true;
     timeout = 2; 
   };
 
@@ -64,15 +68,14 @@ in
     LC_TIME = "de_DE.UTF-8";
   };
 
-  services.gnome.gnome-keyring.enable = true;
+  # services.gnome.gnome-keyring.enable = true;
   services.pcscd.enable = true;
 
-  boot.kernelParams = [ "console=tty1" ];
   services.greetd = {
     enable = true;
     settings = {
       default_session = {
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --asterisks --cmd Hyprland";
+        command = "${pkgs.tuigreet}/bin/tuigreet --time --asterisks --cmd Hyprland";
         user = "${userName}";
       };
     };
@@ -170,6 +173,10 @@ in
   programs.obs-studio = {
     enable = true;
     enableVirtualCamera = true;
+  };
+
+  programs.ssh = {
+    startAgent = true;
   };
 
   virtualisation.docker = {
