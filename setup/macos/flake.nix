@@ -36,9 +36,6 @@
     };
   in
   {
-    # Build darwin flake using:
-    # sudo darwin-rebuild build --flake .#SIT-SMBP-YF0X2F
-    # sudo darwin-rebuild switch --flake .#SIT-SMBP-YF0X2F
     darwinConfigurations."SIT-SMBP-YF0X2F" = nix-darwin.lib.darwinSystem {
       modules = [ 
         ./configuration.nix

@@ -30,7 +30,6 @@
           tmux
           nodejs
           bat
-          keepassxc
           spotify
           obsidian
           gnumake
@@ -41,6 +40,7 @@
           neofetch
           cyberduck
           cowsay
+          yubikey-manager
   ];
 
   fonts.packages = with pkgs; [

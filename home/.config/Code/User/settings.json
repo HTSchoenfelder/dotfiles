@@ -607,9 +607,10 @@
   "vim.visualModeKeyBindingsNonRecursive": [],
   "vs-kubernetes": {
     "vs-kubernetes.knownKubeconfigs": [
-      "/home/henrik/.kube/config.k3s"
+      "/home/henrik/.kube/config.k3s",
+      "/Users/schoenfeldeh/Documents/config"
     ],
-    "vs-kubernetes.kubeconfig": "/home/henrik/.kube/config.k3s"
+    "vs-kubernetes.kubeconfig": "/Users/schoenfeldeh/Documents/config"
   },
   "window.menuBarVisibility": "toggle",
   "window.title": "${rootPath} | Code",
