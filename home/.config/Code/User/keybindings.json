@@ -30,10 +30,6 @@
         "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceReadonly && !inputFocus"
     },
     {
-        "command": "-workbench.action.files.save",
-        "key": "ctrl+s"
-    },
-    {
         "command": "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup",
         "key": "ctrl+,",
         "when": "!activeEditorGroupEmpty"
