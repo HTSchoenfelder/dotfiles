@@ -140,6 +140,7 @@
     vlc
     ncdu
     unison
+    freefilesync
   ];
 
   fonts.packages = with pkgs; [
