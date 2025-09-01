@@ -20,8 +20,6 @@
           starship
           eza
           yazi
-          podman
-          podman-desktop
           kubectl 
           direnv
           terraform
@@ -41,6 +39,9 @@
           cyberduck
           cowsay
           yubikey-manager
+          cloudfoundry-cli
+          docker
+          colima
   ];
 
   fonts.packages = with pkgs; [

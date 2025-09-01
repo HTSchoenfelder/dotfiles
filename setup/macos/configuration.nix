@@ -35,4 +35,22 @@ in
   nixpkgs.hostPlatform = "aarch64-darwin";
 
   programs.zsh.enable = true;
+  
+  launchd.agents."colima-daemon" = {
+    serviceConfig = {
+      Label = "io.github.abiosoft.colima";
+      RunAtLoad = true;                     
+      KeepAlive = true;                     
+      ProgramArguments = [
+        "${pkgs.colima}/bin/colima"
+        "start"
+        "--cpu" "2"
+        "--memory" "4"
+        "--disk" "30"
+      ];
+      StandardOutPath = "/tmp/colima.log";
+      StandardErrorPath = "/tmp/colima.log";
+    };
+  };
+
 }

@@ -205,7 +205,8 @@
     "<C-s>": false,
     "<C-w>": true,
     "<C-z>": false,
-    "<C-y>": false
+    "<C-y>": false,
+    "<C-f>": false
   },
   "vim.highlightedyank.color": "#a9dc7660",
   "vim.highlightedyank.duration": 800,
@@ -639,5 +640,6 @@
     "surveyPromptDate": "2025-09-15T13:56:27.237Z",
     "surveyPromptIgnoredCount": 3
   },
-  "editor.autoClosingBrackets": "never"
+  "editor.autoClosingBrackets": "never",
+  "dev.containers.dockerPath": "podman"
 }

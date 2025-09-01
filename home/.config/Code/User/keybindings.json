@@ -63,18 +63,8 @@
         "when": "terminal.active"
     },
     {
-        "command": "-workbench.action.terminal.toggleTerminal",
-        "key": "ctrl+`",
-        "when": "terminal.active"
-    },
-    {
         "command": "workbench.action.terminal.new",
         "key": "ctrl+shift+j",
-        "when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
-    },
-    {
-        "command": "-workbench.action.terminal.new",
-        "key": "ctrl+shift+`",
         "when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
     },
     {
@@ -82,21 +72,76 @@
         "key": "ctrl+'"
     },
     {
-        "key": "meta+s",
         "command": "saveAll",
-        "when": "isMac"
+        "key": "ctrl+s"
     },
     {
-        "key": "ctrl+s",
-        "command": "saveAll",
-        "when": "!isMac"
+        "command": "-workbench.action.switchWindow",
+        "key": "ctrl+w"
     },
     {
-        "key": "ctrl+w",
-        "command": "-workbench.action.switchWindow"
+        "command": "workbench.action.focusActiveEditorGroup",
+        "key": "ctrl+e"
     },
     {
-        "key": "ctrl+e",
-        "command": "workbench.action.focusActiveEditorGroup"
+        "command": "workbench.action.quickOpen",
+        "key": "ctrl+p"
+    },
+    {
+        "command": "workbench.action.showCommands",
+        "key": "ctrl+shift+p"
+    },
+    {
+        "command": "workbench.action.terminal.copySelection",
+        "key": "ctrl+shift+c",
+        "when": "terminalTextSelectedInFocused || terminalFocus && terminalHasBeenCreated && terminalTextSelected || terminalFocus && terminalProcessSupported && terminalTextSelected || terminalFocus && terminalTextSelected && terminalTextSelectedInFocused || terminalHasBeenCreated && terminalTextSelected && terminalTextSelectedInFocused || terminalProcessSupported && terminalTextSelected && terminalTextSelectedInFocused"
+    },
+    {
+        "command": "workbench.action.terminal.paste",
+        "key": "ctrl+shift+v",
+        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+    },
+    {
+        "command": "workbench.action.closeAllEditors",
+        "key": "ctrl+k ctrl+w"
+    },
+    {
+        "command": "editor.action.clipboardCopyAction",
+        "key": "ctrl+c"
+    },
+    {
+        "command": "editor.action.clipboardPasteAction",
+        "key": "ctrl+v"
+    },
+    {
+        "command": "undo",
+        "key": "ctrl+z"
+    },
+    {
+        "command": "redo",
+        "key": "ctrl+y"
+    },
+    {
+        "command": "editor.action.selectAll",
+        "key": "ctrl+a"
+    },
+    {
+        "command": "workbench.action.terminal.selectAll",
+        "key": "ctrl+a",
+        "when": "terminalFocusInAny && terminalHasBeenCreated || terminalFocusInAny && terminalProcessSupported"
+    },
+    {
+        "command": "list.selectAll",
+        "key": "ctrl+a",
+        "when": "listFocus && listSupportsMultiselect && !inputFocus && !treestickyScrollFocused"
+    },
+    {
+        "command": "actions.find",
+        "key": "ctrl+f",
+        "when": "editorFocus || editorIsOpen"
+    },
+    {
+        "command": "workbench.action.closeActiveEditor",
+        "key": "ctrl+w"
     }
 ]
