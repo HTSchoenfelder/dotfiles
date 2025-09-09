@@ -641,5 +641,18 @@
     "surveyPromptIgnoredCount": 3
   },
   "editor.autoClosingBrackets": "never",
-  "dev.containers.dockerPath": "podman"
+  "dev.containers.dockerPath": "docker",
+  "containers.images.groupBy": "None",
+  "containers.images.description": [
+    "CreatedTime",
+    "Size"
+  ],
+  "containers.images.label": "FullTag",
+  "containers.images.sortBy": "CreatedTime",
+  "mssql.connectionGroups": [
+    {
+      "name": "ROOT",
+      "id": "5A2122A7-BB7A-4781-A9A0-7DB63782256D"
+    }
+  ]
 }

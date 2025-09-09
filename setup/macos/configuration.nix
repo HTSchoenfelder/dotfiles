@@ -36,14 +36,21 @@ in
 
   programs.zsh.enable = true;
   
-  launchd.agents."colima-daemon" = {
+ launchd.agents."colima-daemon" = {
     serviceConfig = {
       Label = "io.github.abiosoft.colima";
-      RunAtLoad = true;                     
-      KeepAlive = true;                     
+      RunAtLoad = true;
+      KeepAlive = true;
+
+      # Add this EnvironmentVariables block
+      EnvironmentVariables = {
+        DOCKER_HOST = "unix://${pkgs.docker}/var/run/docker.sock";
+      };
+
       ProgramArguments = [
         "${pkgs.colima}/bin/colima"
         "start"
+        "--runtime" "docker" # Explicitly set runtime
         "--cpu" "2"
         "--memory" "4"
         "--disk" "30"

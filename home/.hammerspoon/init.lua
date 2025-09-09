@@ -3,7 +3,6 @@ local hyper = {"alt", "ctrl", "cmd"}
 local log = hs.logger.new('hammerspoon','debug')
 log.i("open App")
 
--- Define a list of applications to be launched with hotkeys
 local apps = {
   {key = "j", name = "kitty"},
   {key = "k", name = "Code"},
@@ -14,12 +13,11 @@ local apps = {
   {key = "o", name = "KeePassXC"},
   {key = "p", name = "Spotify"},
 }
-log.i(apps)
 
 -- Create hotkeys to activate applications from the list above
 for _, app in ipairs(apps) do
   hs.hotkey.bind(hyper, app.key, function()
-    log.i("bindi")
+    log.i(app.name)
     local targetApp = hs.application.get(app.name)
     if targetApp then
       targetApp:activate()
@@ -29,35 +27,8 @@ for _, app in ipairs(apps) do
   end)
 end
 
--- App-specific hotkeys for Chrome, managed by an application watcher
--- local chromeHotkeys = {}
--- local appWatcher = hs.application.watcher.new(function(appName, eventType, appObject)
---     if eventType == hs.application.watcher.activated then
---         if appObject:bundleID() == "com.google.Chrome" then
---             -- Create hotkeys only if they don't already exist
---             if next(chromeHotkeys) == nil then
---                 chromeHotkeys.p = hs.hotkey.bind({"cmd"}, "p", function() hs.eventtap.keyStroke({"cmd", "shift"}, "a") end) -- Search tabs
---                 chromeHotkeys.j = hs.hotkey.bind({"cmd"}, "j", function() hs.eventtap.keyStroke({"ctrl", "shift"}, "tab") end) -- Previous tab
---                 chromeHotkeys.k = hs.hotkey.bind({"cmd"}, "k", function() hs.eventtap.keyStroke({"ctrl"}, "tab") end) -- Next tab
---                 chromeHotkeys.h = hs.hotkey.bind({"cmd"}, "h", function() hs.eventtap.keyStroke({"cmd"}, "[") end) -- History back
---                 chromeHotkeys.l = hs.hotkey.bind({"cmd"}, "l", function() hs.eventtap.keyStroke({"cmd"}, "]") end) -- History forward
---             -- If another app is activated, delete the Chrome hotkeys to avoid conflicts
---             if next(chromeHotkeys) ~= nil then
---                 for key, hotkey in pairs(chromeHotkeys) do
---                     hotkey:delete()
---                 end
---                 chromeHotkeys = {}
---             end
---         end
---     end
--- end)
--- appWatcher:start()
-
-
--- Modal hotkey for window management
 local windowManager = hs.hotkey.modal.new()
 
--- Helper function to get screens, sorted from left to right
 local function getScreens()
     local screens = hs.screen.allScreens()
     table.sort(screens, function(a, b) return a:frame().x < b:frame().x end)
