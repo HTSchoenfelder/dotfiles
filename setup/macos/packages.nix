@@ -28,10 +28,8 @@
           tmux
           nodejs
           bat
-          spotify
           obsidian
           gnumake
-          logseq
           sketchybar
           zsh-autosuggestions
           zsh-fast-syntax-highlighting

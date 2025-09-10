@@ -139,5 +139,9 @@
     {
         "command": "workbench.action.closeActiveEditor",
         "key": "ctrl+w"
+    },
+    {
+        "key": "ctrl+x",
+        "command": "editor.action.clipboardCutAction"
     }
 ]
