@@ -33,7 +33,6 @@
 
           #Apps
           cyberduck
-          kitty
           obsidian
           utm
           vscode
