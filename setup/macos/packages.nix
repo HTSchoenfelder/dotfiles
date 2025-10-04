@@ -32,6 +32,7 @@
           colima
 
           #Apps
+          pkgsStable.kitty
           cyberduck
           obsidian
           utm
