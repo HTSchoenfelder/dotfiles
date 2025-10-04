@@ -11,7 +11,12 @@ if ! command -v nix &>/dev/null; then
     echo "Nix is not available."
     curl -fsSL https://install.determinate.systems/nix | sh -s -- install --determinate
 fi
-echo "Git is available, continuing..."
+
+### Check if nix is available
+if ! command -v brew &>/dev/null; then
+    echo "Homebrew is not available."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
 
 ### Check if git is available
 if ! command -v git &>/dev/null; then

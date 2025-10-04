@@ -30,6 +30,16 @@
           cloudfoundry-cli
           docker
           colima
+
+          #Apps
+          cyberduck
+          kitty
+          obsidian
+          utm
+          vscode
+          karabiner-elements
+          keepassxc
+          spotify
   ];
 
   fonts.packages = with pkgs; [

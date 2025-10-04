@@ -34,6 +34,7 @@ alias nixbuildmac='sudo nix run nix-darwin/master#darwin-rebuild -- switch --fla
 alias nixupdatelatest='nix flake update nixpkgs-latest --flake $HOME/dotfiles/setup/nixos'
 alias nixupdatestable='nix flake update nixpkgs-stable --flake $HOME/dotfiles/setup/nixos'
 alias nixrepl='nix repl -f flake:nixpkgs'
+alias brewbundle='brew bundle install --file ~/dotfiles/setup/macos/Brewfile'
 
 nixsh() {
     export NIXPKGS_ALLOW_UNFREE=1
@@ -52,6 +53,21 @@ nixbuild() {
     fi
 
     sudo nixos-rebuild switch --flake "$HOME/dotfiles/setup/nixos#$1" "${flags[@]}"
+}
+
+brew-orphans() {
+    brew deps --installed | \
+    awk -F'[: ]+' \
+    '{
+        packages[$1]++
+        for (i = 2; i <= NF; i++)
+            dependencies[$i]++
+    }
+    END {
+        for (package in packages)
+            if (!(package in dependencies))
+                print package
+    }'
 }
 
 alias sshcp='echo "source <(wget -qO- gagelpuh.de/sh)" | wl-copy'
