@@ -2,3 +2,4 @@
 
 cask "yubico-authenticator"
 cask "hammerspoon"
+cask "keepassxc"

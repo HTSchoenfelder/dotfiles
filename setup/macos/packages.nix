@@ -38,7 +38,7 @@
           utm
           vscode
           karabiner-elements
-          keepassxc
+          # keepassxc
           spotify
   ];
 
