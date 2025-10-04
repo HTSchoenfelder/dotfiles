@@ -8,6 +8,7 @@
 
   outputs = { self, nixpkgs, nixpkgs-stable, nix-darwin, ... }@inputs:
   let
+    hostname = import ./hostname.nix;
     system = "aarch64-darwin";
     pkgsStable = import nixpkgs-stable {
       inherit system;
@@ -15,7 +16,7 @@
     };
   in
   {
-    darwinConfigurations."SIT-SMBP-YF0X2F" = nix-darwin.lib.darwinSystem {
+    darwinConfigurations."macbook" = nix-darwin.lib.darwinSystem {
       inherit system; 
       modules = [
         ./configuration.nix
