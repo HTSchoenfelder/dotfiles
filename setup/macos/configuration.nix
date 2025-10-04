@@ -11,9 +11,8 @@ in
 {
   nix.settings.experimental-features = "nix-command flakes";
   nixpkgs.config.allowUnfree = true;
+  nix.enable = false;
 
-  # Used for backwards compatibility, please read the changelog before changing.
-  # $ darwin-rebuild changelog
  system = {
     primaryUser = "schoenfeldeh";
     stateVersion = 6;
@@ -23,8 +22,6 @@ in
       dock.orientation = "bottom";
       dock.autohide = false;
       controlcenter.NowPlaying = true;
-      # other macOS's defaults configuration.
-      # .....
     };
   };
 

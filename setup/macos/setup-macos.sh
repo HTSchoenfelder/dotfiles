@@ -6,6 +6,13 @@ else
   read -p "Enter the configuration: " configuration
 fi
 
+### Check if nix is available
+if ! command -v nix &>/dev/null; then
+    echo "Nix is not available."
+    curl -fsSL https://install.determinate.systems/nix | sh -s -- install --determinate
+fi
+echo "Git is available, continuing..."
+
 ### Check if git is available
 if ! command -v git &>/dev/null; then
     echo "Git is not available."
@@ -14,9 +21,8 @@ if ! command -v git &>/dev/null; then
 fi
 echo "Git is available, continuing..."
 
-curl -fsSL https://install.determinate.systems/nix | sh -s -- install --determinate
-
 sudo nix run nix-darwin/master#darwin-rebuild -- switch
+sudo darwin-rebuild switch --flake ~/dotfiles/setup/macos#SIT-SMBP-YF0X2F
 
 mkdir -p ~/projects/dev
 mkdir -p ~/projects/temp

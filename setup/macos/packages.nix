@@ -1,19 +1,14 @@
 {
   pkgs,
   pkgsStable,
-  pkgsLatest,
-  pkgsDarwin,
   ...
 }:
 {
   environment.systemPackages = with pkgs; [
-          kitty
           vim
           git
-          vscode
           stow
           stackit-cli
-          utm
           fzf
           zoxide
           direnv
@@ -25,18 +20,13 @@
           terraform
           zellij
           neovim
-          tmux
           nodejs
           bat
-          obsidian
           gnumake
-          sketchybar
           zsh-autosuggestions
           zsh-fast-syntax-highlighting
           neofetch
-          cyberduck
           cowsay
-          yubikey-manager
           cloudfoundry-cli
           docker
           colima

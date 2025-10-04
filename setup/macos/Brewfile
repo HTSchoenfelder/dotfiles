@@ -1,0 +1,11 @@
+# Brewfile
+
+cask "cyberduck"
+cask "kitty"
+cask "obsidian"
+cask "utm"
+cask "vscode"
+cask "yubico-authenticator"
+cask "utm"
+casc "karabiner-elements"
+casc "keepassxc"

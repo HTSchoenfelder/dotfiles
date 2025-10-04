@@ -637,8 +637,8 @@
     "editor.defaultFormatter": "tamasfe.even-better-toml"
   },
   "azureTerraform.survey": {
-    "surveyPromptDate": "2025-09-15T13:56:27.237Z",
-    "surveyPromptIgnoredCount": 3
+    "surveyPromptDate": "2025-10-22T13:00:14.387Z",
+    "surveyPromptIgnoredCount": 4
   },
   "editor.autoClosingBrackets": "never",
   "dev.containers.dockerPath": "docker",
@@ -654,5 +654,20 @@
       "name": "ROOT",
       "id": "5A2122A7-BB7A-4781-A9A0-7DB63782256D"
     }
-  ]
+  ],
+  "yaml.maxItemsComputed": 30000,
+  "[dockercompose]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.autoIndent": "advanced",
+    "editor.quickSuggestions": {
+      "other": true,
+      "comments": false,
+      "strings": true
+    },
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  }
 }
