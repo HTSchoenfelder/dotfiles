@@ -29,6 +29,7 @@
           cowsay
           cloudfoundry-cli
           docker
+          docker-buildx
           colima
 
           #Apps
