@@ -40,7 +40,7 @@
           vscode
           karabiner-elements
           # keepassxc
-          spotify
+          # spotify
   ];
 
   fonts.packages = with pkgs; [

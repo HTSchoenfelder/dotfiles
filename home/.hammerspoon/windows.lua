@@ -84,7 +84,7 @@ end)
 
 -- Enter the window manager modal mode
 hs.hotkey.bind(config.hyper, ".", function()
-  hs.alert.show("Fenster-Aktion", 1.5)
+  hs.alert.show("Window-Action", 1.5)
   windowManager:enter()
 end)
 
