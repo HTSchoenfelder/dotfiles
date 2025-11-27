@@ -131,10 +131,6 @@ in
     nativeMessagingHosts.packages = [ pkgs.firefoxpwa ];
   };
 
-  programs.file-roller = {
-    enable = true;
-  };
-
   programs.waybar.enable = true;
   nixpkgs.config.allowUnfree = true;
 

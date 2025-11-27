@@ -141,6 +141,7 @@
     ncdu
     unison
     freefilesync
+    file-roller
   ];
 
   fonts.packages = with pkgs; [
