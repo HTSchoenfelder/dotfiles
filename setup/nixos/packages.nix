@@ -124,7 +124,7 @@
     gnome-calculator
     arduino-cli
     arduino-ide
-    arduino-create-agent
+    # arduino-create-agent
     pdfsam-basic
     socat
     python313
