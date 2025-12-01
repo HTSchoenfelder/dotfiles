@@ -124,7 +124,7 @@
     gnome-calculator
     arduino-cli
     arduino-ide
-    arduino-create-agent
+    # arduino-create-agent
     pdfsam-basic
     socat
     python313
@@ -141,12 +141,13 @@
     ncdu
     unison
     freefilesync
+    file-roller
   ];
 
   fonts.packages = with pkgs; [
     noto-fonts
     noto-fonts-cjk-sans
-    noto-fonts-emoji
+    noto-fonts-color-emoji
     nerd-fonts._0xproto
     nerd-fonts.agave
     font-awesome

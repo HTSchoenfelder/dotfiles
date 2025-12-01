@@ -203,7 +203,6 @@
     "<C-k>": false,
     "<C-p>": false,
     "<C-s>": false,
-    "<C-w>": true,
     "<C-z>": false,
     "<C-y>": false,
     "<C-f>": false
@@ -244,64 +243,11 @@
     {
       "before": [
         "leader",
-        "v"
-      ],
-      "commands": [
-        ":vsplit"
-      ]
-    },
-    {
-      "before": [
-        "leader",
-        "s"
-      ],
-      "commands": [
-        ":split"
-      ]
-    },
-    {
-      "before": [
-        "leader",
-        "h"
-      ],
-      "commands": [
-        "workbench.action.focusLeftGroup"
-      ]
-    },
-    {
-      "before": [
-        "leader",
-        "j"
-      ],
-      "commands": [
-        "workbench.action.focusBelowGroup"
-      ]
-    },
-    {
-      "before": [
-        "leader",
-        "k"
-      ],
-      "commands": [
-        "workbench.action.focusAboveGroup"
-      ]
-    },
-    {
-      "before": [
-        "leader",
-        "l"
-      ],
-      "commands": [
-        "workbench.action.focusRightGroup"
-      ]
-    },
-    {
-      "before": [
-        "leader",
         "w"
       ],
       "commands": [
-        ":w!"
+        "workbench.action.files.save",
+        "workbench.action.closeActiveEditor"
       ]
     },
     {
@@ -310,7 +256,7 @@
         "q"
       ],
       "commands": [
-        ":q!"
+        "workbench.action.closeActiveEditor"
       ]
     },
     {
@@ -348,25 +294,8 @@
       ],
       "commands": [
         "editor.action.selectAll",
-        "editor.action.clipboardCopyAction"
-      ]
-    },
-    {
-      "before": [
-        "[",
-        "d"
-      ],
-      "commands": [
-        "editor.action.marker.prev"
-      ]
-    },
-    {
-      "before": [
-        "]",
-        "d"
-      ],
-      "commands": [
-        "editor.action.marker.next"
+        "editor.action.clipboardCopyAction",
+        "cancelSelection"
       ]
     },
     {
