@@ -78,7 +78,262 @@
         "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
     },
     {
-        "key": "ctrl+e",
-        "command": "workbench.action.focusActiveEditorGroup"
+        "command": "workbench.action.focusActiveEditorGroup",
+        "key": "ctrl+e"
+    },
+    {
+        "command": "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup",
+        "key": "cmd+,",
+        "when": "!activeEditorGroupEmpty && isMac"
+    },
+    {
+        "command": "workbench.action.quickOpenNavigateNextInEditorPicker",
+        "key": "cmd+,",
+        "when": "inEditorsPicker && inQuickOpen && isMac"
+    },
+    {
+        "command": "workbench.action.quickOpenLeastRecentlyUsedEditorInGroup",
+        "key": "shift+cmd+,",
+        "when": "!activeEditorGroupEmpty && isMac"
+    },
+    {
+        "command": "workbench.action.quickOpenNavigatePreviousInEditorPicker",
+        "key": "shift+cmd+,",
+        "when": "inEditorsPicker && inQuickOpen && isMac"
+    },
+    {
+        "command": "workbench.action.terminal.toggleTerminal",
+        "key": "cmd+j",
+        "when": "terminal.active && isMac"
+    },
+    {
+        "command": "workbench.action.terminal.new",
+        "key": "cmd+shift+j",
+        "when": "(terminalProcessSupported || terminalWebExtensionContributedProfile) && isMac"
+    },
+    {
+        "command": "workbench.action.toggleMaximizedPanel",
+        "key": "cmd+'",
+        "when": "isMac"
+    },
+    {
+        "command": "saveAll",
+        "key": "cmd+s",
+        "when": "isMac"
+    },
+    {
+        "command": "workbench.action.terminal.copySelection",
+        "key": "cmd+shift+c",
+        "when": "(terminalTextSelectedInFocused || terminalFocus && terminalHasBeenCreated && terminalTextSelected || terminalFocus && terminalProcessSupported && terminalTextSelected || terminalFocus && terminalTextSelected && terminalTextSelectedInFocused || terminalHasBeenCreated && terminalTextSelected && terminalTextSelectedInFocused || terminalProcessSupported && terminalTextSelected && terminalTextSelectedInFocused) && isMac"
+    },
+    {
+        "command": "workbench.action.terminal.paste",
+        "key": "cmd+shift+v",
+        "when": "(terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported) && isMac"
+    },
+    {
+        "command": "workbench.action.focusActiveEditorGroup",
+        "key": "cmd+e",
+        "when": "isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+a",
+        "key": "cmd+a",
+        "when": "editorTextFocus && vim.active && vim.use<C-a> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+b",
+        "key": "cmd+b",
+        "when": "editorTextFocus && vim.active && vim.use<C-b> && !inDebugRepl && vim.mode != 'Insert' && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+c",
+        "key": "cmd+c",
+        "when": "editorTextFocus && vim.active && vim.overrideCtrlC && vim.use<C-c> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+d",
+        "key": "cmd+d",
+        "when": "editorTextFocus && vim.active && vim.use<C-d> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+e",
+        "key": "cmd+e",
+        "when": "editorTextFocus && vim.active && vim.use<C-e> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+f",
+        "key": "cmd+f",
+        "when": "editorTextFocus && vim.active && vim.use<C-f> && !inDebugRepl && vim.mode != 'Insert' && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+g",
+        "key": "cmd+g",
+        "when": "editorTextFocus && vim.active && vim.use<C-g> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+h",
+        "key": "cmd+h",
+        "when": "editorTextFocus && vim.active && vim.use<C-h> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+i",
+        "key": "cmd+i",
+        "when": "editorTextFocus && vim.active && vim.use<C-i> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+j",
+        "key": "cmd+j",
+        "when": "editorTextFocus && vim.active && vim.use<C-j> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+k",
+        "key": "cmd+k",
+        "when": "editorTextFocus && vim.active && vim.use<C-k> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_navigateCtrlL",
+        "key": "cmd+l",
+        "when": "editorTextFocus && vim.active && vim.use<C-l> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+m",
+        "key": "cmd+m",
+        "when": "editorTextFocus && vim.active && vim.use<C-m> && !inDebugRepl && isMac || vim.active && vim.use<C-m> && !inDebugRepl && vim.mode == 'CommandlineInProgress' && isMac || vim.active && vim.use<C-m> && !inDebugRepl && vim.mode == 'SearchInProgressMode' && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+n",
+        "key": "cmd+n",
+        "when": "editorTextFocus && vim.active && vim.use<C-n> && !inDebugRepl && isMac || vim.active && vim.use<C-n> && !inDebugRepl && vim.mode == 'CommandlineInProgress' && isMac || vim.active && vim.use<C-n> && !inDebugRepl && vim.mode == 'SearchInProgressMode' && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+o",
+        "key": "cmd+o",
+        "when": "editorTextFocus && vim.active && vim.use<C-o> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+p",
+        "key": "cmd+p",
+        "when": "editorTextFocus && vim.active && vim.use<C-p> && !inDebugRepl && isMac || vim.active && vim.use<C-p> && !inDebugRepl && vim.mode == 'CommandlineInProgress' && isMac || vim.active && vim.use<C-p> && !inDebugRepl && vim.mode == 'SearchInProgressMode' && isMac"
+    },
+    {
+        "command": "extension.vim_winCtrlQ",
+        "key": "cmd+q",
+        "when": "editorTextFocus && vim.active && vim.use<C-q> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+r",
+        "key": "cmd+r",
+        "when": "editorTextFocus && vim.active && vim.use<C-r> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+s",
+        "key": "cmd+s",
+        "when": "editorTextFocus && vim.active && vim.use<C-s> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+t",
+        "key": "cmd+t",
+        "when": "editorTextFocus && vim.active && vim.use<C-t> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+u",
+        "key": "cmd+u",
+        "when": "editorTextFocus && vim.active && vim.use<C-u> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+v",
+        "key": "cmd+v",
+        "when": "editorTextFocus && vim.active && vim.use<C-v> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+w",
+        "key": "cmd+w",
+        "when": "editorTextFocus && vim.active && vim.use<C-w> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+x",
+        "key": "cmd+x",
+        "when": "editorTextFocus && vim.active && vim.use<C-x> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+y",
+        "key": "cmd+y",
+        "when": "editorTextFocus && vim.active && vim.use<C-y> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+z",
+        "key": "cmd+z",
+        "when": "editorTextFocus && vim.active && vim.use<C-z> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+6",
+        "key": "cmd+6",
+        "when": "editorTextFocus && vim.active && vim.use<C-6> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+[",
+        "key": "cmd+[",
+        "when": "editorTextFocus && vim.active && vim.use<C-[> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+]",
+        "key": "cmd+]",
+        "when": "editorTextFocus && vim.active && vim.use<C-]> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+shift+2",
+        "key": "cmd+shift+2",
+        "when": "editorTextFocus && vim.active && vim.use<C-shift+2> && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+up",
+        "key": "cmd+up",
+        "when": "editorTextFocus && vim.active && !inDebugRepl && vim.mode != 'Insert' && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+down",
+        "key": "cmd+down",
+        "when": "editorTextFocus && vim.active && !inDebugRepl && vim.mode != 'Insert' && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+left",
+        "key": "cmd+left",
+        "when": "editorTextFocus && vim.active && !inDebugRepl && vim.mode != 'Insert' && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+right",
+        "key": "cmd+right",
+        "when": "editorTextFocus && vim.active && !inDebugRepl && vim.mode != 'Insert' && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+pagedown",
+        "key": "cmd+pagedown",
+        "when": "editorTextFocus && vim.active && vim.use<C-pagedown> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+pageup",
+        "key": "cmd+pageup",
+        "when": "editorTextFocus && vim.active && vim.use<C-pageup> && !inDebugRepl && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+space",
+        "key": "cmd+space",
+        "when": "editorTextFocus && vim.active && vim.use<C-space> && !inDebugRepl && vim.mode != 'Insert' && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+backspace",
+        "key": "cmd+backspace",
+        "when": "editorTextFocus && vim.active && vim.use<C-BS> && !inDebugRepl && vim.mode != 'Insert' && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+home",
+        "key": "cmd+home",
+        "when": "editorTextFocus && vim.active && !inDebugRepl && vim.mode != 'Insert' && isMac"
+    },
+    {
+        "command": "extension.vim_ctrl+end",
+        "key": "cmd+end",
+        "when": "editorTextFocus && vim.active && !inDebugRepl && vim.mode != 'Insert' && isMac"
     }
 ]
