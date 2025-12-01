@@ -3,3 +3,4 @@
 cask "yubico-authenticator"
 cask "hammerspoon"
 cask "keepassxc"
+cask "pdfsam-basic"

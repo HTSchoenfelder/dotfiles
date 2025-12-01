@@ -143,3 +143,11 @@ bindkey "^[[1;5D" backward-word
 if [[ "$START_ZELLIJ" == 1 ]]; then
   eval "$(zellij setup --generate-auto-start zsh)"
 fi
+
+# pnpm
+export PNPM_HOME="$HOME/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
