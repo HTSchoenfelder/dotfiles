@@ -1,3 +1,4 @@
+42crunch.vscode-openapi
 ahmadalli.vscode-nginx-conf
 alefragnani.project-manager
 alexcvzz.vscode-sqlite
@@ -8,6 +9,7 @@ bbenoist.nix
 bierner.folder-source-actions
 bierner.markdown-preview-github-styles
 brettm12345.nixfmt-vscode
+bruno-api-client.bruno
 budparr.language-hugo-vscode
 catppuccin.catppuccin-vsc
 catppuccin.catppuccin-vsc-icons
@@ -44,6 +46,7 @@ jq-syntax-highlighting.jq-syntax-highlighting
 jrebocho.vscode-random
 letmaik.git-tree-compare
 lkrms.inifmt
+mechatroner.rainbow-csv
 mhutchie.git-graph
 mikestead.dotenv
 mindaro-dev.file-downloader
@@ -56,24 +59,28 @@ ms-azuretools.vscode-azureresourcegroups
 ms-azuretools.vscode-azurestorage
 ms-azuretools.vscode-azureterraform
 ms-azuretools.vscode-bicep
+ms-azuretools.vscode-containers
 ms-azuretools.vscode-cosmosdb
-ms-azuretools.vscode-dapr
 ms-azuretools.vscode-docker
 ms-dotnettools.csdevkit
 ms-dotnettools.csharp
 ms-dotnettools.vscode-dotnet-runtime
 ms-dotnettools.vscodeintellicode-csharp
 ms-kubernetes-tools.vscode-kubernetes-tools
+ms-mssql.data-workspace-vscode
+ms-mssql.mssql
+ms-mssql.sql-bindings-vscode
+ms-mssql.sql-database-projects-vscode
 ms-python.debugpy
 ms-python.isort
 ms-python.python
 ms-python.vscode-pylance
+ms-python.vscode-python-envs
 ms-vscode-remote.remote-containers
 ms-vscode-remote.remote-ssh
 ms-vscode-remote.remote-ssh-edit
 ms-vscode-remote.remote-wsl
 ms-vscode-remote.vscode-remote-extensionpack
-ms-vscode.azure-account
 ms-vscode.azurecli
 ms-vscode.hexeditor
 ms-vscode.makefile-tools
@@ -81,7 +88,6 @@ ms-vscode.powershell
 ms-vscode.remote-explorer
 ms-vscode.remote-server
 ms-vsliveshare.vsliveshare
-msazurermtools.azurerm-vscode-tools
 naumovs.color-highlight
 philstainer.git-worktree
 pomdtr.excalidraw-editor
@@ -93,6 +99,7 @@ rust-lang.rust-analyzer
 saramorillon.terraform-graph
 skellock.just
 sonarsource.sonarlint-vscode
+sumneko.lua
 syler.sass-indented
 tamasfe.even-better-toml
 tchayen.markdown-links
@@ -101,6 +108,8 @@ tomoki1207.pdf
 tyriar.lorem-ipsum
 usernamehw.commands
 usernamehw.errorlens
+virgilsisoe.hammerspoon
 vscodevim.vim
 vue.volar
+yinfei.luahelper
 yzhang.markdown-all-in-one
