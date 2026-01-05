@@ -30,29 +30,9 @@
         "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceReadonly && !inputFocus"
     },
     {
-        "command": "workbench.action.quickOpenNavigateNextInEditorPicker",
-        "key": "ctrl+,",
-        "when": "inEditorsPicker && inQuickOpen"
-    },
-    {
-        "command": "workbench.action.quickOpenLeastRecentlyUsedEditorInGroup",
-        "key": "shift+ctrl+,",
-        "when": "!activeEditorGroupEmpty"
-    },
-    {
-        "command": "workbench.action.quickOpenNavigatePreviousInEditorPicker",
-        "key": "shift+ctrl+,",
-        "when": "inEditorsPicker && inQuickOpen"
-    },
-    {
         "command": "workbench.action.terminal.toggleTerminal",
         "key": "ctrl+j",
         "when": "terminal.active"
-    },
-    {
-        "command": "workbench.action.terminal.new",
-        "key": "ctrl+shift+j",
-        "when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
     },
     {
         "command": "workbench.action.toggleMaximizedPanel",
@@ -68,33 +48,28 @@
         "when": "terminalTextSelectedInFocused || terminalFocus && terminalHasBeenCreated && terminalTextSelected || terminalFocus && terminalProcessSupported && terminalTextSelected || terminalFocus && terminalTextSelected && terminalTextSelectedInFocused || terminalHasBeenCreated && terminalTextSelected && terminalTextSelectedInFocused || terminalProcessSupported && terminalTextSelected && terminalTextSelectedInFocused"
     },
     {
-        "command": "workbench.action.terminal.paste",
-        "key": "ctrl+shift+v",
-        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
-    },
-    {
         "command": "workbench.action.focusActiveEditorGroup",
         "key": "ctrl+e"
     },
     {
         "command": "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup",
-        "key": "cmd+,",
-        "when": "!activeEditorGroupEmpty && isMac"
+        "key": "ctrl+,",
+        "when": "!activeEditorGroupEmpty"
     },
     {
         "command": "workbench.action.quickOpenNavigateNextInEditorPicker",
-        "key": "cmd+,",
-        "when": "inEditorsPicker && inQuickOpen && isMac"
+        "key": "ctrl+,",
+        "when": "inEditorsPicker && inQuickOpen"
     },
     {
         "command": "workbench.action.quickOpenLeastRecentlyUsedEditorInGroup",
-        "key": "shift+cmd+,",
-        "when": "!activeEditorGroupEmpty && isMac"
+        "key": "ctrl+shift+,",
+        "when": "!activeEditorGroupEmpty"
     },
     {
         "command": "workbench.action.quickOpenNavigatePreviousInEditorPicker",
-        "key": "shift+cmd+,",
-        "when": "inEditorsPicker && inQuickOpen && isMac"
+        "key": "ctrl+shift+,",
+        "when": "inEditorsPicker && inQuickOpen"
     },
     {
         "command": "workbench.action.terminal.toggleTerminal",
@@ -117,20 +92,11 @@
         "when": "(terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported) && isMac"
     },
     {
-        "command": "workbench.action.focusActiveEditorGroup",
-        "key": "cmd+e",
-        "when": "isMac"
-    },
-    {
         "key": "ctrl+p",
         "command": "workbench.action.quickOpen"
     },
     {
         "key": "ctrl+shift+p",
         "command": "workbench.action.showCommands"
-    },
-    {
-        "key": "s s",
-        "command": "keybindings.editor.resetKeybinding"
     }
 ]
