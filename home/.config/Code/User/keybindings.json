@@ -182,11 +182,6 @@
         "when": "editorTextFocus && vim.active && vim.use<C-i> && !inDebugRepl && isMac"
     },
     {
-        "command": "extension.vim_ctrl+j",
-        "key": "cmd+j",
-        "when": "editorTextFocus && vim.active && vim.use<C-j> && !inDebugRepl && isMac"
-    },
-    {
         "command": "extension.vim_ctrl+k",
         "key": "cmd+k",
         "when": "editorTextFocus && vim.active && vim.use<C-k> && !inDebugRepl && isMac"

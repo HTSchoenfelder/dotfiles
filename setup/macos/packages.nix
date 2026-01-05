@@ -38,7 +38,6 @@
           obsidian
           utm
           vscode
-          karabiner-elements
           # keepassxc
           # spotify
   ];

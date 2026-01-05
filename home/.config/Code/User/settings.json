@@ -566,8 +566,8 @@
     "editor.defaultFormatter": "tamasfe.even-better-toml"
   },
   "azureTerraform.survey": {
-    "surveyPromptDate": "2025-10-22T13:00:14.387Z",
-    "surveyPromptIgnoredCount": 4
+    "surveyPromptDate": "2026-01-09T09:31:24.691Z",
+    "surveyPromptIgnoredCount": 5
   },
   "editor.autoClosingBrackets": "never",
   "dev.containers.dockerPath": "docker",
@@ -598,5 +598,6 @@
   },
   "[github-actions-workflow]": {
     "editor.defaultFormatter": "redhat.vscode-yaml"
-  }
+  },
+  "vim.commandLineModeKeyBindings": []
 }
