@@ -599,5 +599,8 @@
   "[github-actions-workflow]": {
     "editor.defaultFormatter": "redhat.vscode-yaml"
   },
-  "vim.commandLineModeKeyBindings": []
+  "vim.commandLineModeKeyBindings": [],
+  "[lua]": {
+    "editor.defaultFormatter": "yinfei.luahelper"
+  }
 }

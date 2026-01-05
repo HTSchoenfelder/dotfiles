@@ -117,11 +117,6 @@
         "when": "isMac"
     },
     {
-        "command": "saveAll",
-        "key": "cmd+s",
-        "when": "isMac"
-    },
-    {
         "command": "workbench.action.terminal.copySelection",
         "key": "cmd+shift+c",
         "when": "(terminalTextSelectedInFocused || terminalFocus && terminalHasBeenCreated && terminalTextSelected || terminalFocus && terminalProcessSupported && terminalTextSelected || terminalFocus && terminalTextSelected && terminalTextSelectedInFocused || terminalHasBeenCreated && terminalTextSelected && terminalTextSelectedInFocused || terminalProcessSupported && terminalTextSelected && terminalTextSelectedInFocused) && isMac"
@@ -330,5 +325,17 @@
         "command": "extension.vim_ctrl+end",
         "key": "cmd+end",
         "when": "editorTextFocus && vim.active && !inDebugRepl && vim.mode != 'Insert' && isMac"
+    },
+    {
+        "key": "ctrl+p",
+        "command": "workbench.action.quickOpen"
+    },
+    {
+        "key": "ctrl+shift+p",
+        "command": "workbench.action.showCommands"
+    },
+    {
+        "key": "s s",
+        "command": "keybindings.editor.resetKeybinding"
     }
 ]
