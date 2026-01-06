@@ -90,105 +90,144 @@
         "key": "ctrl+shift+p"
     },
     {
-        "key": "ctrl+c",
-        "command": "editor.action.clipboardCopyAction"
+        "command": "editor.action.clipboardCopyAction",
+        "key": "ctrl+c"
     },
     {
-        "key": "ctrl+a",
-        "command": "editor.action.selectAll"
+        "command": "editor.action.selectAll",
+        "key": "ctrl+a"
     },
     {
-        "key": "ctrl+a",
         "command": "list.selectAll",
+        "key": "ctrl+a",
         "when": "listFocus && listSupportsMultiselect && !inputFocus && !treestickyScrollFocused"
     },
     {
-        "key": "ctrl+a",
         "command": "workbench.action.terminal.selectAll",
+        "key": "ctrl+a",
         "when": "terminalFocusInAny && terminalHasBeenCreated || terminalFocusInAny && terminalProcessSupported"
     },
     {
-        "key": "ctrl+a",
         "command": "notebook.cell.output.selectAll",
+        "key": "ctrl+a",
         "when": "notebookEditorFocused && notebookOutputFocused"
     },
     {
-        "key": "ctrl+c",
         "command": "workbench.debug.viewlet.action.copyValue",
+        "key": "ctrl+c",
         "when": "!expressionSelected && focusedView == 'workbench.debug.variablesView' || !expressionSelected && focusedView == 'workbench.debug.watchExpressionsView'"
     },
     {
-        "key": "ctrl+c",
         "command": "problems.action.copy",
+        "key": "ctrl+c",
         "when": "problemsVisibility && !relatedInformationFocus && focusedView == 'workbench.panel.markers.view'"
     },
     {
-        "key": "ctrl+c",
         "command": "problems.action.copy",
+        "key": "ctrl+c",
         "when": "problemsVisibility && !relatedInformationFocus && focusedView == 'workbench.panel.markers.view'"
     },
     {
-        "key": "ctrl+c",
         "command": "keybindings.editor.copyKeybindingEntry",
+        "key": "ctrl+c",
         "when": "inKeybindings && keybindingFocus && !whenFocus"
     },
     {
-        "key": "ctrl+f",
         "command": "keybindings.editor.searchKeybindings",
+        "key": "ctrl+f",
         "when": "inKeybindings"
     },
     {
-        "key": "ctrl+k ctrl+w",
-        "command": "workbench.action.closeAllEditors"
+        "command": "workbench.action.closeAllEditors",
+        "key": "ctrl+k ctrl+w"
     },
     {
-        "key": "ctrl+f",
         "command": "actions.find",
+        "key": "ctrl+f",
         "when": "editorFocus || editorIsOpen"
     },
     {
-        "key": "ctrl+f",
         "command": "notebook.find",
+        "key": "ctrl+f",
         "when": "notebookEditorFocused && !editorFocus && activeEditor == 'workbench.editor.interactive' || notebookEditorFocused && !editorFocus && activeEditor == 'workbench.editor.notebook'"
     },
     {
-        "key": "ctrl+f",
         "command": "settings.action.search",
+        "key": "ctrl+f",
         "when": "inSettingsEditor"
     },
     {
-        "key": "ctrl+f",
         "command": "workbench.action.terminal.focusFind",
+        "key": "ctrl+f",
         "when": "terminalFindFocused && terminalHasBeenCreated || terminalFindFocused && terminalProcessSupported || terminalFocusInAny && terminalHasBeenCreated || terminalFocusInAny && terminalProcessSupported"
     },
     {
-        "key": "ctrl+f",
         "command": "commentsFocusFilter",
+        "key": "ctrl+f",
         "when": "focusedView == 'workbench.panel.comments'"
     },
     {
-        "key": "ctrl+f",
         "command": "editor.action.extensioneditor.showfind",
+        "key": "ctrl+f",
         "when": "!editorFocus && activeEditor == 'workbench.editor.extension'"
     },
     {
-        "key": "ctrl+f",
         "command": "editor.action.webvieweditor.showFind",
+        "key": "ctrl+f",
         "when": "webviewFindWidgetEnabled && !editorFocus && activeEditor == 'WebviewEditor'"
     },
     {
-        "key": "ctrl+f",
         "command": "keybindings.editor.searchKeybindings",
+        "key": "ctrl+f",
         "when": "inKeybindings"
     },
     {
-        "key": "ctrl+f",
         "command": "problems.action.focusFilter",
+        "key": "ctrl+f",
         "when": "focusedView == 'workbench.panel.markers.view'"
     },
     {
-        "key": "ctrl+f",
         "command": "repl.action.filter",
+        "key": "ctrl+f",
         "when": "inDebugRepl && textInputFocus"
+    },
+    {
+        "command": "chat.inlineResourceAnchor.copyResource",
+        "key": "ctrl+c",
+        "when": "chatAttachmentResource"
+    },
+    {
+        "command": "execCopy",
+        "key": "ctrl+c"
+    },
+    {
+        "command": "filesExplorer.copy",
+        "key": "ctrl+c",
+        "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !inputFocus"
+    },
+    {
+        "command": "keybindings.editor.copyKeybindingEntry",
+        "key": "ctrl+c",
+        "when": "inKeybindings && keybindingFocus && !whenFocus"
+    },
+    {
+        "command": "problems.action.copy",
+        "key": "ctrl+c",
+        "when": "problemsVisibility && !relatedInformationFocus && focusedView == 'workbench.panel.markers.view'"
+    },
+    {
+        "command": "remote.tunnel.copyAddressInline",
+        "key": "ctrl+c",
+        "when": "tunnelViewFocus && tunnelType == 'Detected' && tunnelViewMultiSelection == 'undefined' || tunnelViewFocus && tunnelType == 'Forwarded' && tunnelViewMultiSelection == 'undefined'"
+    },
+    {
+        "command": "search.action.copyMatch",
+        "key": "ctrl+c",
+        "when": "fileMatchOrMatchFocus"
+    },
+    {
+        "command": "workbench.debug.viewlet.action.copyValue",
+        "key": "ctrl+c",
+        "when": "!expressionSelected && focusedView == 'workbench.debug.variablesView' || !expressionSelected && focusedView == 'workbench.debug.watchExpressionsView'"
     }
 ]
