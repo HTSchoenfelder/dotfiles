@@ -582,7 +582,9 @@
     ],
     "vs-kubernetes.kubeconfig": "/Users/schoenfeldeh/Documents/config"
   },
+  "window.commandCenter": false,
   "window.menuBarVisibility": "toggle",
+  "window.menuStyle": "inherit",
   "window.title": "${rootPath} | Code",
   "workbench.colorCustomizations": {
     "statusBar.background": "#11111B",
@@ -595,6 +597,8 @@
   "workbench.colorTheme": "Catppuccin Mocha",
   "workbench.editor.showTabs": "single",
   "workbench.iconTheme": "catppuccin-mocha",
+  "workbench.layoutControl.enabled": false,
+  "workbench.navigationControl.enabled": false,
   "workbench.panel.showLabels": false,
   "workbench.preferredDarkColorTheme": "Catppuccin Mocha",
   "workbench.preferredLightColorTheme": "Catppuccin Frappé",
