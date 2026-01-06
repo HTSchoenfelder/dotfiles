@@ -82,11 +82,11 @@
         "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
     },
     {
-        "key": "ctrl+p",
-        "command": "workbench.action.quickOpen"
+        "command": "workbench.action.quickOpen",
+        "key": "ctrl+p"
     },
     {
-        "key": "ctrl+shift+p",
-        "command": "workbench.action.showCommands"
+        "command": "workbench.action.showCommands",
+        "key": "ctrl+shift+p"
     }
 ]
