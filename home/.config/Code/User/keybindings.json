@@ -90,10 +90,6 @@
         "key": "ctrl+shift+p"
     },
     {
-        "command": "editor.action.clipboardCopyAction",
-        "key": "ctrl+c"
-    },
-    {
         "command": "editor.action.selectAll",
         "key": "ctrl+a"
     },
@@ -197,10 +193,6 @@
         "when": "chatAttachmentResource"
     },
     {
-        "command": "execCopy",
-        "key": "ctrl+c"
-    },
-    {
         "command": "filesExplorer.copy",
         "key": "ctrl+c",
         "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !inputFocus"
@@ -229,5 +221,58 @@
         "command": "workbench.debug.viewlet.action.copyValue",
         "key": "ctrl+c",
         "when": "!expressionSelected && focusedView == 'workbench.debug.variablesView' || !expressionSelected && focusedView == 'workbench.debug.watchExpressionsView'"
+    },
+    {
+        "command": "undo",
+        "key": "ctrl+z"
+    },
+    {
+        "command": "inlineChat.unstash",
+        "key": "ctrl+z",
+        "when": "inlineChatHasStashedSession && !editorReadonly"
+    },
+    {
+        "command": "excalidraw.preventDefault",
+        "key": "ctrl+z",
+        "when": "activeCustomEditorId == 'editor.excalidraw'"
+    },
+    {
+        "command": "redo",
+        "key": "ctrl+shift+z"
+    },
+    {
+        "command": "workbench.action.findInFiles",
+        "key": "ctrl+shift+f"
+    },
+    {
+        "command": "workbench.view.search",
+        "key": "ctrl+shift+f",
+        "when": "workbench.view.search.active && neverMatch =~ /doesNotMatch/"
+    },
+    {
+        "command": "workbench.action.terminal.searchWorkspace",
+        "key": "ctrl+shift+f",
+        "when": "terminalFocus && terminalProcessSupported && terminalTextSelected"
+    },
+    {
+        "command": "execCut",
+        "key": "ctrl+x"
+    },
+    {
+        "command": "editor.action.clipboardCutAction",
+        "key": "ctrl+x"
+    },
+    {
+        "command": "filesExplorer.cut",
+        "key": "ctrl+x",
+        "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+    },
+    {
+        "command": "workbench.action.files.saveAll",
+        "key": "ctrl+s"
+    },
+    {
+        "command": "workbench.action.files.saveFiles",
+        "key": "ctrl+s"
     }
 ]

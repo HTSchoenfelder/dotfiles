@@ -11,11 +11,25 @@
   "[csharp]": {
     "editor.defaultFormatter": "ms-dotnettools.csharp"
   },
+  "[dockercompose]": {
+    "editor.autoIndent": "advanced",
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.insertSpaces": true,
+    "editor.quickSuggestions": {
+      "comments": false,
+      "other": true,
+      "strings": true
+    },
+    "editor.tabSize": 2
+  },
   "[dockerfile]": {
     "editor.defaultFormatter": "ms-azuretools.vscode-docker"
   },
   "[dotenv]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
   },
   "[go]": {
     "editor.defaultFormatter": "golang.go"
@@ -34,6 +48,9 @@
   },
   "[jsonc]": {
     "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[lua]": {
+    "editor.defaultFormatter": "yinfei.luahelper"
   },
   "[markdown]": {
     "diffEditor.ignoreTrimWhitespace": false,
@@ -80,6 +97,9 @@
   "[terraform]": {
     "editor.defaultFormatter": "hashicorp.terraform"
   },
+  "[toml]": {
+    "editor.defaultFormatter": "tamasfe.even-better-toml"
+  },
   "[typescript]": {
     "editor.defaultFormatter": "vscode.typescript-language-features"
   },
@@ -97,6 +117,10 @@
   "azureResourceGroups.selectedSubscriptions": [
     "be4e3f5e-4841-426f-96f3-e2dbe0b106b1/638e83f3-f008-4039-a5fa-b8bce9a9df54"
   ],
+  "azureTerraform.survey": {
+    "surveyPromptDate": "2026-01-09T09:31:24.691Z",
+    "surveyPromptIgnoredCount": 5
+  },
   "azureTerraform.terminal": "integrated",
   "bicep.enableSurveys": false,
   "catppuccin.customUIColors": {
@@ -126,6 +150,14 @@
       }
     }
   },
+  "containers.images.description": [
+    "CreatedTime",
+    "Size"
+  ],
+  "containers.images.groupBy": "None",
+  "containers.images.label": "FullTag",
+  "containers.images.sortBy": "CreatedTime",
+  "dev.containers.dockerPath": "docker",
   "diffEditor.ignoreTrimWhitespace": false,
   "docker.images.description": [
     "CreatedTime",
@@ -136,6 +168,7 @@
   "docker.images.sortBy": "CreatedTime",
   "dotfiles.installCommand": "stow home --no-folding",
   "dotfiles.repository": "https://github.com/htschoenfelder/dotfiles.git",
+  "editor.autoClosingBrackets": "never",
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
   },
@@ -178,10 +211,17 @@
     "compounds": [],
     "configurations": []
   },
+  "makefile.configureOnOpen": true,
   "markdown-preview-github-styles.colorTheme": "light",
   "markdown.extension.toc.levels": "2..6",
   "markdown.updateLinksOnFileMove.enabled": "prompt",
   "markdown.validate.enabled": true,
+  "mssql.connectionGroups": [
+    {
+      "id": "5A2122A7-BB7A-4781-A9A0-7DB63782256D",
+      "name": "ROOT"
+    }
+  ],
   "redhat.telemetry.enabled": true,
   "rest-client.environmentVariables": {
     "$shared": {}
@@ -197,15 +237,15 @@
   "typescript.updateImportsOnFileMove.enabled": "always",
   "update.mode": "none",
   "update.showReleaseNotes": false,
+  "vim.commandLineModeKeyBindings": [],
   "vim.commandLineModeKeyBindingsNonRecursive": [],
   "vim.handleKeys": {
     "<C-a>": false,
+    "<C-f>": false,
     "<C-k>": false,
     "<C-p>": false,
     "<C-s>": false,
-    "<C-z>": false,
-    "<C-y>": false,
-    "<C-f>": false
+    "<C-z>": false
   },
   "vim.highlightedyank.color": "#a9dc7660",
   "vim.highlightedyank.duration": 800,
@@ -561,46 +601,5 @@
   "workbench.sideBar.location": "right",
   "workbench.startupEditor": "none",
   "workbench.tree.enableStickyScroll": false,
-  "makefile.configureOnOpen": true,
-  "[toml]": {
-    "editor.defaultFormatter": "tamasfe.even-better-toml"
-  },
-  "azureTerraform.survey": {
-    "surveyPromptDate": "2026-01-09T09:31:24.691Z",
-    "surveyPromptIgnoredCount": 5
-  },
-  "editor.autoClosingBrackets": "never",
-  "dev.containers.dockerPath": "docker",
-  "containers.images.groupBy": "None",
-  "containers.images.description": [
-    "CreatedTime",
-    "Size"
-  ],
-  "containers.images.label": "FullTag",
-  "containers.images.sortBy": "CreatedTime",
-  "mssql.connectionGroups": [
-    {
-      "name": "ROOT",
-      "id": "5A2122A7-BB7A-4781-A9A0-7DB63782256D"
-    }
-  ],
-  "yaml.maxItemsComputed": 30000,
-  "[dockercompose]": {
-    "editor.insertSpaces": true,
-    "editor.tabSize": 2,
-    "editor.autoIndent": "advanced",
-    "editor.quickSuggestions": {
-      "other": true,
-      "comments": false,
-      "strings": true
-    },
-    "editor.defaultFormatter": "redhat.vscode-yaml"
-  },
-  "[github-actions-workflow]": {
-    "editor.defaultFormatter": "redhat.vscode-yaml"
-  },
-  "vim.commandLineModeKeyBindings": [],
-  "[lua]": {
-    "editor.defaultFormatter": "yinfei.luahelper"
-  }
+  "yaml.maxItemsComputed": 30000
 }
