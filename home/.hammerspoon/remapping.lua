@@ -26,7 +26,6 @@ local ctrlToOptionMap = {
 }
 
 M.start = function()
-    -- Wir erstellen den Tap. WICHTIG: Er muss am Ende IMMER false liefern für unbekannte Tasten.
     M.tap = hs.eventtap.new({hs.eventtap.event.types.keyDown}, function(event)
         local flags = event:getFlags()
         local keyCode = event:getKeyCode()
@@ -38,6 +37,7 @@ M.start = function()
         local bundleID = app:bundleID()
         local isTerm = terminalApps[bundleID]
         local isChrome = (bundleID == "com.google.Chrome")
+        local isVsCode = (bundleID == "com.microsoft.VSCode")
 
         -- 1. TERMINAL PRIORITÄT
         if isTerm then
@@ -55,6 +55,10 @@ M.start = function()
                     return true
                 end
             end
+            return false
+        end
+
+        if isVsCode then
             return false
         end
 
@@ -96,14 +100,9 @@ M.start = function()
                 return true
             end
 
-            -- FALLBACK INNERHALB CTRL: 
-            -- Wenn Ctrl gedrückt ist, aber die Taste (wie Enter=36) nicht gemappt ist,
-            -- MUSS hier false zurückgegeben werden, damit das Original-Event weitergeht.
             return false
         end
 
-        -- ABSOLUTES ENDE: 
-        -- Für alle Tasten ohne Ctrl (normale Buchstaben, Enter, etc.)
         return false
     end):start()
 end

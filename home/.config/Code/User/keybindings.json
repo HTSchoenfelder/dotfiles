@@ -30,22 +30,12 @@
         "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceReadonly && !inputFocus"
     },
     {
-        "command": "workbench.action.terminal.toggleTerminal",
-        "key": "ctrl+j",
-        "when": "terminal.active"
-    },
-    {
         "command": "workbench.action.toggleMaximizedPanel",
         "key": "ctrl+'"
     },
     {
         "command": "saveAll",
         "key": "ctrl+s"
-    },
-    {
-        "command": "workbench.action.terminal.copySelection",
-        "key": "ctrl+shift+c",
-        "when": "terminalTextSelectedInFocused || terminalFocus && terminalHasBeenCreated && terminalTextSelected || terminalFocus && terminalProcessSupported && terminalTextSelected || terminalFocus && terminalTextSelected && terminalTextSelectedInFocused || terminalHasBeenCreated && terminalTextSelected && terminalTextSelectedInFocused || terminalProcessSupported && terminalTextSelected && terminalTextSelectedInFocused"
     },
     {
         "command": "workbench.action.focusActiveEditorGroup",
@@ -73,23 +63,23 @@
     },
     {
         "command": "workbench.action.terminal.toggleTerminal",
-        "key": "cmd+j",
-        "when": "terminal.active && isMac"
+        "key": "ctrl+j",
+        "when": "terminal.active"
     },
     {
         "command": "workbench.action.terminal.new",
-        "key": "cmd+shift+j",
-        "when": "(terminalProcessSupported || terminalWebExtensionContributedProfile) && isMac"
+        "key": "ctrl+shift+j",
+        "when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
     },
     {
         "command": "workbench.action.terminal.copySelection",
-        "key": "cmd+shift+c",
-        "when": "(terminalTextSelectedInFocused || terminalFocus && terminalHasBeenCreated && terminalTextSelected || terminalFocus && terminalProcessSupported && terminalTextSelected || terminalFocus && terminalTextSelected && terminalTextSelectedInFocused || terminalHasBeenCreated && terminalTextSelected && terminalTextSelectedInFocused || terminalProcessSupported && terminalTextSelected && terminalTextSelectedInFocused) && isMac"
+        "key": "ctrl+shift+c",
+        "when": "terminalTextSelectedInFocused || terminalFocus && terminalHasBeenCreated && terminalTextSelected || terminalFocus && terminalProcessSupported && terminalTextSelected || terminalFocus && terminalTextSelected && terminalTextSelectedInFocused || terminalHasBeenCreated && terminalTextSelected && terminalTextSelectedInFocused || terminalProcessSupported && terminalTextSelected && terminalTextSelectedInFocused"
     },
     {
         "command": "workbench.action.terminal.paste",
-        "key": "cmd+shift+v",
-        "when": "(terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported) && isMac"
+        "key": "ctrl+shift+v",
+        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
     },
     {
         "key": "ctrl+p",
