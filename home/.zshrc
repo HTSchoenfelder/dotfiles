@@ -16,9 +16,9 @@ alias l='eza -alF --no-user --icons --group-directories-first'
 
 alias x='exec zsh'
 alias lsdev='lsblk -o NAME,SIZE,TYPE,FSTYPE,LABEL,MOUNTPOINT'
-alias cd="z"
-alias cdc="cd"
-alias c="wl-copy"
+alias cd='z'
+alias cdc='cd'
+alias c='wl-copy'
 alias myip="curl -s ifconfig.io | tee >(wl-copy)"
 
 alias code='code --profile Default --enable-features=WebRTCPipeWireCapturer --ozone-platform-hint=wayland'
@@ -35,6 +35,14 @@ alias nixupdatelatest='nix flake update nixpkgs-latest --flake $HOME/dotfiles/se
 alias nixupdatestable='nix flake update nixpkgs-stable --flake $HOME/dotfiles/setup/nixos'
 alias nixrepl='nix repl -f flake:nixpkgs'
 alias brewbundle='brew bundle install --file ~/dotfiles/setup/macos/Brewfile'
+
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	command yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+	rm -f -- "$tmp"
+}
 
 nixsh() {
     export NIXPKGS_ALLOW_UNFREE=1
@@ -86,6 +94,7 @@ export PATH=$PATH:/usr/local/go/bin
 export PATH=$PATH:/home/henrik/.dapr/bin
 # export DOTNET_ROOT=/home/henrik/.dotnet
 export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
+export EDITOR=nvim
 
 fpath=(~/.docker/completions $fpath)
 
