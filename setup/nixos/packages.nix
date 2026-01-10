@@ -141,6 +141,7 @@
     unison
     freefilesync
     file-roller
+    lua
   ];
 
   fonts.packages = with pkgs; [
