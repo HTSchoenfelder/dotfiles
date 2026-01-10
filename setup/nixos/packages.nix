@@ -81,7 +81,6 @@
     seahorse
     google-chrome
     gthumb
-    synergy
     wev
     tree
     hyprshot
