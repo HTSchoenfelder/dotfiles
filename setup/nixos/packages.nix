@@ -106,7 +106,6 @@
     strace
     fd
     ripgrep
-    microsoft-edge
     # linphone
     audacity
     usbview
