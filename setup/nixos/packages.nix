@@ -142,6 +142,7 @@
     freefilesync
     file-roller
     lua
+    disktui
   ];
 
   fonts.packages = with pkgs; [
