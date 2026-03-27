@@ -106,7 +106,6 @@
     strace
     fd
     ripgrep
-    microsoft-edge
     # linphone
     audacity
     usbview
@@ -142,6 +141,7 @@
     freefilesync
     file-roller
     lua
+    disktui
   ];
 
   fonts.packages = with pkgs; [

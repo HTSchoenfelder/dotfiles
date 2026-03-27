@@ -605,5 +605,6 @@
   "workbench.sideBar.location": "right",
   "workbench.startupEditor": "none",
   "workbench.tree.enableStickyScroll": false,
-  "yaml.maxItemsComputed": 30000
+  "yaml.maxItemsComputed": 30000,
+  "terminal.integrated.suggest.enabled": false
 }
