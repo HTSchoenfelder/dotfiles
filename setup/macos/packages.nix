@@ -11,12 +11,11 @@
           stackit-cli
           fzf
           zoxide
-          direnv
           starship
           eza
           yazi
           kubectl 
-          direnv
+          pkgsStable.direnv
           terraform
           zellij
           neovim
