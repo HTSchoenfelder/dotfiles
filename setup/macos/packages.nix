@@ -25,7 +25,7 @@
           gnumake
           zsh-autosuggestions
           zsh-fast-syntax-highlighting
-          neofetch
+          fastfetch
           cowsay
           cloudfoundry-cli
           docker
