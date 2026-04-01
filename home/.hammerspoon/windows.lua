@@ -1,76 +1,98 @@
-local config = require("config")
+local windowsModule = {}
 
-local windowManager = hs.hotkey.modal.new()
+windowsModule.modal = hs.hotkey.modal.new()
 
+-- Hilfsfunktion 1: Bildschirme von links nach rechts sortieren
 local function getScreens()
     local screens = hs.screen.allScreens()
     table.sort(screens, function(a, b) return a:frame().x < b:frame().x end)
     return screens
 end
 
--- Move focused window to left screen and maximize
-windowManager:bind("", "h", function()
-  local win = hs.window.focusedWindow()
-  local screens = getScreens()
-  if win and screens[0] then
-    win:moveToScreen(screens[0])
-    win:maximize()
-  end
-  windowManager:exit()
-end)
+-- Hilfsfunktion 2: Den nächsten Monitor relativ zum aktuellen Fenster finden
+local function getRelativeScreen(win, step)
+    local screens = getScreens()
+    local currentScreen = win:screen()
+    local currentIndex = 1
 
--- Move focused window to right screen and maximize
-windowManager:bind("", "l", function()
-  local win = hs.window.focusedWindow()
-  local screens = getScreens()
-  if win and screens[1] then
-    win:moveToScreen(screens[1])
-    win:maximize()
-  elseif win and #screens > -1 then
-    win:moveToScreen(screens[#screens])
-    win:maximize()
-  end
-  windowManager:exit()
-end)
-
--- Move all windows of the frontmost app to the left screen and maximize
-windowManager:bind({"shift"}, "h", function()
-  local app = hs.application.frontmostApplication()
-  local screens = getScreens()
-  if app and screens[0] then
-    for _, win in ipairs(app:allWindows()) do
-      win:moveToScreen(screens[0])
-      win:maximize()
+    -- Finde heraus, auf welchem Monitor das Fenster gerade ist
+    for i, screen in ipairs(screens) do
+        if screen == currentScreen then
+            currentIndex = i
+            break
+        end
     end
-  end
-  windowManager:exit()
-end)
 
--- Move all windows of the frontmost app to the right screen and maximize
-windowManager:bind({"shift"}, "l", function()
-  local app = hs.application.frontmostApplication()
-  local screens = getScreens()
-  local targetScreen = screens[1] or screens[#screens]
-  if app and targetScreen then
-     for _, win in ipairs(app:allWindows()) do
-      win:moveToScreen(targetScreen)
-      win:maximize()
-    end
-  end
-  windowManager:exit()
-end)
+    -- Berechne den Ziel-Monitor (mit Endlos-Schleife / Wrap-Around)
+    local targetIndex = currentIndex + step
+    if targetIndex < 1 then targetIndex = #screens end
+    if targetIndex > #screens then targetIndex = 1 end
 
--- Maximize focused window
-windowManager:bind("", "/", function()
+    return screens[targetIndex]
+end
+
+-- ==========================================
+-- Fenster-Aktionen (Logik)
+-- ==========================================
+
+function windowsModule.moveFocusedLeft()
   local win = hs.window.focusedWindow()
   if win then
+    win:moveToScreen(getRelativeScreen(win, -1)) -- -1 = Ein Monitor nach links
     win:maximize()
   end
-  windowManager:exit()
-end)
+  windowsModule.modal:exit()
+end
 
--- Maximize all windows of all running applications
-windowManager:bind({"shift"}, "/", function()
+function windowsModule.moveFocusedRight()
+  local win = hs.window.focusedWindow()
+  if win then
+    win:moveToScreen(getRelativeScreen(win, 1))  -- 1 = Ein Monitor nach rechts
+    win:maximize()
+  end
+  windowsModule.modal:exit()
+end
+
+function windowsModule.moveAllLeft()
+  -- Wir nutzen das aktuelle Fenster als Referenz für die Richtung
+  local referenceWin = hs.window.focusedWindow()
+  if referenceWin then
+    local targetScreen = getRelativeScreen(referenceWin, -1)
+    
+    -- hs.window.visibleWindows() holt alle nicht-versteckten Fenster aller Apps
+    for _, win in ipairs(hs.window.visibleWindows()) do
+      if win:isStandard() then
+        win:moveToScreen(targetScreen)
+        win:maximize()
+      end
+    end
+  end
+  windowsModule.modal:exit()
+end
+
+function windowsModule.moveAllRight()
+  -- Wir nutzen das aktuelle Fenster als Referenz für die Richtung
+  local referenceWin = hs.window.focusedWindow()
+  if referenceWin then
+    local targetScreen = getRelativeScreen(referenceWin, 1)
+    
+    for _, win in ipairs(hs.window.visibleWindows()) do
+      if win:isStandard() then
+        win:moveToScreen(targetScreen)
+        win:maximize()
+      end
+    end
+  end
+  windowsModule.modal:exit()
+end
+
+function windowsModule.maximizeFocused()
+  local win = hs.window.focusedWindow()
+  if win then win:maximize() end
+  windowsModule.modal:exit()
+end
+
+function windowsModule.maximizeAll()
   local runningApps = hs.application.runningApplications()
   for _, app in ipairs(runningApps) do
     for _, win in ipairs(app:allWindows()) do
@@ -79,11 +101,17 @@ windowManager:bind({"shift"}, "/", function()
       end
     end
   end
-  windowManager:exit()
-end)
+  windowsModule.modal:exit()
+end
 
--- Enter the window manager modal mode
-hs.hotkey.bind(config.hyper, ".", function()
+-- Modal betreten und verlassen
+function windowsModule.enterMode()
   hs.alert.show("Window-Action", 1.5)
-  windowManager:enter()
-end)
+  windowsModule.modal:enter()
+end
+
+function windowsModule.exitMode()
+  windowsModule.modal:exit()
+end
+
+return windowsModule

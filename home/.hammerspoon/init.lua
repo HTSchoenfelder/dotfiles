@@ -3,6 +3,8 @@ require("hs.ipc")
 require("apps")
 require("windows")
 require("functions")
+require("midi")
+require("shortcuts")
 local launcher = require("launcher")
 local linuxshortcuts = require("remapping")
 
