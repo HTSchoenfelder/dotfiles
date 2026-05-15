@@ -38,7 +38,7 @@
     nano
     stow
     keepassxc
-    neofetch
+    fastfetch
     obsidian
     nautilus
     wget
