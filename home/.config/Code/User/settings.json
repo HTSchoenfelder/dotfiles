@@ -606,5 +606,15 @@
   "workbench.startupEditor": "none",
   "workbench.tree.enableStickyScroll": false,
   "yaml.maxItemsComputed": 30000,
-  "terminal.integrated.suggest.enabled": false
+  "terminal.integrated.suggest.enabled": false,
+  "yaml.disableSchemaDetection": [
+    "**/.github/workflows/*.yml",
+    "**/.github/workflows/*.yaml",
+    "**/.gitea/workflows/*.yml",
+    "**/.gitea/workflows/*.yaml",
+    "**/.forgejo/workflows/*.yml",
+    "**/.forgejo/workflows/*.yaml",
+    "azure-pipelines.yml",
+    "azure-pipelines.yaml"
+  ]
 }
