@@ -67,7 +67,7 @@
     playerctl
     mlocate
     libsForQt5.qt5ct
-    libsForQt5.qt5.qtwayland
+    qt5.qtwayland
     catppuccin-cursors.mochaMauve
     libreoffice
     simple-scan
