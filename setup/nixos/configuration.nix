@@ -131,7 +131,6 @@ in
     nativeMessagingHosts.packages = [ pkgs.firefoxpwa ];
   };
 
-  programs.waybar.enable = true;
   nixpkgs.config.allowUnfree = true;
 
   nix.settings.experimental-features = [

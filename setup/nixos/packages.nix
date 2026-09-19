@@ -142,6 +142,7 @@
     file-roller
     lua
     disktui
+    waybar
   ];
 
   fonts.packages = with pkgs; [
