@@ -195,7 +195,6 @@
   "git.confirmSync": false,
   "git.enableSmartCommit": true,
   "git.openRepositoryInParentFolders": "always",
-  "github.copilot.advanced": {},
   "github.copilot.editor.enableAutoCompletions": true,
   "github.copilot.enable": {
     "markdown": true
@@ -602,7 +601,6 @@
   "workbench.panel.showLabels": false,
   "workbench.preferredDarkColorTheme": "Catppuccin Mocha",
   "workbench.preferredLightColorTheme": "Catppuccin Frappé",
-  "workbench.sideBar.location": "right",
   "workbench.startupEditor": "none",
   "workbench.tree.enableStickyScroll": false,
   "yaml.maxItemsComputed": 30000,
@@ -615,15 +613,8 @@
     "**/.forgejo/workflows/*.yml",
     "**/.forgejo/workflows/*.yaml",
     "azure-pipelines.yml",
-    "azure-pipelines.yaml",
-    "**/docker-compose.yml",
-    "**/docker-compose.yaml",
-    "**/docker-compose.*.yml",
-    "**/docker-compose.*.yaml",
-    "**/compose.yml",
-    "**/compose.yaml",
-    "**/compose.*.yml",
-    "**/compose.*.yaml"
+    "azure-pipelines.yaml"
   ],
-  "workbench.secondarySideBar.defaultVisibility": "hidden"
+  "workbench.secondarySideBar.defaultVisibility": "hidden",
+  "workbench.sideBar.location": "right"
 }
