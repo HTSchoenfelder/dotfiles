@@ -71,16 +71,6 @@ in
   # services.gnome.gnome-keyring.enable = true;
   services.pcscd.enable = true;
 
-  services.greetd = {
-    enable = true;
-    settings = {
-      default_session = {
-        command = "${pkgs.tuigreet}/bin/tuigreet --time --asterisks --cmd ${hyprlandPackage}/bin/start-hyprland";
-        user = "${userName}";
-      };
-    };
-  };
-
   # Scanning / Printing (CUPS)
   services.printing = {
     enable = true;
