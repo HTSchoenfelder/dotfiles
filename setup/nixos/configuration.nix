@@ -75,7 +75,7 @@ in
     enable = true;
     settings = {
       default_session = {
-        command = "${pkgs.tuigreet}/bin/tuigreet --time --asterisks --cmd Hyprland";
+        command = "${pkgs.tuigreet}/bin/tuigreet --time --asterisks --cmd ${hyprlandPackage}/bin/start-hyprland";
         user = "${userName}";
       };
     };
