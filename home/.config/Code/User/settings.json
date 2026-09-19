@@ -624,5 +624,6 @@
     "**/compose.yaml",
     "**/compose.*.yml",
     "**/compose.*.yaml"
-  ]
+  ],
+  "workbench.secondarySideBar.defaultVisibility": "hidden"
 }
