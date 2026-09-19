@@ -32,7 +32,8 @@ echo "Applying nixos configuration $configuration..."
 read -p "(Press Enter to continue)" enter
 sudo nixos-rebuild switch --flake .#$configuration
 
-ln -sf ~/dotfiles/home/.config/hypr/configurations/$configuration/monitor.conf ~/.config/hypr/hyprland.monitor.conf
+mkdir -p ~/.config/hypr/config
+ln -sfn ~/dotfiles/home/.config/hypr/config/hosts/$configuration/monitor.lua ~/.config/hypr/config/monitor.lua
 
 mkdir $HOME/screenshots/
 mkdir -p ~/projects/dev
