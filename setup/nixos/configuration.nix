@@ -10,6 +10,25 @@ let
   hyprlandPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
   hyprlandPortalPackage =
     inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+
+  # tty1 is the regular interactive login for Henrik: skip the username prompt,
+  # but keep the normal PAM password authentication. Other TTYs remain standard
+  # username/password logins so another account can always be used there.
+  consoleLogin = pkgs.writeShellScript "console-login" ''
+    if [ "$TTY" = "tty1" ]; then
+      exec ${pkgs.util-linux}/bin/agetty \
+        --login-program ${pkgs.shadow}/bin/login \
+        --login-options '-p -- ${userName}' \
+        --skip-login \
+        --issue-file /etc/issue:/etc/issue.d:/run/issue:/run/issue.d \
+        --noclear --keep-baud "$TTY" 115200,38400,9600 "$TERM"
+    fi
+
+    exec ${pkgs.util-linux}/bin/agetty \
+      --login-program ${pkgs.shadow}/bin/login \
+      --issue-file /etc/issue:/etc/issue.d:/run/issue:/run/issue.d \
+      --noclear --keep-baud "$TTY" 115200,38400,9600 "$TERM"
+  '';
 in
 {
   users.users."${userName}" = {
@@ -70,6 +89,40 @@ in
 
   # services.gnome.gnome-keyring.enable = true;
   services.pcscd.enable = true;
+
+  # Console login styling. tty1 is optimized for the normal Henrik login;
+  # Ctrl+Alt+F2 (and the other TTYs) keep the regular user-name prompt.
+  services.getty = {
+    greetingLine = ":: NixOS :: \\n :: \\l ::";
+    helpLine = "tty1: henrik  |  Ctrl+Alt+F2: login as another user";
+  };
+
+  systemd.services."getty@".serviceConfig.ExecStart = lib.mkForce [
+    ""
+    consoleLogin
+  ];
+
+  console = {
+    font = "Lat2-Terminus16";
+    colors = [
+      "1e1e2e"
+      "f38ba8"
+      "a6e3a1"
+      "f9e2af"
+      "89b4fa"
+      "cba6f7"
+      "94e2d5"
+      "bac2de"
+      "585b70"
+      "eba0ac"
+      "a6e3a1"
+      "f9e2af"
+      "74c7ec"
+      "cba6f7"
+      "89dceb"
+      "cdd6f4"
+    ];
+  };
 
   # Scanning / Printing (CUPS)
   services.printing = {
