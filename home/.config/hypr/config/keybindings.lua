@@ -22,7 +22,7 @@ hl.bind(
 hl.bind(
     mainMod .. " + L",
     hl.dsp.exec_cmd([[if hyprctl clients -j | jq -e 'any(.[]; .class == "google-chrome")' >/dev/null; then
-        hyprctl dispatch focuswindow 'class:^(google-chrome)$'
+        hyprctl dispatch 'hl.dsp.focus({ window = "class:^(google-chrome)$" })'
     else
         google-chrome-stable
     fi]])
