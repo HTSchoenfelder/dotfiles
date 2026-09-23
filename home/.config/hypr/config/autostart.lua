@@ -9,7 +9,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("udiskie --tray")
 
     -- Keep Synology Drive on X11/XWayland and retain the previous 10 second delay.
-    hl.exec_cmd("env QT_QPA_PLATFORM=xcb sh -c 'sleep 10 && exec synology-drive start'")
+    -- hl.exec_cmd("env QT_QPA_PLATFORM=xcb sh -c 'sleep 10 && exec synology-drive start'")
 
     hl.exec_cmd([[dconf write /org/gnome/desktop/interface/cursor-theme "'catppuccin-mocha-mauve-cursors'"]])
     hl.exec_cmd("dconf write /org/gnome/desktop/interface/cursor-size 32")
