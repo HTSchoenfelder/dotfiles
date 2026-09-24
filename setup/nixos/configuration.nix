@@ -87,7 +87,18 @@ in
     LC_TIME = "de_DE.UTF-8";
   };
 
-  # services.gnome.gnome-keyring.enable = true;
+  # Freedesktop Secret Service provider for applications such as VS Code.
+  # The login keyring is unlocked by PAM during the normal TTY login.
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services.login.enableGnomeKeyring = true;
+
+  # secret-tool provides CLI access to the Secret Service; Seahorse is the
+  # graphical inspector/editor for GNOME Keyring.
+  environment.systemPackages = with pkgs; [
+    libsecret
+    seahorse
+  ];
+
   services.pcscd.enable = true;
 
   # Console login styling. tty1 is optimized for the normal Henrik login;
