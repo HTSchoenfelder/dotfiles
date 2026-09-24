@@ -1,4 +1,4 @@
-local mainMod = "SUPER + CTRL + ALT"
+mainMod = "SUPER + CTRL + ALT"
 
 -- Application launcher
 hl.bind(
