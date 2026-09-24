@@ -90,6 +90,9 @@ in
   # Freedesktop Secret Service provider for applications such as VS Code.
   # The login keyring is unlocked by PAM during the normal TTY login.
   services.gnome.gnome-keyring.enable = true;
+  # Keep the existing OpenSSH agent. Nixpkgs otherwise enables GCR's SSH
+  # agent by default when GNOME Keyring is enabled, and the two conflict.
+  services.gnome.gcr-ssh-agent.enable = false;
   security.pam.services.login.enableGnomeKeyring = true;
 
   # secret-tool provides CLI access to the Secret Service; Seahorse is the
