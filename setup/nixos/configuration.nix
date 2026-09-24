@@ -95,13 +95,6 @@ in
   services.gnome.gcr-ssh-agent.enable = false;
   security.pam.services.login.enableGnomeKeyring = true;
 
-  # secret-tool provides CLI access to the Secret Service; Seahorse is the
-  # graphical inspector/editor for GNOME Keyring.
-  environment.systemPackages = with pkgs; [
-    libsecret
-    seahorse
-  ];
-
   services.pcscd.enable = true;
 
   # Console login styling. tty1 is optimized for the normal Henrik login;

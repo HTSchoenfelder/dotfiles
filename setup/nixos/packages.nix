@@ -143,6 +143,7 @@
     lua
     disktui
     waybar
+    libsecret
   ];
 
   fonts.packages = with pkgs; [

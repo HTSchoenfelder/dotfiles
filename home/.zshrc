@@ -35,6 +35,7 @@ alias nixupdatelatest='nix flake update nixpkgs-latest --flake $HOME/dotfiles/se
 alias nixupdatestable='nix flake update nixpkgs-stable --flake $HOME/dotfiles/setup/nixos'
 alias nixrepl='nix repl -f flake:nixpkgs'
 alias brewbundle='brew bundle install --file ~/dotfiles/setup/macos/Brewfile'
+alias shl='start-hyprland'
 
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
