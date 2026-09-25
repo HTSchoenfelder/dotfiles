@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 
-# Get user selection via tofi from emoji file.
-chosen=$(cat $HOME/.config/hypr/launcher-data/emoji.txt | wofi --show dmenu --insensitive --prompt "select" | awk '{print $1}')
+# Select an emoji with Rofi.
+chosen=$(cat $HOME/.config/hypr/launcher-data/emoji.txt | rofi -dmenu -i -no-custom -p "" | awk '{print $1}')
 
 # Exit if none chosen.
 [ -z "$chosen" ] && exit

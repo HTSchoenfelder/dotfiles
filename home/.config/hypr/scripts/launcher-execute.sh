@@ -7,7 +7,7 @@ if [[ ! -f "$file" ]]; then
   exit 1
 fi
 
-chosen=$(awk -F'|' '{print $2}' "$file" | wofi --show dmenu --insensitive --prompt "execute")
+chosen=$(awk -F'|' '{print $2}' "$file" | rofi -dmenu -i -no-custom -p "")
 
 if [[ -z "$chosen" ]]; then
   exit 0

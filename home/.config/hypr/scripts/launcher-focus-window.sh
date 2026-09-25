@@ -11,7 +11,7 @@ chosen=$( \
     hyprctl clients -j \
     | jq -r '. | sort_by(.focusHistoryID) | .[].title' \
     | grep "${title}" \
-    | wofi --show dmenu --insensitive --prompt "focus" \
+    | rofi -dmenu -i -no-custom -p "" \
     | xargs \
     | sed 's/[.|\\-]/\\&/g' \
     )

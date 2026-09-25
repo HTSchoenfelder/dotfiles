@@ -1,0 +1,77 @@
+* {
+    base: #1e1e2e;
+    text: #cdd6f4;
+    lavender: #b4befe;
+    mauve: #cba6f7;
+    red: #f38ba8;
+    background-color: transparent;
+    text-color: @text;
+    border-color: @lavender;
+    margin: 0;
+    padding: 0;
+    spacing: 0;
+}
+
+window {
+    location: center;
+    anchor: center;
+    width: calc(50% + 30px);
+    height: calc(40% + 48px);
+    border: 2px;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: @base;
+}
+
+mainbox {
+    children: [inputbar, listview];
+    margin: 5px;
+    padding: 10px;
+}
+
+inputbar {
+    children: [textbox-search, entry];
+    margin: 5px 10px;
+    padding: 10px;
+    spacing: 10px;
+}
+
+textbox-search {
+    str: "";
+    font: "Font Awesome 7 Free Solid 16px";
+    expand: false;
+    text-color: @red;
+    vertical-align: 0.5;
+}
+
+entry {
+    placeholder: "";
+    cursor-color: @text;
+}
+
+listview {
+    columns: 1;
+    lines: 8;
+    fixed-height: false;
+    scrollbar: false;
+    margin: 5px;
+    padding: 20px 8px;
+}
+
+element {
+    children: [element-text];
+    border: 2px;
+    border-color: transparent;
+    padding: 7.5px 5px;
+}
+
+element selected {
+    border-color: @lavender;
+    text-color: @mauve;
+}
+
+element-text {
+    text-color: inherit;
+    vertical-align: 0.5;
+    highlight: none;
+}

@@ -59,8 +59,6 @@
     font-manager
     firefoxpwa
     gparted
-    tofi
-    wofi
     clipse
     wlogout
     usbutils
@@ -144,6 +142,7 @@
     disktui
     waybar
     libsecret
+    rofi
   ];
 
   fonts.packages = with pkgs; [

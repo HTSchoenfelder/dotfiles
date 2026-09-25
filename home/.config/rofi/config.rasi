@@ -1,0 +1,17 @@
+configuration {
+    modes: "drun,run";
+    font: "CaskaydiaCove Nerd Font,monospace 18px";
+    terminal: "kitty";
+    show-icons: false;
+    drun-display-format: "{name}";
+    display-drun: "";
+    display-run: "";
+    case-sensitive: false;
+    sort: false;
+    cycle: true;
+    hover-select: false;
+    scroll-method: 1;
+    monitor: "-1";
+}
+
+@theme "mocha"
