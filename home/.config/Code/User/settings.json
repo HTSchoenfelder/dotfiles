@@ -616,5 +616,6 @@
     "azure-pipelines.yaml"
   ],
   "workbench.secondarySideBar.defaultVisibility": "hidden",
-  "workbench.sideBar.location": "right"
+  "workbench.sideBar.location": "right",
+  "workbench.secondarySideBar.showLabels": false
 }
