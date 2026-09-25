@@ -53,13 +53,41 @@ function M.find_window(app)
     return M.find_windows(app)[1]
 end
 
-function M.cycle_index(windows, direction)
-    local current = hl.get_active_window()
+function M.cycle_index(items, direction, current)
+    if #items == 0 then return end
+    current = current or hl.get_active_window()
     local index = direction > 0 and 0 or 1
-    for i, window in ipairs(windows) do
-        if current and window.address == current.address then index = i; break end
+    for i, item in ipairs(items) do
+        if current and item.address == current.address then index = i; break end
     end
-    return (index - 1 + direction) % #windows + 1
+    return (index - 1 + direction) % #items + 1
+end
+
+function M.workspace_items(history)
+    local items = {}
+    for _, workspace in ipairs(hl.get_workspaces()) do
+        if not workspace.special then
+            items[#items + 1] = {
+                address = workspace.addressable_name,
+                title = workspace.name ~= "" and workspace.name or workspace.addressable_name,
+                id = workspace.id,
+            }
+        end
+    end
+    table.sort(items, function(a, b)
+        local a_rank, b_rank = history[a.address] or 0, history[b.address] or 0
+        if a_rank ~= b_rank then return a_rank > b_rank end
+        if a.id and b.id and a.id ~= b.id then return a.id < b.id end
+        return a.address < b.address
+    end)
+    return items
+end
+
+function M.show_workspace(address)
+    local workspace = hl.get_workspace(address)
+    if workspace and not workspace.special then
+        dispatch(hl.dsp.focus({ workspace = address }))
+    end
 end
 
 function M.on_modifier_release(mod, callback)
@@ -82,11 +110,11 @@ local function shell_quote(value)
     return "'" .. value:gsub("'", "'\\''") .. "'"
 end
 
-function M.picker_command(windows, token, options, selected)
+function M.picker_command(items, token, options, selected, cycle_key)
     local rows = {}
-    for _, window in ipairs(windows) do
-        -- One plain-text row per window; duplicate titles remain distinct by index.
-        local title = window.title ~= "" and window.title or window.class
+    for _, item in ipairs(items) do
+        -- One plain-text row per item; duplicate titles remain distinct by index.
+        local title = item.title ~= "" and item.title or item.class or item.address
         rows[#rows + 1] = title:gsub("%c", " ")
     end
     local arguments = {
@@ -95,9 +123,11 @@ function M.picker_command(windows, token, options, selected)
     }
     if selected then
         local mod = options.mod:gsub("%s+", ""):gsub("SUPER", "Super"):gsub("CTRL", "Control"):gsub("ALT", "Alt")
-        local forward = mod .. "+" .. options.cycle_key
-        -- Shift consumes the comma keysym on the current US keyboard layout.
-        local backward = mod .. "+Shift+" .. options.cycle_key .. "," .. mod .. "+less"
+        local key = (cycle_key or options.cycle_key):lower()
+        local forward = mod .. "+" .. key
+        -- Account for Shift being consumed into the keysym by the US keyboard layout.
+        local shifted_key = key == "comma" and "less" or key:upper()
+        local backward = mod .. "+Shift+" .. key .. "," .. mod .. "+" .. shifted_key
         local accept = "Return,!Super_L,!Super_R,!Control_L,!Control_R,!Alt_L,!Alt_R,!" .. forward
             .. ",!" .. backward:gsub(",", ",!")
         arguments[#arguments + 1] = "-selected-row " .. tostring(selected - 1)
@@ -198,6 +228,17 @@ function M.setup(options)
     local latest_request
     local finish_timer
     local picker
+    local workspace_history, workspace_visit = {}, 0
+    local last_workspace
+
+    local function remember_workspace(workspace)
+        if not workspace or workspace.special or workspace.addressable_name == last_workspace then return end
+        workspace_visit = workspace_visit + 1
+        last_workspace = workspace.addressable_name
+        workspace_history[last_workspace] = workspace_visit
+    end
+    remember_workspace(hl.get_last_workspace())
+    remember_workspace(hl.get_active_workspace())
 
     local function request_is_current(request)
         local workspace = active_workspace()
@@ -228,22 +269,33 @@ function M.setup(options)
         picker.pid = pid
     end
 
+    local function confirm_selection(selection, index)
+        if not request_is_current(selection.request) then return end
+        if type(index) ~= "number" or index < 0 or index % 1 ~= 0 then return end
+        local item = selection.items[index + 1]
+        if item then selection.on_select(item, selection.request) end
+    end
+
     _G.navigation_picker_result = function(token, index)
         if not picker or picker.token ~= token then return end
         local selection = picker
         picker = nil
         enable_cycle_bindings(true)
-        if not request_is_current(selection.request) then return end
-        if type(index) ~= "number" or index < 0 or index % 1 ~= 0 then return end
-        local window = selection.windows[index + 1]
-        if not window or not window.mapped or not selection.app.matches(window) then return end
-        M.show_window(window, selection.request, parking_workspace)
+        confirm_selection(selection, index)
+    end
+
+    local function open_picker(items, request, selected, on_select, cycle_key)
+        local token = tostring(request) .. ":" .. tostring(os.clock())
+        picker = { token = token, items = items, request = request, selected = selected, on_select = on_select }
+        hl.exec_cmd(M.picker_command(items, token, options, selected, cycle_key))
     end
 
     local function choose_window(app, windows, request, selected)
-        local token = tostring(request) .. ":" .. tostring(os.clock())
-        picker = { token = token, app = app, windows = windows, request = request, selected = selected }
-        hl.exec_cmd(M.picker_command(windows, token, options, selected))
+        open_picker(windows, request, selected, function(window, destination)
+            if window.mapped and app.matches(window) then
+                M.show_window(window, destination, parking_workspace)
+            end
+        end)
     end
 
     hl.on("layer.opened", function(layer)
@@ -262,11 +314,8 @@ function M.setup(options)
         if not picker or not picker.selected or picker.ready then return end
         -- A quick tap can finish before the launcher maps. Complete it directly.
         local selection = picker
-        local window = selection.windows[selection.selected]
         cancel_picker()
-        if window and window.mapped and request_is_current(selection.request) then
-            M.show_window(window, selection.request, parking_workspace)
-        end
+        confirm_selection(selection, selection.selected - 1)
     end
 
     local function finish_launches()
@@ -286,6 +335,7 @@ function M.setup(options)
     end
 
     local function window_ready()
+        remember_workspace(hl.get_active_workspace())
         if not next(launching) or finish_timer then return end
         -- window.open fires before initial fullscreen/focus handling has finished.
         finish_timer = hl.timer(function()
@@ -349,7 +399,7 @@ function M.setup(options)
 
     -- Consume these prefixes while mainMod is held; ordinary typing stays unaffected.
     hl.bind(options.mod .. " + " .. options.side_key, function()
-        if picker and picker.selected then picker.request.side = true end
+        if picker and picker.selected and picker.request.side ~= nil then picker.request.side = true end
     end)
     hl.bind(options.mod .. " + " .. options.picker_key, hl.dsp.no_op())
     for _, app in ipairs(options.apps) do
@@ -375,18 +425,42 @@ function M.setup(options)
         choose_window(all_windows, windows, request, M.cycle_index(windows, direction))
     end
 
-    cycle_bindings[1] = hl.bind(options.mod .. " + " .. options.cycle_key, function()
-        cycle_window(1)
-    end, { description = "Cycle windows by last focus" })
-    cycle_bindings[2] = hl.bind(options.mod .. " + " .. options.cycle_reverse_mod .. " + " .. options.cycle_key, function()
-        cycle_window(-1)
-    end, { description = "Cycle windows backwards by last focus" })
+    local function cycle_workspace(direction)
+        if picker then return end
+        local workspace = active_workspace()
+        if not workspace then return end
+        remember_workspace(hl.get_active_workspace())
+        local items = M.workspace_items(workspace_history)
+        if #items == 0 then return end
+        local request = { workspace = workspace.addressable_name }
+        latest_request = request
+        local selected = M.cycle_index(items, direction, { address = workspace.addressable_name })
+        open_picker(items, request, selected, function(item)
+            M.show_workspace(item.address)
+        end, options.workspace_cycle_key)
+    end
+
+    local function bind_cycle(key, callback, description)
+        cycle_bindings[#cycle_bindings + 1] = hl.bind(options.mod .. " + " .. key, function()
+            callback(1)
+        end, { description = "Cycle " .. description .. " by last focus" })
+        cycle_bindings[#cycle_bindings + 1] = hl.bind(options.mod .. " + " .. options.cycle_reverse_mod .. " + " .. key, function()
+            callback(-1)
+        end, { description = "Cycle " .. description .. " backwards by last focus" })
+    end
+    bind_cycle(options.cycle_key, cycle_window, "windows")
+    bind_cycle(options.workspace_cycle_key, cycle_workspace, "workspaces")
     for _, mod in ipairs({ options.mod, options.mod .. " + " .. options.cycle_reverse_mod }) do
         hl.bind(mod .. " + " .. options.cycle_cancel_key, cancel_picker,
             { description = "Cancel window selection" })
     end
     M.on_modifier_release(options.mod, confirm_pending_cycle)
-    hl.on("workspace.active", cancel_picker)
+    local function workspace_focused()
+        cancel_picker()
+        remember_workspace(hl.get_active_workspace())
+    end
+    hl.on("workspace.active", workspace_focused)
+    hl.on("monitor.focused", workspace_focused)
     hl.on("workspace.special_active", cancel_picker)
     hl.on("config.unload", cancel_picker)
 end

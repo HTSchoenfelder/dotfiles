@@ -41,6 +41,7 @@ navigation.setup({
     picker_key = "a",
     all_windows_key = "P",
     cycle_key = "comma",
+    workspace_cycle_key = "g",
     cycle_reverse_mod = "SHIFT",
     cycle_cancel_key = "Escape",
     cycle_rows = 7,
