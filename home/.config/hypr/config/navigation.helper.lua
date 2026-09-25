@@ -33,19 +33,47 @@ function M.by_class(class)
     return function(window) return window.class:lower() == class:lower() end
 end
 
-function M.find_window(app)
-    local newest, newest_rank
+function M.find_windows(app)
+    local windows = {}
     for _, window in ipairs(hl.get_windows({ mapped = true })) do
-        if app.matches(window) then
-            -- Hyprland uses 0 for the most recent focus and -1 for never focused.
-            local rank = window.focus_history_id
-            if rank < 0 then rank = math.huge end
-            if not newest or rank < newest_rank then
-                newest, newest_rank = window, rank
-            end
-        end
+        if app.matches(window) then windows[#windows + 1] = window end
     end
-    return newest
+    local function rank(window)
+        -- Hyprland uses 0 for the most recent focus and -1 for never focused.
+        return window.focus_history_id >= 0 and window.focus_history_id or math.huge
+    end
+    table.sort(windows, function(a, b)
+        if rank(a) == rank(b) then return a.address < b.address end
+        return rank(a) < rank(b)
+    end)
+    return windows
+end
+
+function M.find_window(app)
+    return M.find_windows(app)[1]
+end
+
+local function shell_quote(value)
+    return "'" .. value:gsub("'", "'\\''") .. "'"
+end
+
+function M.picker_command(windows, prompt, token)
+    local rows = {}
+    for _, window in ipairs(windows) do
+        -- Each window occupies exactly one row; titles are plain text, never shell/Lua code.
+        rows[#rows + 1] = window.title:gsub("%c", " ")
+    end
+    local callback = string.format("navigation_picker_result(%q, ", token)
+    local instance = assert(os.getenv("HYPRLAND_INSTANCE_SIGNATURE"), "No Hyprland instance")
+    -- Wofi runs outside the compositor. Only its zero-based numeric index crosses IPC.
+    return string.format([[
+choice=$(printf '%%s' %s | wofi --dmenu --insensitive --no-custom-entry --sort-order default \
+    --define dmenu-print_line_num=true --define allow_markup=false --define allow_images=false --prompt %s)
+status=$?
+case "$choice" in ''|*[!0-9]*) choice=-1 ;; esac
+if [ "$status" -ne 0 ]; then choice=-1; fi
+hyprctl --instance %s eval %s"$choice)" >/dev/null
+]], shell_quote(table.concat(rows, "\n") .. "\n"), shell_quote(prompt), shell_quote(instance), shell_quote(callback))
 end
 
 function M.move_window(window, workspace)
@@ -95,6 +123,34 @@ function M.setup(options)
     local launching = {}
     local latest_request
     local finish_timer
+    local picker
+
+    local function request_is_current(request)
+        local workspace = active_workspace()
+        return request == latest_request and workspace
+            and workspace.addressable_name == request.workspace
+    end
+
+    -- A single, token-checked IPC entry point for the asynchronous Wofi process.
+    -- Config reloads replace this closure, making replies to an old picker harmless.
+    _G.navigation_picker_result = function(token, index)
+        if not picker or picker.token ~= token then return end
+        local selection = picker
+        picker = nil
+        if not request_is_current(selection.request) then return end
+        if type(index) ~= "number" or index < 0 or index % 1 ~= 0 then return end
+        local window = selection.windows[index + 1]
+        if not window or not window.mapped or not selection.app.matches(window) then return end
+        M.show_window(window, selection.request, parking_workspace)
+    end
+
+    local function choose_window(app, windows, request)
+        if picker then return end
+        local token = tostring(request) .. ":" .. tostring(os.clock())
+        local command = M.picker_command(windows, app.name .. " — Fenster auswählen", token)
+        picker = { token = token, app = app, windows = windows, request = request }
+        hl.exec_cmd(command)
+    end
 
     local function finish_launches()
         for app, launch in pairs(launching) do
@@ -102,9 +158,7 @@ function M.setup(options)
             if window then
                 launching[app] = nil
                 local request = launch.request
-                local workspace = active_workspace()
-                if request == latest_request and workspace
-                    and workspace.addressable_name == request.workspace then
+                if request_is_current(request) then
                     M.show_window(window, request, parking_workspace)
                 else
                     -- A newer app selection or workspace switch superseded this launch.
@@ -123,16 +177,22 @@ function M.setup(options)
         end, { timeout = 1, type = "oneshot" })
     end
 
-    local function activate(app, side)
+    local function activate(app, side, choose)
+        -- Keep one picker at a time; repeated presses must not stack launcher surfaces.
+        if picker and choose then return end
         local workspace = active_workspace()
         if not workspace then return end
         local request = { workspace = workspace.addressable_name, side = side }
         latest_request = request
 
-        local window = M.find_window(app)
-        if window then
+        local windows = M.find_windows(app)
+        if #windows > 0 then
             launching[app] = nil
-            M.show_window(window, request, parking_workspace)
+            if choose then
+                choose_window(app, windows, request)
+            else
+                M.show_window(windows[1], request, parking_workspace)
+            end
             return
         end
 
@@ -161,11 +221,13 @@ function M.setup(options)
     -- Some single-instance applications restore a hidden window instead of opening one.
     hl.on("window.active", window_ready)
 
+    -- Consume these prefixes while mainMod is held; ordinary typing stays unaffected.
+    hl.bind(options.mod .. " + " .. options.side_key, hl.dsp.no_op())
+    hl.bind(options.mod .. " + " .. options.picker_key, hl.dsp.no_op())
     for _, app in ipairs(options.apps) do
-        hl.bind(options.mod .. " + " .. app.key, function() activate(app, false) end,
-            { description = app.name .. ": fokussieren und andere Fenster wegräumen" })
-        hl.bind(options.mod .. " + SHIFT + " .. app.key, function() activate(app, true) end,
-            { description = app.name .. ": im rechten Stack ergänzen" })
+        hl.bind(options.mod .. " + " .. app.key, function()
+            activate(app, hl.is_key_down(options.side_key), hl.is_key_down(options.picker_key))
+        end, { description = app.name .. ": navigieren; F: rechts ergänzen; A: Fenster auswählen" })
     end
 end
 

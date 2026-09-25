@@ -2,7 +2,7 @@
 local config_dir = assert(debug.getinfo(1, "S").source:match("^@(.*/)"))
 local navigation = dofile(config_dir .. "navigation.helper.lua")
 
-local parking_workspace = 10
+local parking_workspace = 10 -- Parking is shown as an icon in the workspace bar.
 
 hl.config({
     general = { layout = "master" },
@@ -25,12 +25,18 @@ hl.workspace_rule({
     layout = "master",
 })
 hl.workspace_rule({
+    workspace = "2",
+    default_name = "󰍹",
+})
+hl.workspace_rule({
     workspace = tostring(parking_workspace),
-    default_name = "Minimize",
+    default_name = "󰮍",
 })
 
 navigation.setup({
     mod = mainMod,
+    side_key = "f",
+    picker_key = "a",
     parking_workspace = parking_workspace,
     launch_timeout_ms = 15000,
     apps = {
