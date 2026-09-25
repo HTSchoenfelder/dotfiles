@@ -32,11 +32,11 @@ local mocha = {
 }
 
 function mocha.rgb(name)
-    return "rgb(" .. mocha[name] .. ")"
+    return "rgb(" .. assert(mocha[name], "Unknown color: " .. name) .. ")"
 end
 
 function mocha.rgba(name, alpha)
-    return "rgba(" .. mocha[name] .. alpha .. ")"
+    return "rgba(" .. assert(mocha[name], "Unknown color: " .. name) .. alpha .. ")"
 end
 
 return mocha

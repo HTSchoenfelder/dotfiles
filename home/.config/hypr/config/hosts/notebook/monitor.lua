@@ -1,7 +1,7 @@
-local notebookDisplay = "eDP-1"
+local notebook_display = "eDP-1"
 
 hl.monitor({
-    output = notebookDisplay,
+    output = notebook_display,
     mode = "3840x2400",
     position = "1920x0",
     scale = 2.133333,

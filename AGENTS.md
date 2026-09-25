@@ -55,13 +55,18 @@ Prefer declarative configuration and explicit ownership of processes.
 - Use the current official Hyprland documentation/API when changing Lua syntax. Do not silently fall back to old Hyprlang dispatcher/config syntax.
 - Entry point: `home/.config/hypr/hyprland.lua`.
 - Current modular structure includes:
-  - `config/env.lua`
+  - `config/environment.lua`
   - `config/input.lua`
-  - `config/look-and-feel.lua`
-  - `config/mocha.lua`
-  - `config/autostart.lua`
+  - `config/appearance.lua`
+  - `config/catppuccin_mocha.lua`
+  - `config/session.lua`
   - `config/keybindings.lua`
+  - `config/navigation.lua` (application definitions and navigation preferences)
+  - `config/workspaces.lua`
   - `config/hosts/<host>/monitor.lua`
+- Reusable behavior lives in `lib/`: window/workspace navigation, Rofi selection lifecycle, media control and text insertion.
+- `lib/rofi_mode.lua` is a standalone Lua provider invoked by Rofi. Keep blocking process I/O out of the compositor's Lua thread.
+- The active Lua configuration does not depend on `scripts/*.sh`. These scripts and the old `.conf` files remain migration references; see `docs/hyprland-lua.md` for remaining candidates.
 - `setup/nixos/setup-nixos.sh` creates the runtime `~/.config/hypr/config/monitor.lua` symlink for the selected host.
 - Old Hyprland `.conf` files intentionally remain as migration reference/backup. Do not delete or bulk-migrate them unless explicitly requested.
 - The workspace/keybinding concept is intentionally being redesigned. Do not blindly port the old workspace setup.

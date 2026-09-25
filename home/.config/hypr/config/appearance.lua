@@ -1,6 +1,6 @@
-local mocha = require("config.mocha")
+local mocha = require("config.catppuccin_mocha")
 
-local activeBorder = {
+local active_border = {
     colors = {
         mocha.rgba("green", "ee"),
         mocha.rgba("sky", "ee"),
@@ -16,7 +16,7 @@ hl.config({
         border_size = 2,
 
         col = {
-            active_border = activeBorder,
+            active_border = active_border,
             inactive_border = "rgba(595959aa)",
         },
 
@@ -26,7 +26,7 @@ hl.config({
 
     group = {
         col = {
-            border_active = activeBorder,
+            border_active = active_border,
             border_inactive = "rgba(595959aa)",
         },
 
@@ -73,7 +73,7 @@ hl.config({
     },
 })
 
-hl.curve("myBezier", {
+hl.curve("window_motion", {
     type = "bezier",
     points = {
         { 0.05, 0.9 },
@@ -81,7 +81,7 @@ hl.curve("myBezier", {
     },
 })
 
-hl.animation({ leaf = "windows",          enabled = true, speed = 7,  bezier = "myBezier" })
+hl.animation({ leaf = "windows",          enabled = true, speed = 7,  bezier = "window_motion" })
 hl.animation({ leaf = "windowsOut",       enabled = true, speed = 7,  bezier = "default", style = "popin 80%" })
 hl.animation({ leaf = "border",           enabled = true, speed = 10, bezier = "default" })
 hl.animation({ leaf = "borderangle",      enabled = true, speed = 8,  bezier = "default" })

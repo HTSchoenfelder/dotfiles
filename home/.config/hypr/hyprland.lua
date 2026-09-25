@@ -1,10 +1,10 @@
--- Hyprland 0.55+ Lua configuration.
--- Configuration is split by concern. See https://wiki.hypr.land/configuring/
+-- Hyprland 0.55+ Lua configuration. The host monitor symlink is created by setup-nixos.sh.
+local config_directory = assert(debug.getinfo(1, "S").source:match("^@(.*/)"))
+package.path = config_directory .. "?.lua;" .. package.path
 
 require("config.monitor")
-require("config.env")
+require("config.environment")
 require("config.input")
-require("config.look-and-feel")
-require("config.autostart")
+require("config.appearance")
+require("config.session")
 require("config.keybindings")
-require("config.navigation")
