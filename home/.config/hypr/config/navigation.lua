@@ -1,6 +1,7 @@
 -- Load the literal filename: require() would turn its dots into directories.
 local config_dir = assert(debug.getinfo(1, "S").source:match("^@(.*/)"))
 local navigation = dofile(config_dir .. "navigation.helper.lua")
+local mocha = require("config.mocha")
 
 local workspace_cycle = { 1, 2 }
 local parking_workspace = 10 -- Parking is shown as an icon in the workspace bar.
@@ -40,6 +41,10 @@ navigation.setup({
     side_key = "f",
     picker_key = "a",
     all_windows_key = "P",
+    cycle_key = "comma",
+    cycle_reverse_mod = "SHIFT",
+    cycle_cancel_key = "Escape",
+    cycle_overlay = { visible_rows = 7, title_width = 65, font_size = 18, color = mocha.rgb("green") },
     parking_workspace = parking_workspace,
     launch_timeout_ms = 15000,
     apps = {
@@ -84,6 +89,6 @@ navigation.setup({
 
 hl.bind(mainMod .. " + H", function()
     navigation.cycle_workspaces(workspace_cycle)
-end, { description = "Zwischen Workspace 1 und 2 wechseln" })
+end, { description = "Switch between workspaces 1 and 2" })
 hl.bind(mainMod .. " + M", hl.dsp.layout("cyclenext"))
 hl.bind(mainMod .. " + N", navigation.rotate_windows)

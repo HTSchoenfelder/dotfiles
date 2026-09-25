@@ -7,7 +7,11 @@ These instructions apply to the entire repository.
 ## Communication and working style
 
 - Communicate with the user in German unless asked otherwise.
+- Always write authored UI labels, captions, headings, prompts, notifications, and keybinding descriptions in English, even when the user prompts in German. Preserve externally supplied text such as application and window titles.
+- Always use English for code identifiers and comments.
 - The user is an experienced developer. Explain Linux/NixOS/Hyprland architecture precisely without beginner-level padding.
+- This is Henrik's personal power-user repository, designed exclusively for his workflow. Optimize for his explicit preferences and efficient operation rather than a general audience.
+- Keep UI surfaces minimal. Do not add onboarding, usage instructions, keyboard hints, explanatory labels, or captions to launchers, selection dialogs, or overlays unless explicitly requested. Show only the information needed to make the selection.
 - For architectural changes, explain the responsibility boundaries and trade-offs before making broad changes.
 - Prefer small, reviewable changes over large rewrites.
 - Inspect the current repository state before editing. Do not assume that an earlier chat summary is newer than the working tree.

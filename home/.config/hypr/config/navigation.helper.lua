@@ -53,6 +53,100 @@ function M.find_window(app)
     return M.find_windows(app)[1]
 end
 
+local function short_title(window, width)
+    local title = window.title ~= "" and window.title or window.class
+    local characters = {}
+    -- Cut at UTF-8 character boundaries, and keep each title on one line.
+    for character in title:gsub("%c", " "):gmatch("[^\128-\191][\128-\191]*") do
+        if #characters == width then return table.concat(characters) .. "…" end
+        characters[#characters + 1] = character
+    end
+    return table.concat(characters)
+end
+
+function M.window_list_text(windows, index, options)
+    local first = math.max(1, math.min(index - math.floor(options.visible_rows / 2), #windows - options.visible_rows + 1))
+    local last = math.min(#windows, first + options.visible_rows - 1)
+    local lines = {}
+    for i = first, last do
+        if windows[i].mapped then
+            lines[#lines + 1] = (i == index and "▶  " or "    ") .. short_title(windows[i], options.title_width)
+        end
+    end
+    return table.concat(lines, "\n")
+end
+
+function M.new_window_cycle(options)
+    local windows, index, workspace, overlay
+    local cycle = {}
+
+    function cycle.reset()
+        if overlay then overlay:dismiss() end
+        windows, index, workspace, overlay = nil, nil, nil, nil
+    end
+
+    function cycle.selection()
+        local selected = windows and windows[index]
+        return selected and selected.mapped and selected or nil
+    end
+
+    function cycle.next(direction)
+        local current_workspace = active_workspace()
+        if not current_workspace then
+            cycle.reset()
+            return
+        end
+        local current = hl.get_active_window()
+        if workspace ~= current_workspace.addressable_name then cycle.reset() end
+
+        if not windows then
+            -- Only the overlay changes while cycling; the focus history stays untouched.
+            windows = M.find_windows({ matches = function() return true end })
+            workspace = current_workspace.addressable_name
+            index = direction > 0 and 0 or 1
+            for i, window in ipairs(windows) do
+                if current and window.address == current.address then index = i; break end
+            end
+        end
+
+        for _ = 1, #windows do
+            index = (index - 1 + direction) % #windows + 1
+            if windows[index].mapped then
+                local text = M.window_list_text(windows, index, options)
+                if overlay and overlay:is_alive() then
+                    overlay:set_text(text)
+                else
+                    overlay = hl.notification.create({
+                        text = text, timeout = 60000, icon = "none",
+                        font_size = options.font_size, color = options.color,
+                    })
+                    overlay:pause()
+                end
+                return windows[index]
+            end
+        end
+        cycle.reset()
+    end
+
+    return cycle
+end
+
+function M.on_modifier_release(mod, callback)
+    local keys = { SUPER = "Super", CTRL = "Control", CONTROL = "Control", ALT = "Alt", SHIFT = "Shift" }
+    for modifier in mod:gmatch("[%w_]+") do
+        local key = assert(keys[modifier:upper()], "Unsupported navigation modifier: " .. modifier)
+        for _, side in ipairs({ "_L", "_R" }) do
+            -- Observe releases even after a consuming shortcut, without swallowing modifier events.
+            hl.bind(key .. side, callback, {
+                release = true,
+                ignore_mods = true,
+                non_consuming = true,
+                transparent = true,
+            })
+        end
+    end
+end
+
 local function shell_quote(value)
     return "'" .. value:gsub("'", "'\\''") .. "'"
 end
@@ -146,6 +240,8 @@ end
 
 function M.setup(options)
     local parking_workspace = tostring(options.parking_workspace)
+    local cycle = M.new_window_cycle(options.cycle_overlay)
+    local cycle_request
     local launching = {}
     local latest_request
     local finish_timer
@@ -155,6 +251,19 @@ function M.setup(options)
         local workspace = active_workspace()
         return request == latest_request and workspace
             and workspace.addressable_name == request.workspace
+    end
+
+    local function cancel_cycle()
+        cycle.reset()
+        cycle_request = nil
+    end
+
+    local function confirm_cycle()
+        local window, request = cycle.selection(), cycle_request
+        cancel_cycle()
+        if window and request and request_is_current(request) then
+            M.show_window(window, request, parking_workspace)
+        end
     end
 
     -- A single, token-checked IPC entry point for the asynchronous Wofi process.
@@ -173,7 +282,7 @@ function M.setup(options)
     local function choose_window(app, windows, request)
         if picker then return end
         local token = tostring(request) .. ":" .. tostring(os.clock())
-        local command = M.picker_command(windows, app.name .. " — Fenster auswählen", token)
+        local command = M.picker_command(windows, app.name .. " — Select window", token)
         picker = { token = token, app = app, windows = windows, request = request }
         hl.exec_cmd(command)
     end
@@ -208,6 +317,7 @@ function M.setup(options)
         if picker and choose then return end
         local workspace = active_workspace()
         if not workspace then return end
+        cancel_cycle()
         local request = {
             workspace = workspace.addressable_name,
             side = side,
@@ -226,7 +336,7 @@ function M.setup(options)
         end
 
         if not app.command then
-            notify("Navigation: Keine offenen Fenster.")
+            notify("Navigation: No open windows.")
             return
         end
 
@@ -241,7 +351,7 @@ function M.setup(options)
         hl.timer(function()
             if launching[app] ~= launch then return end
             launching[app] = nil
-            notify("Navigation: Kein Fenster für " .. app.name .. " erschienen. Erneut versuchen.")
+            notify("Navigation: No window appeared for " .. app.name .. ". Try again.")
         end, { timeout = options.launch_timeout_ms, type = "oneshot" })
 
         hl.exec_cmd(app.command, {
@@ -261,14 +371,42 @@ function M.setup(options)
     for _, app in ipairs(options.apps) do
         hl.bind(options.mod .. " + " .. app.key, function()
             activate(app, hl.is_key_down(options.side_key), hl.is_key_down(options.picker_key))
-        end, { description = app.name .. ": navigieren; F: rechts ergänzen; A: auswählen" })
+        end, { description = app.name .. ": navigate; F: add to stack; A: select window" })
     end
 
-    local all_windows = { name = "Alle Fenster", matches = function() return true end }
+    local all_windows = { name = "All windows", matches = function() return true end }
     hl.bind(options.mod .. " + " .. options.all_windows_key, function()
         -- P always opens the list; holding A is equivalent to the app picker bindings.
         activate(all_windows, hl.is_key_down(options.side_key), true)
-    end, { description = "Alle Fenster auswählen; F: rechts ergänzen" })
+    end, { description = "Select from all windows; F: add to stack" })
+
+    local function cycle_window(direction)
+        if picker then return end
+        local workspace = active_workspace()
+        if not workspace then cancel_cycle(); return end
+        if not cycle_request or not request_is_current(cycle_request) then
+            cancel_cycle()
+            cycle_request = { workspace = workspace.addressable_name }
+            latest_request = cycle_request
+        end
+        cycle_request.side = hl.is_key_down(options.side_key)
+        if not cycle.next(direction) then cancel_cycle() end
+    end
+
+    hl.bind(options.mod .. " + " .. options.cycle_key, function()
+        cycle_window(1)
+    end, { repeating = true, description = "Cycle windows by last focus" })
+    hl.bind(options.mod .. " + " .. options.cycle_reverse_mod .. " + " .. options.cycle_key, function()
+        cycle_window(-1)
+    end, { repeating = true, description = "Cycle windows backwards by last focus" })
+    for _, mod in ipairs({ options.mod, options.mod .. " + " .. options.cycle_reverse_mod }) do
+        hl.bind(mod .. " + " .. options.cycle_cancel_key, cancel_cycle,
+            { description = "Cancel window selection" })
+    end
+    M.on_modifier_release(options.mod, confirm_cycle)
+    hl.on("workspace.active", cancel_cycle)
+    hl.on("workspace.special_active", cancel_cycle)
+    hl.on("config.unload", cancel_cycle)
 end
 
 return M
