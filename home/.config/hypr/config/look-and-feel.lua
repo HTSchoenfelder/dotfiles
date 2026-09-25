@@ -22,8 +22,6 @@ hl.config({
 
         resize_on_border = true,
         allow_tearing = false,
-
-        layout = "master",
     },
 
     group = {
@@ -66,11 +64,6 @@ hl.config({
 
     animations = {
         enabled = true,
-    },
-
-    master = {
-        new_status = "master",
-        mfact = 0.70,
     },
 
     misc = {
