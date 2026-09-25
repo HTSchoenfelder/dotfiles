@@ -118,6 +118,32 @@ function M.show_window(window, request, parking_workspace)
     dispatch(hl.dsp.focus({ window = window }))
 end
 
+function M.cycle_workspaces(workspaces)
+    if #workspaces == 0 then return end
+    local current = active_workspace()
+    local target = workspaces[1]
+    for index, workspace in ipairs(workspaces) do
+        if current and current.addressable_name == tostring(workspace) then
+            target = workspaces[index % #workspaces + 1]
+            break
+        end
+    end
+    dispatch(hl.dsp.focus({ workspace = tostring(target) }))
+end
+
+function M.rotate_windows()
+    local window = hl.get_active_window()
+    if not window or window.floating or not window.workspace
+        or window.workspace.tiled_layout ~= "master" then return end
+
+    -- rollnext rotates [master, first slave, ...] to [first slave, ..., old master].
+    -- The next layout window therefore takes the currently focused slot.
+    dispatch(hl.dsp.layout("cyclenext"))
+    local next_window = hl.get_active_window()
+    dispatch(hl.dsp.layout("rollnext"))
+    if next_window then dispatch(hl.dsp.focus({ window = next_window })) end
+end
+
 function M.setup(options)
     local parking_workspace = tostring(options.parking_workspace)
     local launching = {}
@@ -182,7 +208,10 @@ function M.setup(options)
         if picker and choose then return end
         local workspace = active_workspace()
         if not workspace then return end
-        local request = { workspace = workspace.addressable_name, side = side }
+        local request = {
+            workspace = workspace.addressable_name,
+            side = side,
+        }
         latest_request = request
 
         local windows = M.find_windows(app)
@@ -193,6 +222,11 @@ function M.setup(options)
             else
                 M.show_window(windows[1], request, parking_workspace)
             end
+            return
+        end
+
+        if not app.command then
+            notify("Navigation: Keine offenen Fenster.")
             return
         end
 
@@ -227,8 +261,14 @@ function M.setup(options)
     for _, app in ipairs(options.apps) do
         hl.bind(options.mod .. " + " .. app.key, function()
             activate(app, hl.is_key_down(options.side_key), hl.is_key_down(options.picker_key))
-        end, { description = app.name .. ": navigieren; F: rechts ergänzen; A: Fenster auswählen" })
+        end, { description = app.name .. ": navigieren; F: rechts ergänzen; A: auswählen" })
     end
+
+    local all_windows = { name = "Alle Fenster", matches = function() return true end }
+    hl.bind(options.mod .. " + " .. options.all_windows_key, function()
+        -- P always opens the list; holding A is equivalent to the app picker bindings.
+        activate(all_windows, hl.is_key_down(options.side_key), true)
+    end, { description = "Alle Fenster auswählen; F: rechts ergänzen" })
 end
 
 return M

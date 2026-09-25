@@ -2,6 +2,7 @@
 local config_dir = assert(debug.getinfo(1, "S").source:match("^@(.*/)"))
 local navigation = dofile(config_dir .. "navigation.helper.lua")
 
+local workspace_cycle = { 1, 2 }
 local parking_workspace = 10 -- Parking is shown as an icon in the workspace bar.
 
 hl.config({
@@ -23,6 +24,7 @@ hl.window_rule({
 hl.workspace_rule({
     workspace = "1",
     layout = "master",
+    default_name = "",
 })
 hl.workspace_rule({
     workspace = "2",
@@ -37,6 +39,7 @@ navigation.setup({
     mod = mainMod,
     side_key = "f",
     picker_key = "a",
+    all_windows_key = "P",
     parking_workspace = parking_workspace,
     launch_timeout_ms = 15000,
     apps = {
@@ -72,11 +75,15 @@ navigation.setup({
         },
         {
             name = "Spotify",
-            key = "P",
+            key = "U",
             command = "spotify",
             matches = navigation.by_class("spotify"),
         },
     },
 })
 
+hl.bind(mainMod .. " + H", function()
+    navigation.cycle_workspaces(workspace_cycle)
+end, { description = "Zwischen Workspace 1 und 2 wechseln" })
 hl.bind(mainMod .. " + M", hl.dsp.layout("cyclenext"))
+hl.bind(mainMod .. " + N", navigation.rotate_windows)
