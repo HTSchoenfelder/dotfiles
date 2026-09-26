@@ -1,6 +1,34 @@
 # Dotfiles
 
-Personal NixOS and Hyprland configuration for Henrik's desktop workflow.
+Personal NixOS, Hyprland and macOS configuration for Henrik's desktop workflow.
+
+## macOS / Hammerspoon quick reference
+
+`mainMod` = `Option + Control + Command`. Each display acts as one working area.
+One managed window fills it; two managed windows use equal left and right halves.
+Application navigation minimizes the other windows on the active display. Hold
+`F` to retain the focused window as the left half and hold `A` to select an
+application instance. `F` and `A` can be combined.
+
+| Shortcut | Action |
+| --- | --- |
+| `mainMod + J` | kitty |
+| `mainMod + K` | VS Code |
+| `mainMod + L` | Chrome |
+| `mainMod + ;` | Obsidian |
+| `mainMod + O` | KeePassXC |
+| `mainMod + U` | Spotify |
+| `mainMod + P` | Select any window by recent focus |
+| `mainMod + ,` / `mainMod + Shift + ,` | Cycle windows forward/backward; release `mainMod` to accept |
+| `mainMod + A + ,` | Cycle through windows of the focused application |
+| `mainMod + M` | Focus the other visible window |
+| `mainMod + N` | Swap the left and right window while retaining focus |
+| `mainMod + H` | Focus the last active window on the other display |
+| `mainMod + W` | Close the focused window and reflow the display |
+| `mainMod + Shift + M` | Toggle the RØDECaster mute state |
+
+The implementation uses native macOS window minimizing and Hammerspoon frame
+management. It does not require AeroSpace or manipulate Mission Control Spaces.
 
 ## Hyprland quick reference
 
