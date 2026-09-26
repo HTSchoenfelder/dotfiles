@@ -3,6 +3,8 @@ local monitor_configuration = require("lib.monitor_configuration")
 local main_monitor = "HDMI-A-1"
 local side_monitor = "HDMI-A-2"
 
+monitor_configuration.set_workspace_roles({ primary = main_monitor, secondary = side_monitor })
+
 monitor_configuration.apply({
     output = main_monitor,
     mode = "1920x1080",

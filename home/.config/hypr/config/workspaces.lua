@@ -1,4 +1,4 @@
-local workspaces = { primary = { 1, 2 }, parking = 10 }
+local workspaces = { terminal = 1, display = 2, primary = { 1, 2 }, parking = 10 }
 
 hl.config({
     general = { layout = "master" },

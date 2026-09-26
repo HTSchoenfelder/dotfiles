@@ -1,10 +1,19 @@
 local compositor = require("lib.compositor")
 local monitor_configuration = {}
 local configured = {}
+local workspace_roles = {}
 
 function monitor_configuration.apply(specification)
     configured[specification.output] = specification
     hl.monitor(specification)
+end
+
+function monitor_configuration.set_workspace_roles(roles)
+    workspace_roles = roles or {}
+end
+
+function monitor_configuration.workspace_roles()
+    return workspace_roles
 end
 
 local function connected(name)

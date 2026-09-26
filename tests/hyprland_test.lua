@@ -7,6 +7,18 @@ local process = require("lib.process")
 local modifier = "SUPER + CTRL + ALT + "
 local passed = 0
 
+local function picker_index(session, label)
+    local request = assert(session.picker_request())
+    local rows = assert(io.open(request.path))
+    local index = 0
+    for row in rows:lines() do
+        if row == label then rows:close(); return index end
+        index = index + 1
+    end
+    rows:close()
+    error("Missing picker row: " .. label)
+end
+
 local function test(name, callback)
     local session = support.session()
     local ok, error_message = xpcall(function() callback(session) end, debug.traceback)
@@ -398,12 +410,31 @@ test("period R opens configured commands without a focused window and waits for 
     session.press("R")
     assert(session.submap == "reset" and #session.commands == 1)
     local request = session.map_picker()
-    rofi_picker_selected(request.token, 6)
+    rofi_picker_selected(request.token, picker_index(session, "notify hallo"))
     assert(#session.commands == 1)
     session.emit("layer.closed", { namespace = "rofi", pid = 5000 })
     session.flush()
     local arguments = session.commands[#session.commands].arguments
     assert(arguments[1] == "bash" and arguments[2] == "-c" and arguments[3] == 'notify-send "Hallo"')
+end)
+
+test("workspace reset restores displays and focuses the terminal workspace", function(session)
+    require("lib.monitor_configuration").set_workspace_roles({
+        primary = "HDMI-A-1", secondary = "HDMI-A-2",
+    })
+    session.monitors[2].enabled = true
+    local code = session.add("code", 1, 0)
+    local terminal = session.add("kitty", 10, 1)
+    session.focus(code)
+    session.press(modifier .. "period")
+    session.press("R")
+    session.choose(picker_index(session, "reset workspaces"))
+
+    assert(session.spaces["1"].monitor.name == "HDMI-A-1")
+    assert(session.spaces["2"].monitor.name == "HDMI-A-2")
+    assert(session.spaces["10"].monitor.name == "HDMI-A-1")
+    assert(session.current == session.spaces["1"] and session.focused == terminal)
+    assert(terminal.workspace == session.spaces["1"] and code.workspace == session.spaces["10"])
 end)
 
 test("command cancellation never starts a configured command", function(session)

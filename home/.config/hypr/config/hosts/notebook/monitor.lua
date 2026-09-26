@@ -2,6 +2,8 @@ local monitor_configuration = require("lib.monitor_configuration")
 
 local notebook_display = "eDP-1"
 
+monitor_configuration.set_workspace_roles({ primary = notebook_display })
+
 monitor_configuration.apply({
     output = notebook_display,
     mode = "3840x2400",

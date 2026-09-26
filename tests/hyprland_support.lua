@@ -1,7 +1,7 @@
 local support = {}
 
 function support.session()
-    local session = { windows = {}, spaces = {}, monitors = {}, monitor_rules = {}, bindings = {}, events = {}, timers = {}, commands = {}, shortcuts = {}, notices = {}, held = {}, submap = "reset" }
+    local session = { windows = {}, spaces = {}, monitors = {}, monitor_rules = {}, workspace_moves = {}, bindings = {}, events = {}, timers = {}, commands = {}, shortcuts = {}, notices = {}, held = {}, submap = "reset" }
     local defining_submap = "reset"
     local process = require("lib.process")
     local original_spawn = process.spawn
@@ -167,6 +167,7 @@ function support.session()
                 resize = dispatcher("resize"), center = dispatcher("center"), deny_from_group = dispatcher("deny_group"),
                 fullscreen_state = dispatcher("fullscreen"), pin = dispatcher("pin"),
             },
+            workspace = { move = dispatcher("workspace_move") },
         },
         dispatch = function(action)
             local arguments = action.arguments
@@ -196,6 +197,12 @@ function support.session()
                 if not window.floating then return { ok = false, error = "No floating window found" } end
                 window.centered = true
             elseif action.kind == "deny_group" then session.group_denied = true
+            elseif action.kind == "workspace_move" then
+                local workspace = session.space(arguments.workspace)
+                for _, monitor in ipairs(session.monitors) do
+                    if monitor.name == arguments.monitor then workspace.monitor = monitor end
+                end
+                session.workspace_moves[#session.workspace_moves + 1] = arguments
             elseif action.kind == "pin" then window.pinned = false
             elseif action.kind == "fullscreen" then
                 window.fullscreen, window.fullscreen_client = 0, 0
@@ -215,6 +222,7 @@ function support.session()
     }
     package.loaded["config.workspaces"] = nil
     package.loaded["config.keybindings"] = nil
+    require("lib.monitor_configuration").set_workspace_roles({})
     require("config.keybindings")
     return session
 end

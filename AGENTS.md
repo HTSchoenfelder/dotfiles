@@ -78,6 +78,9 @@ Prefer declarative configuration and explicit ownership of processes.
 - Current primary modifier is `SUPER + CTRL + ALT`.
 - **Comma selection** means a Rofi selection that cycles while its shortcut is held and accepts the highlighted item when the main modifier is released.
 - **Dot mode** means the Hyprland submap entered with the dot/period key while holding the main modifier.
+- **Terminal Workspace** means workspace 1 (``) on the primary display.
+- **Parking Workspace** means workspace 10 (`󰮍`), which temporarily holds windows removed from the active workspace.
+- **Display Workspace** means workspace 2 (`󰍹`) on the secondary display.
 
 ## Desktop integration topics
 

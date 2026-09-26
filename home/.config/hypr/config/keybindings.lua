@@ -11,6 +11,7 @@ local screenshots = require("lib.screenshots")
 local dot_mode = require("lib.dot_mode")
 local monitor_configuration = require("lib.monitor_configuration")
 local project_overlays = require("lib.project_overlays")
+local workspace_reset = require("lib.workspace_reset")
 local config_directory = assert(debug.getinfo(1, "S").source:match("^@(.*)/config/keybindings.lua$"))
 
 local picker = rofi_picker.new({
@@ -47,7 +48,7 @@ bind("N", window_navigation.rotate_positions, "Rotate window positions")
 
 bind(settings.stack_key, picker.add_to_stack, "Add selection to stack")
 bind(settings.instance_key, hl.dsp.no_op(), "Select application instance")
-local spotify
+local spotify, terminal
 local function focused_application()
     local active = hl.get_active_window()
     if not active then return end
@@ -59,11 +60,17 @@ end
 
 for _, application in ipairs(settings.applications) do
     if application.class == "spotify" then spotify = application end
+    if application.class == "kitty" then terminal = application end
     bind(application.key, function()
         windows.activate(application, add_to_stack(), hl.is_key_down(settings.instance_key:lower()))
     end, "Navigate to " .. application.name)
 end
 assert(spotify, "Spotify must be configured as a navigation application")
+assert(terminal, "Kitty must be configured as a navigation application")
+local reset_workspaces = workspace_reset.new({
+    workspaces = workspaces,
+    activate_terminal = function() windows.activate(terminal, false, false) end,
+})
 
 bind("P", function() windows.activate(nil, add_to_stack(), true) end, "Select window by last focus")
 picker.bind_cycle("comma", function(direction)
@@ -111,7 +118,9 @@ dot_mode.bind({
             text_launcher.open(picker, config_directory .. "/launcher-data/emoji.txt", text_launcher.emoji)
         end },
         { key = "R", description = "Run configured command", run = function()
-            command_launcher.open(picker, config_directory .. "/launcher-data/execute.txt")
+            command_launcher.open(picker, config_directory .. "/launcher-data/execute.txt", {
+                ["reset-workspaces"] = reset_workspaces.run,
+            })
         end },
         { key = "T", description = "Insert snippet", run = function()
             text_launcher.open(picker, config_directory .. "/launcher-data/snippets.txt", text_launcher.snippet)
