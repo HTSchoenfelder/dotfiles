@@ -6,6 +6,7 @@ the setup; files under `lib/` implement reusable behavior.
 
 | File | Responsibility |
 | --- | --- |
+| `config/application_shortcuts.lua` | Ctrl shortcuts and application-specific mappings |
 | `config/navigation.lua` | Modifier, application commands/classes and navigation preferences |
 | `config/workspaces.lua` | Master layout, workspace icons and Parking destination |
 | `config/keybindings.lua` | Bindings and composition of navigation/launcher actions |
@@ -15,6 +16,9 @@ the setup; files under `lib/` implement reusable behavior.
 | `lib/workspace_navigation.lua` | Workspace MRU history and workspace selection |
 | `lib/rofi_picker.lua` | One active selection, native cycling/release bindings, cancellation and cleanup |
 | `lib/rofi_mode.lua` | Standalone Rofi script provider and numeric selection replies |
+| `lib/shortcut_forwarding.lua` | Native shortcut delivery to the focused application |
+| `lib/launcher_data.lua` | Shared launcher file loading and validation |
+| `lib/command_launcher.lua` | Configured command parsing and execution after selection |
 | `lib/text_launcher.lua` | Emoji/snippet parsing and insertion into the original window |
 | `lib/media_controls.lua` | Fixed player menu and Spotify MPRIS commands |
 | `lib/screenshots.lua` | Hyprshot region and active-output commands |
@@ -39,6 +43,20 @@ titles and snippet text are never evaluated as commands. Existing Rofi styling a
 launcher data are reused. Snippets retain the `text|alias` format and support
 `\n`, `\t` and `\\` escapes. Both text and alias are searchable.
 
+`mainMod + period` enters the action submap: `Q` captures a region, `W` captures
+the active monitor, `E` selects an emoji, `R` selects an `execute.txt` command,
+and `T` selects a snippet. The submap resets before the selected tool opens.
+`mainMod + R` still opens the application launcher.
+
+Command entries use `command|label`, split at the last `|` to allow shell pipelines.
+Only labels appear in Rofi. Numeric row selection preserves duplicate labels;
+only the selected command from this trusted configuration runs via `bash -c`.
+Commands retain shell expansion and quoting from the original launcher.
+
+`Ctrl + P/H/J/K/L` are forwarded through `hl.dsp.send_shortcut` to the focused
+window. Chrome maps them to `Ctrl+Shift+A`, `Alt+Left`, `Ctrl+Shift+Tab`,
+`Ctrl+Tab`, and `Alt+Right`; other applications receive the original shortcut.
+
 ## Remaining shell migrations
 
 The active configuration no longer starts any `scripts/*.sh` file. Legacy scripts
@@ -49,14 +67,13 @@ These workflows should be selected deliberately before adding more bindings:
 | --- | --- |
 | `move-current-workspace-to-monitor.sh` | Move the current workspace to the adjacent monitor through `hl.dsp.workspace.move`, preserving focus explicitly. |
 | `move-workspaces-reset.sh` | Reassign existing/configured workspaces to their intended monitors; avoid creating twenty workspaces as the old loop did. |
-| `send-shortcut.sh` | Match the active application class and use `hl.dsp.send_shortcut` for browser/editor navigation. |
-| `launcher-execute.sh` | A Rofi action picker with explicit Lua callbacks or argument vectors instead of regular-expression lookup and `eval`. |
 | `notify-player-current-track.sh` | Query Spotify metadata in an external Lua worker, then display the selected track information. Keep network/artwork fetching outside the compositor. |
 | `launch-chrome.sh`, `launch-chrome-instances.sh` | Optional profile definitions with window-open/class events to identify each launched window, replacing fixed sleeps. |
 
 Already replaced or unnecessary:
 
-- Emoji and snippet shell launchers are replaced by `E` and `Q`.
+- Emoji, execute and snippet shell launchers are replaced by `period`, then `E`/`R`/`T`.
+- `send-shortcut.sh` is replaced by native Lua shortcut forwarding.
 - `launcher-focus-window.sh` is replaced by application instance pickers and `P`.
 - `list-desktop-files.sh` is covered by Rofi's `drun` mode.
 - `exec-reset-submap.sh` is covered by Lua callbacks and the shared picker lifecycle.
@@ -76,7 +93,7 @@ default configuration audit.
 
 Run `lua tests/hyprland_test.lua` from the repository root for behavioral checks.
 The scenarios cover MRU order, workspace changes, launch races, Parking/stack
-placement, cycling, cancellation, reload, player actions and text insertion.
+placement, cycling, cancellation, reload, player actions, shortcut forwarding, command selection and text insertion.
 Validate configuration/API calls with the installed Hyprland's `--verify-config`.
 Use a running session for Rofi's real keyboard and layer lifecycle; Lua mocks do
 not prove compositor event ordering or Wayland input behavior.

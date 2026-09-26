@@ -61,12 +61,13 @@ Prefer declarative configuration and explicit ownership of processes.
   - `config/catppuccin_mocha.lua`
   - `config/session.lua`
   - `config/keybindings.lua`
+  - `config/application_shortcuts.lua`
   - `config/hardware_keys.lua`
   - `config/window_rules.lua`
   - `config/navigation.lua` (application definitions and navigation preferences)
   - `config/workspaces.lua`
   - `config/hosts/<host>/monitor.lua`
-- Reusable behavior lives in `lib/`: window/workspace navigation, Rofi selection lifecycle, media control, screenshots and text insertion.
+- Reusable behavior lives in `lib/`: window/workspace navigation, Rofi selection lifecycle, media control, screenshots, application shortcut forwarding, command selection and text insertion.
 - `lib/rofi_mode.lua` is a standalone Lua provider invoked by Rofi. Keep blocking process I/O out of the compositor's Lua thread.
 - The active Lua configuration does not depend on `scripts/*.sh`. These scripts and the old `.conf` files remain migration references; see `docs/hyprland-lua.md` for remaining candidates.
 - `setup/nixos/setup-nixos.sh` creates the runtime `~/.config/hypr/config/monitor.lua` symlink for the selected host.

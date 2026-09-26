@@ -61,8 +61,8 @@ for both Qt versions, and the existing font packages.
 ## Screenshots
 
 `mainMod + period` enters a waiting submap. `Q` captures a region; `W` captures the
-active monitor. Both work with the main modifier held or released. Escape and
-unrecognized keys cancel. The submap resets before Hyprshot starts, and entering it
+active monitor. `E`, `R` and `T` open the emoji, command and snippet pickers. All work with the main modifier held or released. Escape and
+unrecognized keys cancel. The submap resets before the selected tool starts, and entering it
 cancels any pending navigation picker. Images use `HYPRSHOT_DIR` (`~/screenshots`).
 
 ## Autostart audit

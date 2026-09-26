@@ -1,7 +1,7 @@
 local support = {}
 
 function support.session()
-    local session = { windows = {}, spaces = {}, bindings = {}, events = {}, timers = {}, commands = {}, notices = {}, held = {}, submap = "reset" }
+    local session = { windows = {}, spaces = {}, bindings = {}, events = {}, timers = {}, commands = {}, shortcuts = {}, notices = {}, held = {}, submap = "reset" }
     local defining_submap = "reset"
     local process = require("lib.process")
     local original_spawn = process.spawn
@@ -134,7 +134,7 @@ function support.session()
         end,
         notification = { create = function(notice) table.insert(session.notices, notice) end },
         dsp = {
-            no_op = dispatcher("noop"), layout = dispatcher("layout"), focus = dispatcher("focus"), submap = dispatcher("submap"),
+            send_shortcut = dispatcher("shortcut"), no_op = dispatcher("noop"), layout = dispatcher("layout"), focus = dispatcher("focus"), submap = dispatcher("submap"),
             window = {
                 close = dispatcher("close"), move = dispatcher("move"), float = dispatcher("float"),
                 fullscreen_state = dispatcher("fullscreen"), pin = dispatcher("pin"),
@@ -143,7 +143,8 @@ function support.session()
         dispatch = function(action)
             local arguments = action.arguments
             local window = type(arguments) == "table" and arguments.window
-            if action.kind == "submap" then session.submap = arguments
+            if action.kind == "shortcut" then table.insert(session.shortcuts, arguments)
+            elseif action.kind == "submap" then session.submap = arguments
             elseif action.kind == "move" then
                 if window.fail_move then return { ok = false, error = "Move failed" } end
                 assert(arguments.follow == false)

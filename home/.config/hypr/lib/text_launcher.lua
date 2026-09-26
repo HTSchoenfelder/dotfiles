@@ -1,4 +1,4 @@
-local compositor = require("lib.compositor")
+local launcher_data = require("lib.launcher_data")
 local process = require("lib.process")
 local text_launcher = {}
 
@@ -17,18 +17,6 @@ function text_launcher.snippet(line)
     }
 end
 
-function text_launcher.read_items(path, parse_line)
-    local file, error_message = io.open(path, "r")
-    if not file then return nil, error_message end
-    local items = {}
-    for line in file:lines() do
-        local item = parse_line(line:gsub("\r$", ""))
-        if item then items[#items + 1] = item end
-    end
-    file:close()
-    return items
-end
-
 function text_launcher.insert(text)
     process.spawn({ "wtype", "--", text })
 end
@@ -37,15 +25,8 @@ function text_launcher.open(picker, path, parse_line)
     if picker.is_open() then return end
     local origin = hl.get_active_window()
     if not origin then return end
-    local items, error_message = text_launcher.read_items(path, parse_line)
-    if not items then
-        compositor.notify("Cannot read launcher data: " .. tostring(error_message))
-        return
-    end
-    if #items == 0 then
-        compositor.notify("No launcher entries.")
-        return
-    end
+    local items = launcher_data.load(path, parse_line)
+    if not items then return end
     picker.open(items, {
         is_current = function()
             local active = hl.get_active_window()

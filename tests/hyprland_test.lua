@@ -205,7 +205,8 @@ test("a new picker invalidates a result waiting for keyboard focus restoration",
     rofi_picker_selected(request.token, 0)
     session.emit("layer.closed", { pid = 5000 })
     session.focus(session.add("code", 1))
-    session.press(modifier .. "E")
+    session.press(modifier .. "period")
+    session.press("E")
     session.flush()
     for _, command in ipairs(session.commands) do assert(command.arguments[1] ~= "playerctl") end
 end)
@@ -274,9 +275,10 @@ test("text launchers preserve Unicode and snippet escapes", function()
     assert(not text_launcher.snippet("invalid"))
 end)
 
-test("E opens the emoji dataset and returns the selected emoji", function(session)
+test("period E opens the emoji dataset and returns the selected emoji", function(session)
     session.focus(session.add("code", 1))
-    session.press(modifier .. "E")
+    session.press(modifier .. "period")
+    session.press("E")
     session.choose(0)
     local arguments = session.commands[#session.commands].arguments
     assert(arguments[1] == "wtype" and arguments[2] == "--" and arguments[3] == "😀")
@@ -284,7 +286,8 @@ end)
 
 test("text insertion is cancelled when the original window loses focus", function(session)
     session.focus(session.add("code", 1))
-    session.press(modifier .. "Q")
+    session.press(modifier .. "period")
+    session.press("T")
     session.focus(session.add("kitty", 1))
     session.choose(0)
     for _, command in ipairs(session.commands) do assert(command.arguments[1] ~= "wtype") end
@@ -296,22 +299,22 @@ test("literal text remains one safely quoted command argument", function()
     assert(not pcall(process.command, { "wtype", "a\0b" }))
 end)
 
-test("screenshot mode waits for Q before capturing a region", function(session)
+test("action mode waits for Q before capturing a region", function(session)
     session.press(modifier .. "period")
-    assert(session.submap == "screenshot" and #session.commands == 0)
+    assert(session.submap == "actions" and #session.commands == 0)
     session.press("Q")
     assert(session.submap == "reset")
     assert(table.concat(session.commands[1].arguments, " ") == "hyprshot --mode region")
 end)
 
-test("screenshot mode captures the active output with W", function(session)
+test("action mode captures the active output with W", function(session)
     session.press(modifier .. "period")
     session.press("W")
     assert(session.submap == "reset")
     assert(table.concat(session.commands[1].arguments, " ") == "hyprshot --mode output --mode active")
 end)
 
-test("Escape and unknown keys leave screenshot mode without capturing", function(session)
+test("Escape and unknown keys leave action mode without capturing", function(session)
     for _, key in ipairs({ "Escape", "X" }) do
         session.press(modifier .. "period")
         session.press(key)
@@ -319,7 +322,7 @@ test("Escape and unknown keys leave screenshot mode without capturing", function
     end
 end)
 
-test("entering screenshot mode cancels pending Rofi selections", function(session)
+test("entering action mode cancels pending Rofi selections", function(session)
     session.press(modifier .. "Y")
     local request = session.map_picker()
     session.press(modifier .. "period")
@@ -327,7 +330,7 @@ test("entering screenshot mode cancels pending Rofi selections", function(sessio
     session.emit("layer.closed", { pid = 5000 })
     session.flush()
     for _, command in ipairs(session.commands) do assert(command.arguments[1] ~= "playerctl") end
-    assert(session.submap == "screenshot")
+    assert(session.submap == "actions")
 end)
 
 test("dispatch failures stop navigation before focus changes", function(session)
@@ -335,6 +338,88 @@ test("dispatch failures stop navigation before focus changes", function(session)
     code.fail_move = true
     assert(not pcall(session.press, modifier .. "K"))
     assert(session.focused == nil and code.workspace.id == 2)
+end)
+
+test("Ctrl shortcuts map browser actions to the focused Chrome window", function(session)
+    local chrome = session.add("google-chrome", 1)
+    session.focus(chrome)
+    local expected = { p = { "CTRL SHIFT", "a" }, h = { "ALT", "Left" },
+        j = { "CTRL SHIFT", "Tab" }, k = { "CTRL", "Tab" }, l = { "ALT", "Right" } }
+    for key, shortcut in pairs(expected) do
+        session.press("CTRL + " .. key)
+        local actual = session.shortcuts[#session.shortcuts]
+        assert(actual.mods == shortcut[1] and actual.key == shortcut[2] and actual.window == chrome)
+    end
+    assert(#session.commands == 0)
+end)
+
+test("Ctrl shortcuts follow focus and pass unchanged to other applications", function(session)
+    session.focus(session.add("google-chrome", 1))
+    session.press("CTRL + p")
+    local editor = session.add("code", 1)
+    session.focus(editor)
+    for _, key in ipairs({ "p", "h", "j", "k", "l" }) do
+        session.press("CTRL + " .. key)
+        local actual = session.shortcuts[#session.shortcuts]
+        assert(actual.mods == "CTRL" and actual.key == key and actual.window == editor)
+    end
+    editor.mapped = false
+    session.press("CTRL + p")
+    session.focus(nil)
+    session.press("CTRL + p")
+    assert(#session.shortcuts == 6)
+end)
+
+test("period R opens configured commands without a focused window and waits for selection", function(session)
+    session.press(modifier .. "period")
+    session.press("R")
+    assert(session.submap == "reset" and #session.commands == 1)
+    local request = session.map_picker()
+    rofi_picker_selected(request.token, 6)
+    assert(#session.commands == 1)
+    session.emit("layer.closed", { namespace = "rofi", pid = 5000 })
+    session.flush()
+    local arguments = session.commands[#session.commands].arguments
+    assert(arguments[1] == "bash" and arguments[2] == "-c" and arguments[3] == 'notify-send "Hallo"')
+end)
+
+test("command cancellation never starts a configured command", function(session)
+    session.press(modifier .. "period")
+    session.press("R")
+    session.map_picker()
+    session.emit("layer.closed", { namespace = "rofi", pid = 5000 })
+    session.flush()
+    assert(#session.commands == 1)
+end)
+
+test("command data preserves shell syntax and duplicate labels retain row identity", function(session)
+    local commands = require("lib.command_launcher")
+    local picker = require("lib.rofi_picker").new({ modifier = "SHIFT", rows = 5, provider = "provider.lua" })
+    local path = os.tmpname()
+    local file = assert(io.open(path, "w"))
+    file:write("\r\ninvalid\n |empty command\ntrue|   \n",
+        "printf '%s' 'first'|duplicate\r\n",
+        "printf '%s' '$HOME' | cat|duplicate\r\n")
+    file:close()
+    commands.open(picker, path)
+    os.remove(path)
+    local rows = assert(io.open(session.picker_request().path))
+    assert(rows:read("*a") == "duplicate\nduplicate\n")
+    rows:close()
+    session.choose(1)
+    assert(session.commands[#session.commands].arguments[3] == "printf '%s' '$HOME' | cat")
+end)
+
+test("period T inserts snippets and direct R remains the application launcher", function(session)
+    session.focus(session.add("code", 1))
+    session.press(modifier .. "period")
+    session.press("T")
+    assert(session.submap == "reset")
+    session.choose(0)
+    assert(session.commands[#session.commands].arguments[1] == "wtype")
+    session.press(modifier .. "R")
+    assert(table.concat(session.commands[#session.commands].arguments, " ") == "rofi -show drun")
+    assert(not session.bindings[modifier .. "E"] and not session.bindings[modifier .. "Q"])
 end)
 
 print(string.format("%d Hyprland scenarios passed", passed))
