@@ -13,6 +13,7 @@ Configuration examples from newer documentation are checked against that API.
 | Portal routing | `home/.config/xdg-desktop-portal/hyprland-portals.conf` |
 | Audio and capture transport | Existing NixOS PipeWire and WirePlumber services |
 | Notifications and authorization UI | Upstream Dunst and hyprpolkitagent user units, enabled by `desktop-integration.nix` |
+| Bar, applets, automounter and clipboard watchers | `desktop-session.nix`, tied to `graphical-session.target` |
 | GTK preferences | NixOS dconf defaults in `desktop-integration.nix` |
 | Qt platform-theme plugins | NixOS `qt.enable` and `qt.platformTheme = "qt5ct"`, supplying both Qt 5 and Qt 6 plugins |
 | Qt appearance | Existing `qt5ct` settings and matching `qt6ct/qt6ct.conf` |
@@ -64,14 +65,65 @@ active monitor. Both work with the main modifier held or released. Escape and
 unrecognized keys cancel. The submap resets before Hyprshot starts, and entering it
 cancels any pending navigation picker. Images use `HYPRSHOT_DIR` (`~/screenshots`).
 
+## Autostart audit
+
+| Previous Lua command | Result |
+| --- | --- |
+| `waybar` | NixOS `programs.waybar`, using its upstream user unit |
+| `dunst` | Upstream D-Bus user unit, enabled in `desktop-integration.nix` |
+| `nm-applet` | NixOS `programs.nm-applet`, with its Wayland-compatible tray indicator |
+| `blueman-applet` | Existing `services.blueman` unit, explicitly attached to the graphical session |
+| `udiskie --tray` | Dedicated user service; the existing system `udisks2` service remains separate |
+| `clipse -listen` | Two foreground `wl-paste` user services for text and PNG, calling Clipse's storage handler |
+| `hyprpaper` | Retained in Lua; the deliberately pinned wallpaper package and config are preserved |
+| `hypridle` | Retained in Lua; no new unit or restart while automatic locking is paused |
+| `arduino-create-agent` | Removed stale startup entry: the package is commented out and the command is absent |
+| `dconf write ...` | Replaced by NixOS dconf defaults |
+| `dbus-update-activation-environment --systemd --all` | Removed; Hyprland already manages the session environment |
+
+The running XDG autostart target was inactive, so generated applet units did not
+own the existing processes. Enabling that entire target would also start unrelated
+entries. Instead, only the selected units are enabled. `Hidden=true` overrides for
+the Blueman and NetworkManager desktop entries prevent future duplicate starts if
+XDG autostart is activated. Blueman's D-Bus activation still targets its canonical
+service. The applets manage UI; NetworkManager and Bluetooth remain system services.
+
+GUI services inherit the session PATH exported by Hyprland, preserving configured
+Waybar commands, file-manager actions and applet helpers. Clipse's storage handlers
+instead have an explicit dependency path. Dunst's menu uses Rofi and its URL opener
+uses `xdg-open`, without obsolete `/usr/bin` paths.
+
+[Clipse 1.2.1's Wayland implementation](https://github.com/savedra1/clipse/blob/v1.2.1/shell/wayland.go)
+starts two detached `wl-paste --watch` processes. Its `-listen-shell` mode does not
+provide a foreground Wayland daemon. The Nix units therefore supervise those two
+watchers directly, preserving Clipse's text/image handling, configuration and
+application exclusions. The service paths include the matching `hyprctl` for those
+exclusions. Start/stop the `clipse-text` and `clipse-images` services together when
+managing the listener; running `clipse -listen` separately would create a second
+process owner.
+
+Hyprpaper and Hypridle could also use dedicated user units in a later change. They
+are intentionally excluded from this conservative migration. No display manager,
+automatic compositor startup, PAM change, or system service migration is needed.
+
+Activate the NixOS generation before the next compositor start so the removed Lua
+autostarts have their replacement units installed. For a live handover, stop the
+existing compositor-launched copies of the migrated daemons before starting their
+units. Do not restart the graphical session target or resume Hypridle as part of
+that handover.
+
 ## Validation
 
 - Lua behavior tests cover screenshot selection/cancellation alongside navigation.
 - Real compositor key events verify both modifier states and cancellation.
 - A raw Hyprshot capture is checked as a PNG matching the active output's dimensions.
 - Nix evaluation covers all three host configurations and their assertions.
-- The generated dconf database and assembled user-unit tree are built; the Dunst
-  and Polkit units are checked with `systemd-analyze --user verify`.
+- The generated dconf database and assembled user-unit tree are built. All eight
+  selected desktop units pass `systemd-analyze --user verify`, with their enablement
+  links and graphical-session lifetime checked. Waybar's reload command uses an
+  absolute Nix executable path.
+- An isolated run of `systemd-xdg-autostart-generator` verifies that the two applet
+  overrides suppress only their duplicate startup entries.
 - The running Settings portal reports dark appearance (`1`), and the portal exposes
   FileChooser, ScreenCast and Secret after reloading its routing configuration.
   This does not substitute for an application-specific browser screen-sharing test.

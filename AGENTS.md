@@ -29,7 +29,7 @@ The repository should become easier to understand by keeping responsibilities se
    - System-wide services such as NetworkManager, Bluetooth, CUPS, udisks2, Docker, libvirt, PipeWire configuration, etc.
 2. **User/session services**
    - Long-running desktop-session processes that are better owned by `systemd --user` and, where appropriate, tied to `graphical-session.target`.
-   - Examples under consideration: Waybar, Dunst, hyprpolkitagent, portals/session helpers, and similar daemons.
+   - Waybar, Dunst, hyprpolkitagent, network/Bluetooth applets, Udiskie and Clipse are declared in the Nix desktop modules. Portals use D-Bus activation.
 3. **Hyprland**
    - Compositor behavior only: monitors, input, look and feel, keybindings, window/workspace rules, Hyprland-specific events.
    - Avoid turning Hyprland autostart into a generic process supervisor.
@@ -77,6 +77,8 @@ Prefer declarative configuration and explicit ownership of processes.
 ## Desktop integration topics
 
 - `setup/nixos/desktop-integration.nix` owns toolkit packages, dconf defaults, Dunst and the graphical `hyprpolkitagent` user service.
+- `setup/nixos/desktop-session.nix` owns Waybar, network/Bluetooth applets, Udiskie and the two Clipse clipboard watchers. Do not also start these in Lua or XDG autostart.
+- `config/session.lua` retains Hyprpaper and Hypridle. The current-session request to keep Hypridle paused must not be undone by tests or service migration.
 - `programs.hyprland` supplies the matching Hyprland portal and GTK fallback. Portal routing stays in `home/.config/xdg-desktop-portal/hyprland-portals.conf`.
 - GNOME Keyring remains the configured Secret Service and Secret portal backend. Replacing it with KeePassXC remains a separate, explicit decision.
 - Hyprland manages the graphical session targets and exports session identity. Do not duplicate this with manual portal startup or a blanket environment import.

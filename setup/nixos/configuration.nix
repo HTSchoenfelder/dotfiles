@@ -31,7 +31,10 @@ let
   '';
 in
 {
-  imports = [ ./desktop-integration.nix ];
+  imports = [
+    ./desktop-integration.nix
+    ./desktop-session.nix
+  ];
 
   users.users."${userName}" = {
     isNormalUser = true;

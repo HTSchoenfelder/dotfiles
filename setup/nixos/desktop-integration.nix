@@ -25,7 +25,11 @@
     dunst
     hyprpolkitagent
   ];
-  systemd.user.services.dunst.wantedBy = [ "graphical-session.target" ];
+  systemd.user.services.dunst = {
+    wantedBy = [ "graphical-session.target" ];
+    # Notification actions use the session's Rofi and xdg-open commands.
+    enableDefaultPath = false;
+  };
   systemd.user.services.hyprpolkitagent.wantedBy = [ "graphical-session.target" ];
 
   # GTK and the Settings portal read GSettings/dconf, including libadwaita's
