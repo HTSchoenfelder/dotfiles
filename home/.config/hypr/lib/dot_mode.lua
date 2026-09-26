@@ -22,7 +22,7 @@ function dot_mode.bind(options)
     hl.bind(options.modifier .. " + period", function()
         options.before_enter()
         compositor.dispatch(hl.dsp.submap("dot"))
-    end, { description = "Enter dot mode" })
+    end, { dont_inhibit = true, description = "Enter dot mode" })
 
     hl.define_submap("dot", function()
         for _, action in ipairs(options.actions) do
@@ -30,10 +30,12 @@ function dot_mode.bind(options)
                 -- Restore regular bindings and dismiss the notice before opening a tool.
                 compositor.dispatch(hl.dsp.submap("reset"))
                 action.run()
-            end, { ignore_mods = true, description = action.description })
+            end, { ignore_mods = true, dont_inhibit = true, description = action.description })
         end
-        hl.bind("Escape", hl.dsp.submap("reset"), { ignore_mods = true, description = "Leave dot mode" })
-        hl.bind("catchall", hl.dsp.submap("reset"), { ignore_mods = true })
+        hl.bind("Escape", hl.dsp.submap("reset"), {
+            ignore_mods = true, dont_inhibit = true, description = "Leave dot mode",
+        })
+        hl.bind("catchall", hl.dsp.submap("reset"), { ignore_mods = true, dont_inhibit = true })
     end)
 end
 

@@ -61,4 +61,5 @@ to `Ctrl+Shift+A`, `Alt+Left`, `Ctrl+Shift+Tab`, `Ctrl+Tab` and `Alt+Right`.
 Media, volume, microphone and brightness hardware keys use their native actions.
 Hyprland's Lua entry point is `home/.config/hypr/hyprland.lua`; architecture and
 desktop integration notes live in [`docs/hyprland-lua.md`](docs/hyprland-lua.md)
-and [`docs/hyprland-desktop.md`](docs/hyprland-desktop.md).
+and [`docs/hyprland-desktop.md`](docs/hyprland-desktop.md). Explicitly postponed
+fixes and refactorings are tracked in [`docs/deferred-work.md`](docs/deferred-work.md).

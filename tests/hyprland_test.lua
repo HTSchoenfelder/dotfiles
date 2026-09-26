@@ -315,6 +315,8 @@ test("literal text remains one safely quoted command argument", function()
 end)
 
 test("dot mode stays visible until Q captures a region", function(session)
+    assert(session.bindings[modifier .. "period"].options.dont_inhibit)
+    assert(session.bindings["dot:Q"].options.dont_inhibit)
     session.press(modifier .. "period")
     assert(session.submap == "dot" and #session.commands == 0)
     local notice = session.notices[#session.notices]

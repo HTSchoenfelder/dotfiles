@@ -130,10 +130,10 @@ function support.session()
             defining_submap = previous
         end,
         get_current_submap = function() return session.submap end,
-        bind = function(key, callback)
+        bind = function(key, callback, options)
             key = defining_submap == "reset" and key or defining_submap .. ":" .. key
             assert(not session.bindings[key], "Duplicate binding: " .. key)
-            local binding = { callback = callback, enabled = true }
+            local binding = { callback = callback, enabled = true, options = options or {} }
             function binding:set_enabled(enabled) self.enabled = enabled end
             session.bindings[key] = binding
             return binding

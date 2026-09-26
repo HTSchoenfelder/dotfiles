@@ -13,6 +13,7 @@ hl.window_rule({
     opacity = 0.85,
     animation = "slide bottom",
     group = "deny",
+    no_shortcuts_inhibit = true,
 })
 
 -- The upstream rule prevents empty XWayland drag surfaces from stealing focus.

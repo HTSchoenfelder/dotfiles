@@ -15,6 +15,7 @@ These instructions apply to the entire repository.
 - For architectural changes, explain the responsibility boundaries and trade-offs before making broad changes.
 - Prefer small, reviewable changes over large rewrites.
 - After every change or refactoring, check whether `readme.md` must be updated.
+- `docs/deferred-work.md` contains postponed ideas only. Never implement or investigate an entry unless Henrik explicitly requests that specific item.
 - Inspect the current repository state before editing. Do not assume that an earlier chat summary is newer than the working tree.
 - Never discard or overwrite unrelated local changes.
 - By default, make requested changes only in the working tree and show/review the diff. Do **not** commit, push, reset, rebase, or force-update anything unless the user explicitly asks.
