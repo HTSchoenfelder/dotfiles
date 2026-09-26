@@ -3,6 +3,14 @@ local mocha = require("config.catppuccin_mocha")
 local dot_mode = {}
 
 function dot_mode.bind(options)
+    if options.catalog then
+        options.catalog.add("Dot mode", options.catalog.main("period"), "Enter dot mode")
+        for _, action in ipairs(options.actions) do
+            options.catalog.add("Dot mode", options.catalog.dot(action.key), action.description)
+        end
+        options.catalog.add("Dot mode", options.catalog.dot("Escape"), "Leave dot mode")
+    end
+
     local notice
     local function dismiss()
         if notice then notice:dismiss(); notice = nil end

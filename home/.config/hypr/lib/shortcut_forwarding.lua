@@ -13,11 +13,18 @@ function shortcut_forwarding.forward(settings, key)
     }))
 end
 
-function shortcut_forwarding.bind(settings)
+function shortcut_forwarding.bind(settings, catalog)
     for _, key in ipairs(settings.keys) do
         hl.bind(settings.modifier .. " + " .. key, function()
             shortcut_forwarding.forward(settings, key)
         end, { description = "Forward application shortcut " .. key })
+        if catalog then
+            catalog.add(
+                "Applications",
+                catalog.format_key(settings.modifier .. " + " .. key),
+                "Forward application shortcut"
+            )
+        end
     end
 end
 

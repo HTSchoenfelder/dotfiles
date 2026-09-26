@@ -222,8 +222,10 @@ function support.session()
     }
     package.loaded["config.workspaces"] = nil
     package.loaded["config.keybindings"] = nil
+    package.loaded["config.hardware_keys"] = nil
     require("lib.monitor_configuration").set_workspace_roles({})
     require("config.keybindings")
+    require("config.hardware_keys")
     return session
 end
 

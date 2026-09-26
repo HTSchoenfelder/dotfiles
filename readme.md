@@ -4,31 +4,39 @@ Personal NixOS, Hyprland and macOS configuration for Henrik's desktop workflow.
 
 ## macOS / Hammerspoon quick reference
 
-`mainMod` = `Option + Control + Command`. Each display acts as one working area.
-One managed window fills it; two managed windows use equal left and right halves.
-Application navigation minimizes the other windows on the active display. Hold
-`F` to retain the focused window as the left half and hold `A` to select an
-application instance. `F` and `A` can be combined.
+`mainMod` = `Option + Control + Command`. Application shortcuts bring the
+application's main window to the front and place it on demand. Hammerspoon does
+not track window slots, reflow displays or minimize other windows. Window lists
+and display focus targets are resolved only when their shortcut is pressed.
 
 | Shortcut | Action |
 | --- | --- |
-| `mainMod + J` | kitty |
-| `mainMod + K` | VS Code |
-| `mainMod + L` | Chrome |
-| `mainMod + ;` | Obsidian |
-| `mainMod + O` | KeePassXC |
-| `mainMod + U` | Spotify |
-| `mainMod + P` | Select any window by recent focus |
+| `mainMod + J/K/L/;/O/U` | Focus Kitty / VS Code / Chrome / Obsidian / KeePassXC / Spotify on the primary display |
+| `mainMod + F + app key` | Fill the secondary display |
+| `mainMod + Z + app key` | Use the left half of the secondary display |
+| `mainMod + X + app key` | Use the right half of the secondary display |
+| `mainMod + C + app key` | Use the left half of the primary display |
+| `mainMod + V + app key` | Use the right half of the primary display |
+| `mainMod + A + app key` | Select an application window before placing it |
+| `mainMod + P` | Select any window |
 | `mainMod + ,` / `mainMod + Shift + ,` | Cycle windows forward/backward; release `mainMod` to accept |
 | `mainMod + A + ,` | Cycle through windows of the focused application |
-| `mainMod + M` | Focus the other visible window |
-| `mainMod + N` | Swap the left and right window while retaining focus |
-| `mainMod + H` | Focus the last active window on the other display |
-| `mainMod + W` | Close the focused window and reflow the display |
+| `mainMod + M` | Focus the next window on the current display |
+| `mainMod + N` | Swap the focused and frontmost other window |
+| `mainMod + H` | Focus the frontmost window on the other display |
+| `mainMod + W` | Close the focused window |
+| `mainMod + R` | Toggle the Seal application launcher |
+| `mainMod + Shift + R` | Show the searchable shortcut catalog |
 | `mainMod + Shift + M` | Toggle the RØDECaster mute state |
 
-The implementation uses native macOS window minimizing and Hammerspoon frame
-management. It does not require AeroSpace or manipulate Mission Control Spaces.
+The placement key is held while pressing the application key, for example
+`mainMod + Z + J` for Kitty on the left half of the secondary display. If no
+secondary display is connected, secondary-display actions fall back to the
+primary display. The implementation does not require AeroSpace or manipulate
+Mission Control Spaces.
+
+`mainMod + .` opens the existing window action mode. Its bindings and all other
+macOS bindings are included in the read-only shortcut catalog.
 
 ## Hyprland quick reference
 
@@ -55,6 +63,7 @@ stack. Hold `A` to choose an existing instance.
 | `mainMod + N` | Rotate window positions while retaining the focused slot |
 | `mainMod + W` | Close the focused window |
 | `mainMod + R` | Toggle the Rofi application launcher |
+| `mainMod + Shift + R` | Show the searchable shortcut catalog |
 
 `F` and `A` can be combined for application navigation and comma selection.
 
@@ -87,6 +96,8 @@ the visible overlay.
 to `Ctrl+Shift+A`, `Alt+Left`, `Ctrl+Shift+Tab`, `Ctrl+Tab` and `Alt+Right`.
 
 Media, volume, microphone and brightness hardware keys use their native actions.
+The read-only shortcut catalogs use `Shortcut — Description` rows and include
+global bindings, modifier combinations, Dot mode and hardware/media bindings.
 Hyprland's Lua entry point is `home/.config/hypr/hyprland.lua`; architecture and
 desktop integration notes live in [`docs/hyprland-lua.md`](docs/hyprland-lua.md)
 and [`docs/hyprland-desktop.md`](docs/hyprland-desktop.md). Explicitly postponed

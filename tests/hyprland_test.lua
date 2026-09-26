@@ -5,6 +5,7 @@ local windows = require("lib.window_navigation")
 local text_launcher = require("lib.text_launcher")
 local process = require("lib.process")
 local modifier = "SUPER + CTRL + ALT + "
+local project_path = assert(os.getenv("HOME")) .. "/dotfiles"
 local passed = 0
 
 local function picker_index(session, label)
@@ -476,6 +477,23 @@ test("period T inserts snippets and direct R remains the application launcher", 
     assert(not session.bindings[modifier .. "E"] and not session.bindings[modifier .. "Q"])
 end)
 
+test("Shift R opens a read-only catalog with global, dot mode and hardware shortcuts", function(session)
+    session.press(modifier .. "SHIFT + R")
+    local request = assert(session.picker_request())
+    local rows = assert(io.open(request.path))
+    local labels = rows:read("*a")
+    rows:close()
+
+    assert(labels:find("MainMod + J — Navigate to Kitty / Zellij", 1, true))
+    assert(labels:find("MainMod + Shift + R — Show shortcut catalog", 1, true))
+    assert(labels:find("MainMod + . → Q — Capture region", 1, true))
+    assert(labels:find("XF86AudioRaiseVolume — Raise volume", 1, true))
+    assert(not labels:find("catchall", 1, true))
+
+    session.choose(0)
+    assert(#session.shortcuts == 0)
+end)
+
 test("dot B shows display status and enables the selected output", function(session)
     session.press(modifier .. "period")
     session.press("B")
@@ -499,7 +517,7 @@ end)
 
 test("project overlays reuse one floating Kitty window per project and tool", function(session)
     local code = session.add("code", 1)
-    code.title = "/home/henrik/dotfiles | Code"
+    code.title = project_path .. " | Code"
     session.focus(code)
     session.press(modifier .. "period")
     session.press("J")
@@ -526,7 +544,7 @@ end)
 
 test("project overlays remain floating across repeated hide and restore cycles", function(session)
     local code = session.add("code", 1)
-    code.title = "/home/henrik/dotfiles | Code"
+    code.title = project_path .. " | Code"
     session.focus(code)
     session.press(modifier .. "period")
     session.press("J")
@@ -564,7 +582,7 @@ end)
 
 test("dot G opens LazyVim and Shift G opens Lazygit for the active project", function(session)
     local code = session.add("code", 1)
-    code.title = "/home/henrik/dotfiles | Code"
+    code.title = project_path .. " | Code"
     session.focus(code)
     for _, expected in ipairs({ { "G", "nvim" }, { "SHIFT + G", "lazygit" } }) do
         session.press(modifier .. "period")

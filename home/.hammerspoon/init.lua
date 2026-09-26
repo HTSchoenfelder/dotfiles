@@ -6,10 +6,13 @@ require("shortcuts")
 local launcher = require("launcher")
 local linuxshortcuts = require("remapping")
 local navigation = require("navigation")
+local shortcutCatalog = require("shortcut_catalog")
+local config = require("config")
 
 launcher.init()
 linuxshortcuts.start()
 navigation.start()
+shortcutCatalog.start(config.hyper)
 
 -- Reload automatically after a Lua configuration change.
 function reloadConfig(files)

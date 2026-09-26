@@ -1,4 +1,5 @@
 local process = require("lib.process")
+local shortcut_catalog = require("lib.shortcut_catalog")
 
 local function bind(key, command, description, repeating)
     hl.bind(key, function() process.spawn(command) end, {
@@ -6,6 +7,7 @@ local function bind(key, command, description, repeating)
         repeating = repeating or false,
         description = description,
     })
+    shortcut_catalog.add("Media", shortcut_catalog.format_key(key), description)
 end
 
 bind("XF86AudioRaiseVolume", { "wpctl", "set-volume", "-l", "1", "@DEFAULT_AUDIO_SINK@", "5%+" }, "Raise volume", true)

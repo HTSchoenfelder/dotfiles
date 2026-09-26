@@ -1,18 +1,20 @@
 local WindowChooser = {}
 WindowChooser.__index = WindowChooser
 
-function WindowChooser.new(registry, options)
+function WindowChooser.new(options)
   local self = setmetatable({
-    registry = registry,
     rows = options.rows or 7,
     callback = nil,
+    windowsByID = {},
   }, WindowChooser)
 
   self.chooser = hs.chooser.new(function(choice)
     local callback = self.callback
+    local window = choice and self.windowsByID[choice.windowID] or nil
     self.callback = nil
-    if callback and choice then
-      callback(self.registry:windowByID(choice.windowID))
+    self.windowsByID = {}
+    if callback and window then
+      callback(window)
     end
   end)
   self.chooser:rows(self.rows)
@@ -23,16 +25,19 @@ end
 
 function WindowChooser:show(windows, callback)
   local choices = {}
+  self.windowsByID = {}
   for _, window in ipairs(windows) do
+    local windowID = window:id()
     local owner = window:application()
     local applicationName = owner and owner:name() or "Window"
     local title = window:title()
     if not title or title == "" then
       title = applicationName
     end
+    self.windowsByID[windowID] = window
     choices[#choices + 1] = {
       text = applicationName .. " — " .. title,
-      windowID = self.registry:windowID(window),
+      windowID = windowID,
     }
   end
 

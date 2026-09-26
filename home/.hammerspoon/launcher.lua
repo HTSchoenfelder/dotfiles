@@ -1,5 +1,6 @@
 local M = {}
 local config = require("config")
+local catalog = require("shortcut_catalog")
 function M.init()
   hs.loadSpoon("Seal")
   spoon.Seal:loadPlugins({"useractions", "apps"})
@@ -27,6 +28,7 @@ function M.init()
   hs.hotkey.bind(config.hyper, "R", function()
     spoon.Seal:toggle()
   end)
+  catalog.add("Launchers", "MainMod + R", "Toggle application launcher")
 
   spoon.Seal:start()
 

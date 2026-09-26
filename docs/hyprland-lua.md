@@ -17,6 +17,7 @@ the setup; files under `lib/` implement reusable behavior.
 | `lib/workspace_navigation.lua` | Workspace MRU history and workspace selection |
 | `lib/rofi_picker.lua` | One active selection, native cycling/release bindings, cancellation and cleanup |
 | `lib/rofi_mode.lua` | Standalone Rofi script provider and numeric selection replies |
+| `lib/shortcut_catalog.lua` | Read-only searchable catalog of global, Dot mode and hardware shortcuts |
 | `lib/shortcut_forwarding.lua` | Native shortcut delivery to the focused application |
 | `lib/dot_mode.lua` | Dot mode lifecycle and persistent native notification |
 | `lib/monitor_configuration.lua` | Host monitor rules and Rofi display toggling |
@@ -52,7 +53,8 @@ the mode ends. `Q`, `A` and `Z` capture a region, the active window and the acti
 monitor. `B` selects and toggles connected displays. `G`, `Shift+G` and `J` toggle
 project LazyVim, Lazygit and terminal overlays. `E`, `R` and `T` select emojis,
 configured commands and snippets. The submap resets before the selected tool opens.
-`mainMod + R` still opens the application launcher.
+`mainMod + R` still opens the application launcher. `mainMod + Shift + R` opens
+the read-only shortcut catalog through the same Rofi picker infrastructure.
 
 Command entries use `command|label`, split at the last `|` to allow shell pipelines.
 Only labels appear in Rofi. Numeric row selection preserves duplicate labels;
@@ -79,8 +81,9 @@ default configuration audit.
 
 Run `lua tests/hyprland_test.lua` from the repository root for behavioral checks.
 The scenarios cover MRU order, workspace changes, launch races, Parking/stack
-placement, cycling, cancellation, reload, player actions, shortcut forwarding,
-command selection, monitor toggling, project overlays and text insertion.
+placement, cycling, cancellation, reload, the shortcut catalog, player actions,
+shortcut forwarding, command selection, monitor toggling, project overlays and
+text insertion.
 Validate configuration/API calls with the installed Hyprland's `--verify-config`.
 Use a running session for Rofi's real keyboard and layer lifecycle; Lua mocks do
 not prove compositor event ordering or Wayland input behavior.

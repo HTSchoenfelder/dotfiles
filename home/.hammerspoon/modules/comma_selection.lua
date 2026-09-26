@@ -1,48 +1,32 @@
 local CommaSelection = {}
 CommaSelection.__index = CommaSelection
 
-function CommaSelection.new(registry, navigation)
-  local self = setmetatable({
-    registry = registry,
-    navigation = navigation,
-    session = nil,
-  }, CommaSelection)
-
-  self.releaseTap = hs.eventtap.new({hs.eventtap.event.types.flagsChanged}, function(event)
-    if not self.session then
-      return false
-    end
-
-    local flags = event:getFlags()
-    if not flags.alt and not flags.cmd and not flags.ctrl and not flags.shift then
-      local session = self.session
-      self.session = nil
-      hs.timer.doAfter(0.12, function()
-        local selectedWindow = hs.window.focusedWindow()
-        if self.registry:isManagedWindow(selectedWindow) then
-          self.navigation:activate(selectedWindow, {
-            screen = session.screen,
-            anchor = session.anchor,
-            stack = session.stack,
-          })
-        end
-        self.navigation:endMutationLater()
-        session.switcher = nil
-        session.windowFilter = nil
-      end)
-    end
-    return false
-  end)
-  self.releaseTap:start()
-  return self
+function CommaSelection.new(navigation)
+  return setmetatable({navigation = navigation, session = nil}, CommaSelection)
 end
 
-function CommaSelection:createSession(options)
-  local context = self.navigation:captureContext()
-  self.navigation:beginMutation()
-  local applicationName = nil
-  if options.instancesOnly and context.anchor then
-    local owner = context.anchor:application()
+function CommaSelection:finish()
+  if not self.session then
+    return
+  end
+  local session = self.session
+  self.session = nil
+  if session.releaseTap then
+    session.releaseTap:stop()
+  end
+  hs.timer.doAfter(0.12, function()
+    self.navigation:focus(hs.window.focusedWindow())
+    session.switcher = nil
+    session.windowFilter = nil
+    session.releaseTap = nil
+  end)
+end
+
+function CommaSelection:createSession(instancesOnly)
+  local applicationName
+  local focused = hs.window.focusedWindow()
+  if instancesOnly and self.navigation:isUsableWindow(focused) then
+    local owner = focused:application()
     applicationName = owner and owner:name() or nil
   end
 
@@ -66,22 +50,25 @@ function CommaSelection:createSession(options)
       })
   end
 
-  return {
-    screen = context.screen,
-    anchor = context.anchor,
-    stack = options.stack == true,
+  local session = {
     windowFilter = windowFilter,
     switcher = hs.window.switcher.new(windowFilter),
   }
+  session.releaseTap = hs.eventtap.new({hs.eventtap.event.types.flagsChanged}, function(event)
+    local flags = event:getFlags()
+    if not flags.alt and not flags.cmd and not flags.ctrl and not flags.shift then
+      self:finish()
+    end
+    return false
+  end)
+  session.releaseTap:start()
+  return session
 end
 
-function CommaSelection:cycle(direction, options)
+function CommaSelection:cycle(direction, instancesOnly)
   if not self.session then
-    self.session = self:createSession(options)
-  elseif options.stack then
-    self.session.stack = true
+    self.session = self:createSession(instancesOnly)
   end
-
   if direction < 0 then
     self.session.switcher:previous()
   else
