@@ -25,26 +25,6 @@ manually switching to Parking. Configure the primary and Parking workspace rules
 as persistent using the current Hyprland Lua API so their names and navigation
 targets remain stable.
 
-## Keep Z/X/C/V placements in the Hyprland master layout
-
-The Hyprland placement modifiers currently float the selected window and position
-it with explicit monitor coordinates. Replace that behavior with native master
-layout operations so every affected window remains tiled and existing windows on
-the target workspace remain in the opposite stack.
-
-Use the selected application as the master and set the target workspace's master
-orientation to match the requested side:
-
-- `Z`: workspace 2, master on the left
-- `X`: workspace 2, master on the right
-- `C`: workspace 1, master on the left
-- `V`: workspace 1, master on the right
-
-If no secondary monitor is available, retain the existing fallback to the primary
-monitor and workspace 1. Apply the same placement semantics to direct application
-shortcuts, `P`, Comma Selection, and instance selection with `A`. Do not float or
-manually resize these windows.
-
 ## Add an optional macOS look-and-feel layer
 
 Improve the visual consistency between macOS and the Hyprland setup without

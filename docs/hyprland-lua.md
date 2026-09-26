@@ -13,7 +13,7 @@ the setup; files under `lib/` implement reusable behavior.
 | `config/keybindings.lua` | Bindings and composition of navigation/launcher actions |
 | `config/hardware_keys.lua` | Volume, microphone, brightness and playback keys |
 | `config/window_rules.lua` | Maximize suppression and XWayland drag focus correction |
-| `lib/window_navigation.lua` | Window MRU order, Parking/stack and explicit display-half placement, and asynchronous application startup |
+| `lib/window_navigation.lua` | Window MRU order, Parking/stack and native master placement, and asynchronous application startup |
 | `lib/workspace_navigation.lua` | Workspace MRU history and workspace selection |
 | `lib/rofi_picker.lua` | One active selection, native cycling/release bindings, cancellation and cleanup |
 | `lib/rofi_mode.lua` | Standalone Rofi script provider and numeric selection replies |
@@ -81,7 +81,7 @@ default configuration audit.
 
 Run `lua tests/hyprland_test.lua` from the repository root for behavioral checks.
 The scenarios cover MRU order, workspace changes, launch races, Parking/stack and
-display-half placement, cycling, cancellation, reload, the shortcut catalog, player actions,
+left/right master placement, cycling, cancellation, reload, the shortcut catalog, player actions,
 shortcut forwarding, command selection, monitor toggling, project overlays and
 text insertion.
 Validate configuration/API calls with the installed Hyprland's `--verify-config`.

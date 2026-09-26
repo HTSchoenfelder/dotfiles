@@ -14,7 +14,7 @@ function support.session()
         session.spaces[address] = session.spaces[address] or {
             addressable_name = address, name = address, id = tonumber(address),
             special = address:match("^special:") ~= nil, tiled_layout = "master",
-            monitor = { width = 1920, height = 1080 },
+            monitor = { width = 1920, height = 1080 }, master_orientation = "left",
         }
         return session.spaces[address]
     end
@@ -229,7 +229,13 @@ function support.session()
                 window.workspace.fullscreen_window = nil
             elseif action.kind == "layout" then
                 local order = session.layout_order or {}
-                if arguments == "cyclenext" then
+                if arguments == "orientationleft" then
+                    session.current.master_orientation = "left"
+                elseif arguments == "orientationright" then
+                    session.current.master_orientation = "right"
+                elseif arguments == "swapwithmaster master ignoremaster" then
+                    session.current.master_window = session.focused
+                elseif arguments == "cyclenext" then
                     for index, item in ipairs(order) do
                         if item == session.focused then session.focused = order[index % #order + 1]; break end
                     end

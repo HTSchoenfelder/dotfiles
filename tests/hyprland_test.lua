@@ -51,26 +51,92 @@ test("stack navigation preserves existing windows and clears fullscreen", functi
     assert(master.fullscreen == 0 and session.focused == code)
 end)
 
-test("placement modifiers use matching display halves without parking other windows", function(session)
+test("placement modifiers keep target workspaces tiled and set their master side", function(session)
     session.monitors[2].enabled = true
     local current = session.add("kitty", 1)
     local placements = {
-        { modifier = "z", key = "K", class = "code", workspace = 2, x = 0 },
-        { modifier = "x", key = "L", class = "google-chrome", workspace = 2, x = 960 },
-        { modifier = "c", key = "semicolon", class = "obsidian", workspace = 1, x = 1920 },
-        { modifier = "v", key = "O", class = "org.keepassxc.KeePassXC", workspace = 1, x = 2880 },
+        { modifier = "z", key = "K", class = "code", workspace = 2, side = "left" },
+        { modifier = "x", key = "L", class = "google-chrome", workspace = 2, side = "right" },
+        { modifier = "c", key = "semicolon", class = "obsidian", workspace = 1, side = "left" },
+        { modifier = "v", key = "O", class = "org.keepassxc.KeePassXC", workspace = 1, side = "right" },
     }
 
     for _, expected in ipairs(placements) do
+        local stack = session.add("stack-" .. expected.modifier, expected.workspace)
         local window = session.add(expected.class, 10)
+        window.floating = true
         session.held[expected.modifier] = true
         session.press(modifier .. expected.key)
         session.held[expected.modifier] = false
-        assert(window.workspace.id == expected.workspace and window.floating)
-        assert(window.size[1] == 960 and window.size[2] == 1080)
-        assert(window.position[1] == expected.x and window.position[2] == 0)
-        assert(current.workspace.id == 1)
+        local workspace = session.space(expected.workspace)
+        assert(window.workspace == workspace and not window.floating)
+        assert(not window.size and not window.position)
+        assert(workspace.master_window == window and workspace.master_orientation == expected.side)
+        assert(stack.workspace == workspace and session.focused == window)
     end
+    assert(current.workspace.id == 1)
+end)
+
+test("secondary placement falls back to workspace 1 on the primary monitor", function(session)
+    local stack = session.add("kitty", 1)
+    local code = session.add("code", 10)
+    session.held.z = true
+    session.press(modifier .. "K")
+    assert(code.workspace.id == 1 and not code.floating)
+    assert(session.space(1).master_window == code and session.space(1).master_orientation == "left")
+    assert(stack.workspace.id == 1 and session.focused == code)
+end)
+
+test("P applies master placement to the selected window", function(session)
+    session.monitors[2].enabled = true
+    local stack = session.add("kitty", 2, 0)
+    local code = session.add("code", 10, 1)
+    session.held.x = true
+    session.press(modifier .. "P")
+    session.choose(1)
+    assert(code.workspace.id == 2 and session.space(2).master_window == code)
+    assert(session.space(2).master_orientation == "right" and stack.workspace.id == 2)
+    assert(session.focused == code)
+end)
+
+test("Comma selection applies master placement on release", function(session)
+    local current = session.add("kitty", 1, 0)
+    local code = session.add("code", 10, 1)
+    session.focus(current)
+    session.held.v = true
+    session.press(modifier .. "comma")
+    session.press("Alt_L")
+    assert(code.workspace.id == 1 and session.space(1).master_window == code)
+    assert(session.space(1).master_orientation == "right" and current.workspace.id == 1)
+    assert(session.focused == code)
+end)
+
+test("A instance selection preserves requested master placement", function(session)
+    session.monitors[2].enabled = true
+    local stack = session.add("kitty", 2, 0)
+    local recent = session.add("code", 10, 1)
+    local selected = session.add("Code", 10, 2)
+    session.held.a, session.held.z = true, true
+    session.press(modifier .. "K")
+    assert(session.picker_request() and recent.workspace.id == 10 and selected.workspace.id == 10)
+    session.choose(1)
+    assert(selected.workspace.id == 2 and recent.workspace.id == 10)
+    assert(session.space(2).master_window == selected and session.space(2).master_orientation == "left")
+    assert(stack.workspace.id == 2 and session.focused == selected)
+end)
+
+test("a launched application becomes the requested workspace master", function(session)
+    session.monitors[2].enabled = true
+    local stack = session.add("kitty", 2)
+    session.held.x = true
+    session.press(modifier .. "K")
+    assert(#session.commands == 1 and session.commands[1].rules.workspace == "2 silent")
+    local code = session.add("code", 2)
+    session.emit("window.open", code)
+    session.flush(50)
+    assert(code.workspace.id == 2 and session.space(2).master_window == code)
+    assert(session.space(2).master_orientation == "right" and stack.workspace.id == 2)
+    assert(session.focused == code)
 end)
 
 test("parking workspace never parks its own windows", function(session)

@@ -47,37 +47,20 @@ function window_navigation.show(window, destination, parking_workspace)
     leave_fullscreen(window)
     unpin(window)
     window_navigation.move(window, destination.workspace)
-    if destination.placement then
-        if not window.floating then
-            compositor.dispatch(hl.dsp.window.float({ window = window, action = "set" }))
-        end
-        local monitor = destination.monitor
-            or (hl.get_workspace(destination.workspace) or {}).monitor
-            or window.monitor
-        if monitor then
-            local position = monitor.position or { x = monitor.x or 0, y = monitor.y or 0 }
-            local half_width = math.floor(monitor.width / 2)
-            local width = destination.placement.position == "left"
-                and half_width or monitor.width - half_width
-            local x = position.x
-            if destination.placement.position == "right" then x = x + half_width end
-            compositor.dispatch(hl.dsp.window.resize({
-                window = window, x = width, y = monitor.height,
-            }))
-            compositor.dispatch(hl.dsp.window.move({
-                window = window, x = x, y = position.y, relative = false,
-            }))
-        end
-        compositor.dispatch(hl.dsp.focus({ window = window }))
-        return
-    end
     if window.floating then
         compositor.dispatch(hl.dsp.window.float({ window = window, action = "unset" }))
     end
-    if destination.add_to_stack then
+    if destination.placement or destination.add_to_stack then
         local workspace = hl.get_workspace(destination.workspace)
         if workspace and workspace.fullscreen_window then leave_fullscreen(workspace.fullscreen_window) end
-        -- master.new_status = "slave" preserves existing master and stack positions.
+        if destination.placement then
+            compositor.dispatch(hl.dsp.focus({ window = window }))
+            compositor.dispatch(hl.dsp.layout("orientation" .. destination.placement.position))
+            compositor.dispatch(hl.dsp.layout("swapwithmaster master ignoremaster"))
+            compositor.dispatch(hl.dsp.focus({ window = window }))
+            return
+        end
+        -- master.new_status = "slave" preserves existing master and stack positions for F.
     elseif destination.workspace ~= parking_workspace then
         for _, other in ipairs(hl.get_windows({ workspace = destination.workspace, mapped = true })) do
             if other.address ~= window.address then window_navigation.move(other, parking_workspace) end
@@ -114,10 +97,7 @@ function window_navigation.new(options, picker)
         local monitor = monitor_name and monitor_name ~= "" and hl.get_monitor(monitor_name) or nil
         if monitor and monitor.enabled == false then monitor = nil end
         if screen == "secondary" and not monitor then screen = "primary" end
-        local workspace_name = tostring(assert(options.placement_workspaces[screen]))
-        local workspace = hl.get_workspace(workspace_name)
-        monitor = monitor or (workspace and workspace.monitor) or hl.get_active_monitor()
-        return workspace_name, monitor
+        return tostring(assert(options.placement_workspaces[screen]))
     end
 
     local function create_request(request_options)
@@ -125,14 +105,12 @@ function window_navigation.new(options, picker)
         if not origin then return nil end
         request_options = request_options or {}
         local workspace = origin.addressable_name
-        local monitor
         if request_options.placement then
-            workspace, monitor = placement_target(request_options.placement)
+            workspace = placement_target(request_options.placement)
         end
         latest_request = {
             origin_workspace = origin.addressable_name,
             workspace = workspace,
-            monitor = monitor,
             placement = request_options.placement,
             add_to_stack = request_options.add_to_stack == true,
         }

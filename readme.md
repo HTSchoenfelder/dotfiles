@@ -55,8 +55,8 @@ stack. Hold `A` to choose an existing instance.
 | `mainMod + O` | KeePassXC |
 | `mainMod + U` | Spotify |
 | `mainMod + F + app key` | Keep the current layout and add the selected app to its stack |
-| `mainMod + Z/X + app key` | Place the app on the left/right half of the secondary display |
-| `mainMod + C/V + app key` | Place the app on the left/right half of the primary display |
+| `mainMod + Z/X + app key` | Make the app the left/right master on workspace 2 |
+| `mainMod + C/V + app key` | Make the app the left/right master on workspace 1 |
 | `mainMod + P` | Select any window by recent focus |
 | `mainMod + ,` / `mainMod + Shift + ,` | Comma selection through windows forward/backward; release `mainMod` to accept |
 | `mainMod + A + ,` | Comma selection through instances of the focused app |
@@ -69,8 +69,11 @@ stack. Hold `A` to choose an existing instance.
 | `mainMod + R` | Toggle the Rofi application launcher |
 | `mainMod + Shift + R` | Show the searchable shortcut catalog |
 
-`F`, `A` and the placement modifiers can be combined with application navigation.
-Direct half placement keeps the other workspace windows in place.
+`Z`, `X`, `C` and `V` can also modify `P`, Comma Selection and instance selection
+with `A`. They move only the selected window, keep it tiled, promote it to master,
+set the target workspace's master side explicitly and preserve its existing windows
+as the opposite stack. Without a secondary monitor, `Z` and `X` fall back to
+workspace 1 on the primary monitor. `F` retains its normal add-to-stack behavior.
 
 ## Dot mode
 

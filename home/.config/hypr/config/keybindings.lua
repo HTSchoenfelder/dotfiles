@@ -75,7 +75,8 @@ for _, placement in ipairs(settings.placement_modifiers) do
     shortcut_catalog.add(
         "Applications",
         shortcut_catalog.main(placement.key .. " + App"),
-        "Place on " .. placement.screen .. " " .. placement.position
+        "Make application " .. placement.position .. " master on workspace "
+            .. tostring(settings.placement_workspaces[placement.screen])
     )
 end
 local spotify, terminal
