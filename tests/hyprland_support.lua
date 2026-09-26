@@ -22,9 +22,14 @@ function support.session()
     session.space(2)
     session.space(10)
     session.monitors = {
-        { name = "HDMI-A-1", enabled = true, focused = true },
-        { name = "HDMI-A-2", enabled = false, focused = false },
+        { name = "HDMI-A-1", enabled = true, focused = true, width = 1920, height = 1080,
+            position = { x = 1920, y = 0 } },
+        { name = "HDMI-A-2", enabled = false, focused = false, width = 1920, height = 1080,
+            position = { x = 0, y = 0 } },
     }
+    session.space(1).monitor = session.monitors[1]
+    session.space(2).monitor = session.monitors[2]
+    session.space(10).monitor = session.monitors[1]
 
     function session.emit(event, ...)
         for _, callback in ipairs(session.events[event] or {}) do callback(...) end
@@ -105,6 +110,16 @@ function support.session()
             end
             return monitors
         end,
+        get_monitor = function(selector)
+            for _, monitor in ipairs(session.monitors) do
+                if monitor.name == selector then return monitor end
+            end
+        end,
+        get_active_monitor = function()
+            for _, monitor in ipairs(session.monitors) do
+                if monitor.focused then return monitor end
+            end
+        end,
         get_last_workspace = function() return nil end,
         get_workspace = function(address) return session.spaces[tostring(address)] end,
         get_workspaces = function()
@@ -178,9 +193,14 @@ function support.session()
                 session.emit("keybinds.submap", arguments == "reset" and "" or arguments)
             elseif action.kind == "move" then
                 if window.fail_move then return { ok = false, error = "Move failed" } end
-                assert(arguments.follow == false)
-                window.workspace = session.space(arguments.workspace)
-                if window.retile_on_move then window.floating = false end
+                if arguments.workspace then
+                    assert(arguments.follow == false)
+                    window.workspace = session.space(arguments.workspace)
+                    if window.retile_on_move then window.floating = false end
+                else
+                    assert(arguments.relative == false)
+                    window.position = { arguments.x, arguments.y }
+                end
             elseif action.kind == "focus" then
                 if window then session.focus(window)
                 else
@@ -223,7 +243,9 @@ function support.session()
     package.loaded["config.workspaces"] = nil
     package.loaded["config.keybindings"] = nil
     package.loaded["config.hardware_keys"] = nil
-    require("lib.monitor_configuration").set_workspace_roles({})
+    require("lib.monitor_configuration").set_workspace_roles({
+        primary = "HDMI-A-1", secondary = "HDMI-A-2",
+    })
     require("config.keybindings")
     require("config.hardware_keys")
     return session

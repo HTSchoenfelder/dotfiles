@@ -14,28 +14,45 @@ function navigation.start()
   local windowNavigation = WindowNavigation.new(settings)
   local chooser = WindowChooser.new({rows = settings.chooserRows})
   local applicationNavigation = ApplicationNavigation.new(settings, chooser, windowNavigation)
-  local commaSelection = CommaSelection.new(windowNavigation)
+  local commaSelection = CommaSelection.new(windowNavigation, {rows = settings.chooserRows})
   local heldKeys = HeldKeys.new(config.hyper)
 
+  heldKeys:track(settings.stackKey)
   for _, placement in ipairs(settings.placementModifiers) do
     heldKeys:track(placement.key)
   end
   heldKeys:track(settings.instanceKey)
 
-  local function selectedPlacement()
+  local function selectionRequest()
     for _, placement in ipairs(settings.placementModifiers) do
       if heldKeys:isDown(placement.key) then
-        return placement
+        return {
+          mode = "placement",
+          screenKind = placement.screen,
+          position = placement.position,
+        }
       end
     end
-    return settings.defaultPlacement
+
+    local focused = hs.window.focusedWindow()
+    local screen = windowNavigation:isUsableWindow(focused)
+        and focused:screen() or windowNavigation:activeScreen()
+    if heldKeys:isDown(settings.stackKey) then
+      return {mode = "stack", screenKind = "current", screen = screen, anchor = focused}
+    end
+    return {
+      mode = "placement",
+      screenKind = settings.defaultPlacement.screen,
+      screen = screen,
+      position = settings.defaultPlacement.position,
+    }
   end
 
   for _, application in ipairs(applications) do
     hs.hotkey.bind(config.hyper, application.key, function()
       applicationNavigation:activate(
         application,
-        selectedPlacement(),
+        selectionRequest(),
         heldKeys:isDown(settings.instanceKey)
       )
     end)
@@ -43,6 +60,7 @@ function navigation.start()
   end
 
   catalog.add("Applications", "MainMod + A + App", "Select application window")
+  catalog.add("Applications", "MainMod + F + App", "Place current window left and application right")
   for _, placement in ipairs(settings.placementModifiers) do
     local display = placement.screen == "primary" and "primary" or "secondary"
     catalog.add(
@@ -56,21 +74,25 @@ function navigation.start()
   hs.hotkey.bind(config.hyper, "n", function() windowNavigation:swapPositions() end)
   hs.hotkey.bind(config.hyper, "h", function() windowNavigation:focusOtherDisplay() end)
   hs.hotkey.bind(config.hyper, "w", function() windowNavigation:closeFocused() end)
-  hs.hotkey.bind(config.hyper, "p", function() applicationNavigation:chooseAny() end)
+  hs.hotkey.bind(config.hyper, "p", function()
+    applicationNavigation:chooseAny(selectionRequest())
+  end)
 
   local function cycleForward()
-    commaSelection:cycle(1, heldKeys:isDown(settings.instanceKey))
+    commaSelection:cycle(1, heldKeys:isDown(settings.instanceKey), selectionRequest())
   end
   local function cycleBackward()
-    commaSelection:cycle(-1, heldKeys:isDown(settings.instanceKey))
+    commaSelection:cycle(-1, heldKeys:isDown(settings.instanceKey), selectionRequest())
   end
   hs.hotkey.bind(config.hyper, ",", cycleForward, nil, cycleForward)
   hs.hotkey.bind({"alt", "ctrl", "cmd", "shift"}, ",", cycleBackward, nil, cycleBackward)
 
   catalog.add("Windows", "MainMod + P", "Choose window")
+  catalog.add("Windows", "MainMod + F + P", "Choose window and place it right")
   catalog.add("Windows", "MainMod + ,", "Cycle windows forward")
   catalog.add("Windows", "MainMod + Shift + ,", "Cycle windows backward")
   catalog.add("Windows", "MainMod + A + ,", "Cycle application windows")
+  catalog.add("Windows", "MainMod + F + ,", "Cycle and place selected window right")
   catalog.add("Navigation", "MainMod + M", "Focus next window")
   catalog.add("Navigation", "MainMod + N", "Swap window positions")
   catalog.add("Navigation", "MainMod + H", "Focus other display")

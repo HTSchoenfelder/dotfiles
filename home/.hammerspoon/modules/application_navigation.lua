@@ -1,5 +1,3 @@
-local layout = require("modules.display_layout")
-
 local ApplicationNavigation = {}
 ApplicationNavigation.__index = ApplicationNavigation
 
@@ -22,7 +20,11 @@ local function secondaryScreen(primary)
   end
 end
 
-local function targetScreen(kind)
+local function targetScreen(kind, currentScreen)
+  if kind == "current" then
+    return currentScreen or hs.screen.mainScreen(), false
+  end
+
   local primary = hs.screen.primaryScreen()
   if kind ~= "secondary" then
     return primary, false
@@ -30,10 +32,6 @@ local function targetScreen(kind)
 
   local secondary = secondaryScreen(primary)
   return secondary or primary, secondary == nil
-end
-
-local function isUsableWindow(window)
-  return window and window:isStandard() and not window:isFullScreen()
 end
 
 local function runningApplication(application)
@@ -71,42 +69,47 @@ function ApplicationNavigation:matchingWindows(application)
   return windows
 end
 
-function ApplicationNavigation:showWindow(window, placement)
-  local screen, usedFallback = targetScreen(placement.screen)
-  local frame = layout.frame(screen:frame(), placement.position)
-  local application = window:application()
+function ApplicationNavigation:showWindow(window, request)
+  local screen, usedFallback = targetScreen(request.screenKind, request.screen)
 
   if usedFallback then
     hs.alert.show("Secondary display unavailable; using primary", 1.5)
   end
-  if application and application:isHidden() then
-    application:unhide()
-  end
-  if window:isMinimized() then
-    window:unminimize()
-  end
-
-  hs.timer.doAfter(self.restoreDelay, function()
-    if not isUsableWindow(window) then
-      return
-    end
-    window:setFrame(frame, 0)
-    window:focus()
-  end)
+  request.screen = screen
+  self.navigation:activate(window, request)
 end
 
-function ApplicationNavigation:showOrChoose(windows, placement, chooseInstance)
+function ApplicationNavigation:showOrChoose(windows, request, chooseInstance)
   if chooseInstance then
     self.chooser:show(windows, function(window)
-      self:showWindow(window, placement)
+      self:showWindow(window, request)
     end)
     return
   end
-  self:showWindow(windows[1], placement)
+  self:showWindow(windows[1], request)
 end
 
-function ApplicationNavigation:waitForWindow(application, placement, chooseInstance, serial)
+function ApplicationNavigation:requestNewWindow(application, running)
+  if application.newWindowShortcut then
+    hs.eventtap.keyStroke(
+      application.newWindowShortcut.modifiers,
+      application.newWindowShortcut.key,
+      0,
+      running
+    )
+    return
+  end
+
+  if application.bundleID then
+    hs.task.new("/usr/bin/open", nil, {"-b", application.bundleID}):start()
+  end
+end
+
+function ApplicationNavigation:waitForWindow(application, request, chooseInstance, serial)
   local deadline = hs.timer.secondsSinceEpoch() + self.timeout
+  local running = runningApplication(application)
+  local reopenAt = hs.timer.secondsSinceEpoch() + 0.25
+  local reopenRequested = false
 
   local function poll()
     if serial ~= self.requestSerial then
@@ -115,8 +118,13 @@ function ApplicationNavigation:waitForWindow(application, placement, chooseInsta
 
     local windows = self:matchingWindows(application)
     if #windows > 0 then
-      self:showOrChoose(windows, placement, chooseInstance)
+      self:showOrChoose(windows, request, chooseInstance)
       return
+    end
+
+    if running and not reopenRequested and hs.timer.secondsSinceEpoch() >= reopenAt then
+      reopenRequested = true
+      self:requestNewWindow(application, running)
     end
 
     if hs.timer.secondsSinceEpoch() >= deadline then
@@ -129,12 +137,16 @@ function ApplicationNavigation:waitForWindow(application, placement, chooseInsta
     hs.timer.doAfter(self.pollInterval, poll)
   end
 
-  local launched = false
-  if application.bundleID then
-    launched = hs.application.launchOrFocusByBundleID(application.bundleID)
-  end
-  if not launched then
-    launched = hs.application.launchOrFocus(application.name)
+  local launched = running ~= nil
+  if running then
+    running:activate(true)
+  else
+    if application.bundleID then
+      launched = hs.application.launchOrFocusByBundleID(application.bundleID)
+    end
+    if not launched then
+      launched = hs.application.launchOrFocus(application.name)
+    end
   end
   if launched then
     poll()
@@ -146,22 +158,22 @@ function ApplicationNavigation:waitForWindow(application, placement, chooseInsta
   end
 end
 
-function ApplicationNavigation:activate(application, placement, chooseInstance)
+function ApplicationNavigation:activate(application, request, chooseInstance)
   self.requestSerial = self.requestSerial + 1
   local serial = self.requestSerial
   local windows = self:matchingWindows(application)
   if #windows > 0 then
-    self:showOrChoose(windows, placement, chooseInstance)
+    self:showOrChoose(windows, request, chooseInstance)
     return
   end
 
-  self:waitForWindow(application, placement, chooseInstance, serial)
+  self:waitForWindow(application, request, chooseInstance, serial)
 end
 
-function ApplicationNavigation:chooseAny()
+function ApplicationNavigation:chooseAny(request)
   self.requestSerial = self.requestSerial + 1
   self.chooser:show(self.navigation:allWindows(), function(window)
-    self.navigation:focus(window)
+    self:showWindow(window, request)
   end)
 end
 

@@ -2,6 +2,13 @@ return {
     modifier = "SUPER + CTRL + ALT",
     stack_key = "F",
     instance_key = "A",
+    placement_workspaces = { primary = 1, secondary = 2 },
+    placement_modifiers = {
+        { key = "Z", screen = "secondary", position = "left" },
+        { key = "X", screen = "secondary", position = "right" },
+        { key = "C", screen = "primary", position = "left" },
+        { key = "V", screen = "primary", position = "right" },
+    },
     cycle_rows = 7,
     launch_timeout_ms = 15000,
     applications = {

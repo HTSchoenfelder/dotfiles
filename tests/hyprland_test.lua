@@ -51,6 +51,28 @@ test("stack navigation preserves existing windows and clears fullscreen", functi
     assert(master.fullscreen == 0 and session.focused == code)
 end)
 
+test("placement modifiers use matching display halves without parking other windows", function(session)
+    session.monitors[2].enabled = true
+    local current = session.add("kitty", 1)
+    local placements = {
+        { modifier = "z", key = "K", class = "code", workspace = 2, x = 0 },
+        { modifier = "x", key = "L", class = "google-chrome", workspace = 2, x = 960 },
+        { modifier = "c", key = "semicolon", class = "obsidian", workspace = 1, x = 1920 },
+        { modifier = "v", key = "O", class = "org.keepassxc.KeePassXC", workspace = 1, x = 2880 },
+    }
+
+    for _, expected in ipairs(placements) do
+        local window = session.add(expected.class, 10)
+        session.held[expected.modifier] = true
+        session.press(modifier .. expected.key)
+        session.held[expected.modifier] = false
+        assert(window.workspace.id == expected.workspace and window.floating)
+        assert(window.size[1] == 960 and window.size[2] == 1080)
+        assert(window.position[1] == expected.x and window.position[2] == 0)
+        assert(current.workspace.id == 1)
+    end
+end)
+
 test("parking workspace never parks its own windows", function(session)
     local code = session.add("code", 10)
     local other = session.add("kitty", 10)

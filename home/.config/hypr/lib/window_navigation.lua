@@ -47,6 +47,30 @@ function window_navigation.show(window, destination, parking_workspace)
     leave_fullscreen(window)
     unpin(window)
     window_navigation.move(window, destination.workspace)
+    if destination.placement then
+        if not window.floating then
+            compositor.dispatch(hl.dsp.window.float({ window = window, action = "set" }))
+        end
+        local monitor = destination.monitor
+            or (hl.get_workspace(destination.workspace) or {}).monitor
+            or window.monitor
+        if monitor then
+            local position = monitor.position or { x = monitor.x or 0, y = monitor.y or 0 }
+            local half_width = math.floor(monitor.width / 2)
+            local width = destination.placement.position == "left"
+                and half_width or monitor.width - half_width
+            local x = position.x
+            if destination.placement.position == "right" then x = x + half_width end
+            compositor.dispatch(hl.dsp.window.resize({
+                window = window, x = width, y = monitor.height,
+            }))
+            compositor.dispatch(hl.dsp.window.move({
+                window = window, x = x, y = position.y, relative = false,
+            }))
+        end
+        compositor.dispatch(hl.dsp.focus({ window = window }))
+        return
+    end
     if window.floating then
         compositor.dispatch(hl.dsp.window.float({ window = window, action = "unset" }))
     end
@@ -81,13 +105,37 @@ function window_navigation.new(options, picker)
     local finish_timer
 
     local function request_is_current(request)
-        return request == latest_request and compositor.workspace_is_active(request.workspace)
+        return request == latest_request and compositor.workspace_is_active(request.origin_workspace)
     end
 
-    local function create_request(add_to_stack)
-        local workspace = compositor.active_workspace()
-        if not workspace then return nil end
-        latest_request = { workspace = workspace.addressable_name, add_to_stack = add_to_stack }
+    local function placement_target(placement)
+        local screen = placement.screen
+        local monitor_name = (options.placement_monitors or {})[screen]
+        local monitor = monitor_name and monitor_name ~= "" and hl.get_monitor(monitor_name) or nil
+        if monitor and monitor.enabled == false then monitor = nil end
+        if screen == "secondary" and not monitor then screen = "primary" end
+        local workspace_name = tostring(assert(options.placement_workspaces[screen]))
+        local workspace = hl.get_workspace(workspace_name)
+        monitor = monitor or (workspace and workspace.monitor) or hl.get_active_monitor()
+        return workspace_name, monitor
+    end
+
+    local function create_request(request_options)
+        local origin = compositor.active_workspace()
+        if not origin then return nil end
+        request_options = request_options or {}
+        local workspace = origin.addressable_name
+        local monitor
+        if request_options.placement then
+            workspace, monitor = placement_target(request_options.placement)
+        end
+        latest_request = {
+            origin_workspace = origin.addressable_name,
+            workspace = workspace,
+            monitor = monitor,
+            placement = request_options.placement,
+            add_to_stack = request_options.add_to_stack == true,
+        }
         return latest_request
     end
 
@@ -104,7 +152,10 @@ function window_navigation.new(options, picker)
             cycle_key = cycle_key,
             initial_index = initial_index,
             is_current = function() return request_is_current(request) end,
-            on_stack = function() request.add_to_stack = true end,
+            on_stack = function()
+                request.add_to_stack = true
+                request.placement = nil
+            end,
             on_select = function(item)
                 if item.window.mapped and matches_application(item.window, application) then
                     window_navigation.show(item.window, request, parking_workspace)
@@ -140,10 +191,10 @@ function window_navigation.new(options, picker)
         hl.on(event, schedule_launch_completion)
     end
 
-    function navigation.activate(application, add_to_stack, choose_instance)
+    function navigation.activate(application, request_options, choose_instance)
         if picker.is_open() and choose_instance then return end
         picker.cancel()
-        local request = create_request(add_to_stack)
+        local request = create_request(request_options)
         if not request then return end
         local windows = window_navigation.list(application)
         if #windows > 0 then
@@ -173,11 +224,11 @@ function window_navigation.new(options, picker)
         process.spawn(application.command, { workspace = request.workspace .. " silent", no_initial_focus = true })
     end
 
-    function navigation.cycle(direction, key, add_to_stack, application)
+    function navigation.cycle(direction, key, request_options, application)
         if picker.is_open() then return end
         local windows = window_navigation.list(application)
         if #windows == 0 then return end
-        local request = create_request(add_to_stack)
+        local request = create_request(request_options)
         if not request then return end
         local active_window = hl.get_active_window()
         local initial_index = compositor.next_index(windows, direction, active_window and active_window.address)

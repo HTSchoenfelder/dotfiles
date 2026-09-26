@@ -25,6 +25,8 @@ local picker = rofi_picker.new({
 local windows = window_navigation.new({
     parking_workspace = workspaces.parking,
     launch_timeout_ms = settings.launch_timeout_ms,
+    placement_workspaces = settings.placement_workspaces,
+    placement_monitors = monitor_configuration.workspace_roles(),
 }, picker)
 local spaces = workspace_navigation.new(picker)
 local overlays = project_overlays.new(require("config.project_overlays"))
@@ -38,6 +40,16 @@ end
 
 local function add_to_stack()
     return hl.is_key_down(settings.stack_key:lower())
+end
+
+local function selected_placement()
+    for _, placement in ipairs(settings.placement_modifiers) do
+        if hl.is_key_down(placement.key:lower()) then return placement end
+    end
+end
+
+local function navigation_options()
+    return { add_to_stack = add_to_stack(), placement = selected_placement() }
 end
 
 hl.layer_rule({ match = { namespace = "rofi" }, no_anim = true })
@@ -55,6 +67,17 @@ bind("N", window_navigation.rotate_positions, "Rotate window positions", "Window
 
 bind(settings.stack_key, picker.add_to_stack, "Add selection to stack", "Applications")
 bind(settings.instance_key, hl.dsp.no_op(), "Select application instance", "Applications")
+shortcut_catalog.add("Applications", shortcut_catalog.main("F + App"), "Add application to stack")
+for _, placement in ipairs(settings.placement_modifiers) do
+    hl.bind(settings.modifier .. " + " .. placement.key, hl.dsp.no_op(), {
+        description = "Hold application placement modifier",
+    })
+    shortcut_catalog.add(
+        "Applications",
+        shortcut_catalog.main(placement.key .. " + App"),
+        "Place on " .. placement.screen .. " " .. placement.position
+    )
+end
 local spotify, terminal
 local function focused_application()
     local active = hl.get_active_window()
@@ -69,24 +92,26 @@ for _, application in ipairs(settings.applications) do
     if application.class == "spotify" then spotify = application end
     if application.class == "kitty" then terminal = application end
     bind(application.key, function()
-        windows.activate(application, add_to_stack(), hl.is_key_down(settings.instance_key:lower()))
+        windows.activate(application, navigation_options(), hl.is_key_down(settings.instance_key:lower()))
     end, "Navigate to " .. application.name, "Applications")
 end
 assert(spotify, "Spotify must be configured as a navigation application")
 assert(terminal, "Kitty must be configured as a navigation application")
 local reset_workspaces = workspace_reset.new({
     workspaces = workspaces,
-    activate_terminal = function() windows.activate(terminal, false, false) end,
+    activate_terminal = function() windows.activate(terminal, {}, false) end,
 })
 
-bind("P", function() windows.activate(nil, add_to_stack(), true) end, "Select window by last focus", "Windows")
+bind("P", function() windows.activate(nil, navigation_options(), true) end, "Select window by last focus", "Windows")
 picker.bind_cycle("comma", function(direction)
     local application = hl.is_key_down(settings.instance_key:lower()) and focused_application() or nil
-    windows.cycle(direction, "comma", add_to_stack(), application)
+    windows.cycle(direction, "comma", navigation_options(), application)
 end, "Cycle windows by last focus")
 shortcut_catalog.add("Windows", shortcut_catalog.main("comma"), "Cycle windows by last focus")
 shortcut_catalog.add("Windows", shortcut_catalog.main("SHIFT + comma"), "Cycle windows backwards")
 shortcut_catalog.add("Windows", shortcut_catalog.main("A + comma"), "Cycle application windows")
+shortcut_catalog.add("Windows", shortcut_catalog.main("F + P"), "Choose window and add it to stack")
+shortcut_catalog.add("Windows", shortcut_catalog.main("F + comma"), "Cycle and add selected window to stack")
 picker.bind_cycle("G", function(direction)
     if picker.is_open() then return end
     windows.invalidate_pending_focus()
@@ -100,7 +125,7 @@ picker.bind_cycle("Y", function(direction)
     local stack = add_to_stack()
     media_controls.cycle(picker, {
         key = "Y", direction = direction, player = "spotify",
-        open_spotify = function() windows.activate(spotify, stack, false) end,
+        open_spotify = function() windows.activate(spotify, { add_to_stack = stack }, false) end,
     })
 end, "Cycle player actions")
 shortcut_catalog.add("Media", shortcut_catalog.main("Y"), "Cycle player actions")

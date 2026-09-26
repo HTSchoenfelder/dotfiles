@@ -11,14 +11,14 @@ and display focus targets are resolved only when their shortcut is pressed.
 
 | Shortcut | Action |
 | --- | --- |
-| `mainMod + J/K/L/;/O/U` | Focus Kitty / VS Code / Chrome / Obsidian / KeePassXC / Spotify on the primary display |
-| `mainMod + F + app key` | Fill the secondary display |
+| `mainMod + J/K/L/;/O/U` | Focus Kitty / VS Code / Chrome / Obsidian / KeePassXC / Spotify on the focused display |
+| `mainMod + F + app key` | Keep the focused window left and place the app right |
 | `mainMod + Z + app key` | Use the left half of the secondary display |
 | `mainMod + X + app key` | Use the right half of the secondary display |
 | `mainMod + C + app key` | Use the left half of the primary display |
 | `mainMod + V + app key` | Use the right half of the primary display |
 | `mainMod + A + app key` | Select an application window before placing it |
-| `mainMod + P` | Select any window |
+| `mainMod + P` | Select any window; hold `F` to place it right of the focused window |
 | `mainMod + ,` / `mainMod + Shift + ,` | Cycle windows forward/backward; release `mainMod` to accept |
 | `mainMod + A + ,` | Cycle through windows of the focused application |
 | `mainMod + M` | Focus the next window on the current display |
@@ -29,6 +29,7 @@ and display focus targets are resolved only when their shortcut is pressed.
 | `mainMod + Shift + R` | Show the searchable shortcut catalog |
 | `mainMod + Shift + M` | Toggle the RØDECaster mute state |
 
+Application and comma cycling use the same compact `hs.chooser` presentation.
 The placement key is held while pressing the application key, for example
 `mainMod + Z + J` for Kitty on the left half of the secondary display. If no
 secondary display is connected, secondary-display actions fall back to the
@@ -53,6 +54,9 @@ stack. Hold `A` to choose an existing instance.
 | `mainMod + ;` | Obsidian |
 | `mainMod + O` | KeePassXC |
 | `mainMod + U` | Spotify |
+| `mainMod + F + app key` | Keep the current layout and add the selected app to its stack |
+| `mainMod + Z/X + app key` | Place the app on the left/right half of the secondary display |
+| `mainMod + C/V + app key` | Place the app on the left/right half of the primary display |
 | `mainMod + P` | Select any window by recent focus |
 | `mainMod + ,` / `mainMod + Shift + ,` | Comma selection through windows forward/backward; release `mainMod` to accept |
 | `mainMod + A + ,` | Comma selection through instances of the focused app |
@@ -65,7 +69,8 @@ stack. Hold `A` to choose an existing instance.
 | `mainMod + R` | Toggle the Rofi application launcher |
 | `mainMod + Shift + R` | Show the searchable shortcut catalog |
 
-`F` and `A` can be combined for application navigation and comma selection.
+`F`, `A` and the placement modifiers can be combined with application navigation.
+Direct half placement keeps the other workspace windows in place.
 
 ## Dot mode
 

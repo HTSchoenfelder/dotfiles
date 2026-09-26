@@ -1,3 +1,5 @@
+local layout = require("modules.display_layout")
+
 local WindowNavigation = {}
 WindowNavigation.__index = WindowNavigation
 
@@ -85,6 +87,40 @@ function WindowNavigation:focus(window)
     if isUsableWindow(window) then
       window:focus()
     end
+  end)
+end
+
+function WindowNavigation:activate(window, request)
+  if not isUsableWindow(window) then
+    return
+  end
+
+  local application = window:application()
+  if application and application:isHidden() then
+    application:unhide()
+  end
+  if window:isMinimized() then
+    window:unminimize()
+  end
+
+  hs.timer.doAfter(self.restoreDelay, function()
+    if not isUsableWindow(window) then
+      return
+    end
+
+    local screen = request.screen or self:activeScreen()
+    if request.mode == "stack" then
+      local anchor = request.anchor
+      if isUsableWindow(anchor) and anchor:id() ~= window:id() then
+        anchor:setFrame(layout.frame(screen:frame(), "left"), 0)
+        window:setFrame(layout.frame(screen:frame(), "right"), 0)
+      else
+        window:setFrame(layout.frame(screen:frame(), "full"), 0)
+      end
+    else
+      window:setFrame(layout.frame(screen:frame(), request.position), 0)
+    end
+    window:focus()
   end)
 end
 
