@@ -31,6 +31,8 @@ let
   '';
 in
 {
+  imports = [ ./desktop-integration.nix ];
+
   users.users."${userName}" = {
     isNormalUser = true;
     description = userDescription;
@@ -63,11 +65,6 @@ in
   nix.settings = {
     substituters = [ "https://hyprland.cachix.org" ];
     trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
-  };
-
-  xdg.portal = {
-    enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
 
   networking.networkmanager.enable = true;

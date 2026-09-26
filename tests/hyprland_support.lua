@@ -1,7 +1,8 @@
 local support = {}
 
 function support.session()
-    local session = { windows = {}, spaces = {}, bindings = {}, events = {}, timers = {}, commands = {}, notices = {}, held = {} }
+    local session = { windows = {}, spaces = {}, bindings = {}, events = {}, timers = {}, commands = {}, notices = {}, held = {}, submap = "reset" }
+    local defining_submap = "reset"
     local process = require("lib.process")
     local original_spawn = process.spawn
     process.spawn = function(arguments, rules)
@@ -46,8 +47,12 @@ function support.session()
         session.emit("window.active", window)
     end
     function session.press(key)
-        local binding = assert(session.bindings[key], "Missing binding: " .. key)
-        if binding.enabled and type(binding.callback) == "function" then binding.callback() end
+        local binding_key = session.submap == "reset" and key or session.submap .. ":" .. key
+        local binding = session.bindings[binding_key] or session.bindings[session.submap .. ":catchall"]
+        assert(binding, "Missing binding: " .. key)
+        if not binding.enabled then return end
+        if type(binding.callback) == "function" then binding.callback()
+        else hl.dispatch(binding.callback) end
     end
     function session.picker_request()
         for index = #session.commands, 1, -1 do
@@ -103,7 +108,15 @@ function support.session()
             return windows
         end,
         is_key_down = function(key) return session.held[key] or false end,
+        define_submap = function(name, callback)
+            local previous = defining_submap
+            defining_submap = name
+            callback()
+            defining_submap = previous
+        end,
+        get_current_submap = function() return session.submap end,
         bind = function(key, callback)
+            key = defining_submap == "reset" and key or defining_submap .. ":" .. key
             assert(not session.bindings[key], "Duplicate binding: " .. key)
             local binding = { callback = callback, enabled = true }
             function binding:set_enabled(enabled) self.enabled = enabled end
@@ -121,7 +134,7 @@ function support.session()
         end,
         notification = { create = function(notice) table.insert(session.notices, notice) end },
         dsp = {
-            no_op = dispatcher("noop"), layout = dispatcher("layout"), focus = dispatcher("focus"),
+            no_op = dispatcher("noop"), layout = dispatcher("layout"), focus = dispatcher("focus"), submap = dispatcher("submap"),
             window = {
                 close = dispatcher("close"), move = dispatcher("move"), float = dispatcher("float"),
                 fullscreen_state = dispatcher("fullscreen"), pin = dispatcher("pin"),
@@ -130,7 +143,8 @@ function support.session()
         dispatch = function(action)
             local arguments = action.arguments
             local window = type(arguments) == "table" and arguments.window
-            if action.kind == "move" then
+            if action.kind == "submap" then session.submap = arguments
+            elseif action.kind == "move" then
                 if window.fail_move then return { ok = false, error = "Move failed" } end
                 assert(arguments.follow == false)
                 window.workspace = session.space(arguments.workspace)

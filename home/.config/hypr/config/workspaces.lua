@@ -6,7 +6,6 @@ hl.config({
     group = { group_on_movetoworkspace = false },
 })
 
-hl.window_rule({ match = { class = ".*" }, suppress_event = "maximize" })
 hl.workspace_rule({ workspace = "1", layout = "master", default_name = "" })
 hl.workspace_rule({ workspace = "2", default_name = "󰍹" })
 hl.workspace_rule({ workspace = tostring(workspaces.parking), default_name = "󰮍" })

@@ -5,6 +5,8 @@ local window_navigation = require("lib.window_navigation")
 local workspace_navigation = require("lib.workspace_navigation")
 local media_controls = require("lib.media_controls")
 local text_launcher = require("lib.text_launcher")
+local screenshots = require("lib.screenshots")
+local compositor = require("lib.compositor")
 local config_directory = assert(debug.getinfo(1, "S").source:match("^@(.*)/config/keybindings.lua$"))
 
 local picker = rofi_picker.new({
@@ -74,3 +76,23 @@ bind("Q", function()
     windows.invalidate_pending_focus()
     text_launcher.open(picker, config_directory .. "/launcher-data/snippets.txt", text_launcher.snippet)
 end, "Insert snippet")
+
+bind("period", function()
+    windows.invalidate_pending_focus()
+    picker.cancel()
+    compositor.dispatch(hl.dsp.submap("screenshot"))
+end, "Enter screenshot mode")
+
+hl.define_submap("screenshot", function()
+    local function capture(action)
+        return function()
+            -- Release the submap before Hyprshot takes keyboard/pointer focus.
+            compositor.dispatch(hl.dsp.submap("reset"))
+            action()
+        end
+    end
+    hl.bind("Q", capture(screenshots.capture_region), { ignore_mods = true, description = "Capture region" })
+    hl.bind("W", capture(screenshots.capture_active_output), { ignore_mods = true, description = "Capture active screen" })
+    hl.bind("Escape", hl.dsp.submap("reset"), { ignore_mods = true, description = "Cancel screenshot" })
+    hl.bind("catchall", hl.dsp.submap("reset"), { ignore_mods = true })
+end)

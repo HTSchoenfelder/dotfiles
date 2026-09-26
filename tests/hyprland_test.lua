@@ -296,6 +296,40 @@ test("literal text remains one safely quoted command argument", function()
     assert(not pcall(process.command, { "wtype", "a\0b" }))
 end)
 
+test("screenshot mode waits for Q before capturing a region", function(session)
+    session.press(modifier .. "period")
+    assert(session.submap == "screenshot" and #session.commands == 0)
+    session.press("Q")
+    assert(session.submap == "reset")
+    assert(table.concat(session.commands[1].arguments, " ") == "hyprshot --mode region")
+end)
+
+test("screenshot mode captures the active output with W", function(session)
+    session.press(modifier .. "period")
+    session.press("W")
+    assert(session.submap == "reset")
+    assert(table.concat(session.commands[1].arguments, " ") == "hyprshot --mode output --mode active")
+end)
+
+test("Escape and unknown keys leave screenshot mode without capturing", function(session)
+    for _, key in ipairs({ "Escape", "X" }) do
+        session.press(modifier .. "period")
+        session.press(key)
+        assert(session.submap == "reset" and #session.commands == 0)
+    end
+end)
+
+test("entering screenshot mode cancels pending Rofi selections", function(session)
+    session.press(modifier .. "Y")
+    local request = session.map_picker()
+    session.press(modifier .. "period")
+    rofi_picker_selected(request.token, 0)
+    session.emit("layer.closed", { pid = 5000 })
+    session.flush()
+    for _, command in ipairs(session.commands) do assert(command.arguments[1] ~= "playerctl") end
+    assert(session.submap == "screenshot")
+end)
+
 test("dispatch failures stop navigation before focus changes", function(session)
     local code = session.add("code", 2)
     code.fail_move = true

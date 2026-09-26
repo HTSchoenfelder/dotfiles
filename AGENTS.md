@@ -61,10 +61,12 @@ Prefer declarative configuration and explicit ownership of processes.
   - `config/catppuccin_mocha.lua`
   - `config/session.lua`
   - `config/keybindings.lua`
+  - `config/hardware_keys.lua`
+  - `config/window_rules.lua`
   - `config/navigation.lua` (application definitions and navigation preferences)
   - `config/workspaces.lua`
   - `config/hosts/<host>/monitor.lua`
-- Reusable behavior lives in `lib/`: window/workspace navigation, Rofi selection lifecycle, media control and text insertion.
+- Reusable behavior lives in `lib/`: window/workspace navigation, Rofi selection lifecycle, media control, screenshots and text insertion.
 - `lib/rofi_mode.lua` is a standalone Lua provider invoked by Rofi. Keep blocking process I/O out of the compositor's Lua thread.
 - The active Lua configuration does not depend on `scripts/*.sh`. These scripts and the old `.conf` files remain migration references; see `docs/hyprland-lua.md` for remaining candidates.
 - `setup/nixos/setup-nixos.sh` creates the runtime `~/.config/hypr/config/monitor.lua` symlink for the selected host.
@@ -74,12 +76,11 @@ Prefer declarative configuration and explicit ownership of processes.
 
 ## Desktop integration topics
 
-These are intentionally being reviewed rather than treated as settled:
-
-- XDG Desktop Portal / `xdg-desktop-portal-hyprland` plus GTK fallback.
-- Polkit versus the graphical Polkit authentication agent; `hyprpolkitagent` is a likely choice but should be integrated deliberately.
-- Freedesktop Secret Service provider: GNOME Keyring versus KeePassXC integration is still an open design decision.
-- Whether current Hyprland Lua autostart entries should move to `systemd --user`.
+- `setup/nixos/desktop-integration.nix` owns toolkit packages, dconf defaults, Dunst and the graphical `hyprpolkitagent` user service.
+- `programs.hyprland` supplies the matching Hyprland portal and GTK fallback. Portal routing stays in `home/.config/xdg-desktop-portal/hyprland-portals.conf`.
+- GNOME Keyring remains the configured Secret Service and Secret portal backend. Replacing it with KeePassXC remains a separate, explicit decision.
+- Hyprland manages the graphical session targets and exports session identity. Do not duplicate this with manual portal startup or a blanket environment import.
+- See `docs/hyprland-desktop.md` for the Must-have and upstream default configuration audit.
 
 Do not conflate:
 - PAM (authentication/session setup),

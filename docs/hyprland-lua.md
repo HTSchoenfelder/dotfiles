@@ -9,12 +9,15 @@ the setup; files under `lib/` implement reusable behavior.
 | `config/navigation.lua` | Modifier, application commands/classes and navigation preferences |
 | `config/workspaces.lua` | Master layout, workspace icons and Parking destination |
 | `config/keybindings.lua` | Bindings and composition of navigation/launcher actions |
+| `config/hardware_keys.lua` | Volume, microphone, brightness and playback keys |
+| `config/window_rules.lua` | Maximize suppression and XWayland drag focus correction |
 | `lib/window_navigation.lua` | Window MRU order, Parking/stack placement and asynchronous application startup |
 | `lib/workspace_navigation.lua` | Workspace MRU history and workspace selection |
 | `lib/rofi_picker.lua` | One active selection, native cycling/release bindings, cancellation and cleanup |
 | `lib/rofi_mode.lua` | Standalone Rofi script provider and numeric selection replies |
 | `lib/text_launcher.lua` | Emoji/snippet parsing and insertion into the original window |
 | `lib/media_controls.lua` | Fixed player menu and Spotify MPRIS commands |
+| `lib/screenshots.lua` | Hyprshot region and active-output commands |
 | `lib/process.lua` | Quoted argument vectors and asynchronous process startup |
 | `lib/compositor.lua` | Checked dispatch, current workspace and shared selection indexing |
 
@@ -66,6 +69,8 @@ Already replaced or unnecessary:
 System installation and session-service ownership remain separate from desktop
 interaction. Replacing shell navigation does not imply replacing Nix setup scripts
 or moving session daemons into the compositor.
+See [desktop integration](hyprland-desktop.md) for the portal, toolkit and upstream
+default configuration audit.
 
 ## Validation
 
