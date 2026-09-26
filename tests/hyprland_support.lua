@@ -1,7 +1,7 @@
 local support = {}
 
 function support.session()
-    local session = { windows = {}, spaces = {}, bindings = {}, events = {}, timers = {}, commands = {}, shortcuts = {}, notices = {}, held = {}, submap = "reset" }
+    local session = { windows = {}, spaces = {}, monitors = {}, monitor_rules = {}, bindings = {}, events = {}, timers = {}, commands = {}, shortcuts = {}, notices = {}, held = {}, submap = "reset" }
     local defining_submap = "reset"
     local process = require("lib.process")
     local original_spawn = process.spawn
@@ -14,12 +14,17 @@ function support.session()
         session.spaces[address] = session.spaces[address] or {
             addressable_name = address, name = address, id = tonumber(address),
             special = address:match("^special:") ~= nil, tiled_layout = "master",
+            monitor = { width = 1920, height = 1080 },
         }
         return session.spaces[address]
     end
     session.current = session.space(1)
     session.space(2)
     session.space(10)
+    session.monitors = {
+        { name = "HDMI-A-1", enabled = true, focused = true },
+        { name = "HDMI-A-2", enabled = false, focused = false },
+    }
 
     function session.emit(event, ...)
         for _, callback in ipairs(session.events[event] or {}) do callback(...) end
@@ -40,6 +45,9 @@ function support.session()
         }
         session.windows[#session.windows + 1] = window
         return window
+    end
+    function session.retile_on_next_center(window)
+        session.retile_before_center = window
     end
     function session.focus(window)
         session.focused = window
@@ -90,6 +98,13 @@ function support.session()
         get_active_workspace = function() return session.current end,
         get_active_special_workspace = function() return nil end,
         get_active_window = function() return session.focused end,
+        get_monitors = function(options)
+            local monitors = {}
+            for _, monitor in ipairs(session.monitors) do
+                if options and options.all or monitor.enabled then monitors[#monitors + 1] = monitor end
+            end
+            return monitors
+        end,
         get_last_workspace = function() return nil end,
         get_workspace = function(address) return session.spaces[tostring(address)] end,
         get_workspaces = function()
@@ -132,11 +147,24 @@ function support.session()
             session.timers[#session.timers + 1] = timer
             return timer
         end,
-        notification = { create = function(notice) table.insert(session.notices, notice) end },
+        monitor = function(specification)
+            session.monitor_rules[#session.monitor_rules + 1] = specification
+            for _, monitor in ipairs(session.monitors) do
+                if monitor.name == specification.output then monitor.enabled = not specification.disabled end
+            end
+        end,
+        notification = { create = function(options)
+            local notice = { options = options, alive = true, paused = false }
+            function notice:dismiss() self.alive = false end
+            function notice:pause() self.paused = true end
+            table.insert(session.notices, notice)
+            return notice
+        end },
         dsp = {
             send_shortcut = dispatcher("shortcut"), no_op = dispatcher("noop"), layout = dispatcher("layout"), focus = dispatcher("focus"), submap = dispatcher("submap"),
             window = {
                 close = dispatcher("close"), move = dispatcher("move"), float = dispatcher("float"),
+                resize = dispatcher("resize"), center = dispatcher("center"), deny_from_group = dispatcher("deny_group"),
                 fullscreen_state = dispatcher("fullscreen"), pin = dispatcher("pin"),
             },
         },
@@ -144,18 +172,30 @@ function support.session()
             local arguments = action.arguments
             local window = type(arguments) == "table" and arguments.window
             if action.kind == "shortcut" then table.insert(session.shortcuts, arguments)
-            elseif action.kind == "submap" then session.submap = arguments
+            elseif action.kind == "submap" then
+                session.submap = arguments == "reset" and "reset" or arguments
+                session.emit("keybinds.submap", arguments == "reset" and "" or arguments)
             elseif action.kind == "move" then
                 if window.fail_move then return { ok = false, error = "Move failed" } end
                 assert(arguments.follow == false)
                 window.workspace = session.space(arguments.workspace)
+                if window.retile_on_move then window.floating = false end
             elseif action.kind == "focus" then
                 if window then session.focus(window)
                 else
                     session.current = session.space(arguments.workspace)
                     session.emit("workspace.active", session.current)
                 end
-            elseif action.kind == "float" then window.floating = false
+            elseif action.kind == "float" then window.floating = arguments.action == "set"
+            elseif action.kind == "resize" then window.size = { arguments.x, arguments.y }
+            elseif action.kind == "center" then
+                if session.retile_before_center == window then
+                    session.retile_before_center = nil
+                    window.floating = false
+                end
+                if not window.floating then return { ok = false, error = "No floating window found" } end
+                window.centered = true
+            elseif action.kind == "deny_group" then session.group_denied = true
             elseif action.kind == "pin" then window.pinned = false
             elseif action.kind == "fullscreen" then
                 window.fullscreen, window.fullscreen_client = 0, 0

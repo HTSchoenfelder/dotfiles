@@ -8,7 +8,9 @@ local text_launcher = require("lib.text_launcher")
 local command_launcher = require("lib.command_launcher")
 local shortcut_forwarding = require("lib.shortcut_forwarding")
 local screenshots = require("lib.screenshots")
-local compositor = require("lib.compositor")
+local dot_mode = require("lib.dot_mode")
+local monitor_configuration = require("lib.monitor_configuration")
+local project_overlays = require("lib.project_overlays")
 local config_directory = assert(debug.getinfo(1, "S").source:match("^@(.*)/config/keybindings.lua$"))
 
 local picker = rofi_picker.new({
@@ -21,6 +23,7 @@ local windows = window_navigation.new({
     launch_timeout_ms = settings.launch_timeout_ms,
 }, picker)
 local spaces = workspace_navigation.new(picker)
+local overlays = project_overlays.new(require("config.project_overlays"))
 
 shortcut_forwarding.bind(require("config.application_shortcuts"))
 
@@ -45,6 +48,15 @@ bind("N", window_navigation.rotate_positions, "Rotate window positions")
 bind(settings.stack_key, picker.add_to_stack, "Add selection to stack")
 bind(settings.instance_key, hl.dsp.no_op(), "Select application instance")
 local spotify
+local function focused_application()
+    local active = hl.get_active_window()
+    if not active then return end
+    for _, application in ipairs(settings.applications) do
+        if active.class:lower() == application.class:lower() then return application end
+    end
+    return { class = active.class }
+end
+
 for _, application in ipairs(settings.applications) do
     if application.class == "spotify" then spotify = application end
     bind(application.key, function()
@@ -55,7 +67,8 @@ assert(spotify, "Spotify must be configured as a navigation application")
 
 bind("P", function() windows.activate(nil, add_to_stack(), true) end, "Select window by last focus")
 picker.bind_cycle("comma", function(direction)
-    windows.cycle(direction, "comma", add_to_stack())
+    local application = hl.is_key_down(settings.instance_key:lower()) and focused_application() or nil
+    windows.cycle(direction, "comma", add_to_stack(), application)
 end, "Cycle windows by last focus")
 picker.bind_cycle("G", function(direction)
     if picker.is_open() then return end
@@ -72,31 +85,36 @@ picker.bind_cycle("Y", function(direction)
     })
 end, "Cycle player actions")
 
-bind("period", function()
-    windows.invalidate_pending_focus()
-    picker.cancel()
-    compositor.dispatch(hl.dsp.submap("actions"))
-end, "Enter action mode")
-
-hl.define_submap("actions", function()
-    local function run_action(action)
-        return function()
-            -- Release the submap before a launcher or capture tool takes focus.
-            compositor.dispatch(hl.dsp.submap("reset"))
-            action()
-        end
-    end
-    hl.bind("Q", run_action(screenshots.capture_region), { ignore_mods = true, description = "Capture region" })
-    hl.bind("W", run_action(screenshots.capture_active_output), { ignore_mods = true, description = "Capture active screen" })
-    hl.bind("E", run_action(function()
-        text_launcher.open(picker, config_directory .. "/launcher-data/emoji.txt", text_launcher.emoji)
-    end), { ignore_mods = true, description = "Insert emoji" })
-    hl.bind("R", run_action(function()
-        command_launcher.open(picker, config_directory .. "/launcher-data/execute.txt")
-    end), { ignore_mods = true, description = "Run configured command" })
-    hl.bind("T", run_action(function()
-        text_launcher.open(picker, config_directory .. "/launcher-data/snippets.txt", text_launcher.snippet)
-    end), { ignore_mods = true, description = "Insert snippet" })
-    hl.bind("Escape", hl.dsp.submap("reset"), { ignore_mods = true, description = "Cancel action mode" })
-    hl.bind("catchall", hl.dsp.submap("reset"), { ignore_mods = true })
-end)
+dot_mode.bind({
+    modifier = settings.modifier,
+    before_enter = function()
+        windows.invalidate_pending_focus()
+        picker.cancel()
+    end,
+    actions = {
+        { key = "Q", description = "Capture region", run = screenshots.capture_region },
+        { key = "A", description = "Capture active window", run = screenshots.capture_active_window },
+        { key = "Z", description = "Capture active screen", run = screenshots.capture_active_output },
+        { key = "B", description = "Toggle display", run = function()
+            monitor_configuration.open(picker)
+        end },
+        { key = "G", description = "Toggle project editor", run = function()
+            overlays.toggle("editor")
+        end },
+        { key = "SHIFT + G", description = "Toggle project Git client", run = function()
+            overlays.toggle("git")
+        end },
+        { key = "J", description = "Toggle project terminal", run = function()
+            overlays.toggle("terminal")
+        end },
+        { key = "E", description = "Insert emoji", run = function()
+            text_launcher.open(picker, config_directory .. "/launcher-data/emoji.txt", text_launcher.emoji)
+        end },
+        { key = "R", description = "Run configured command", run = function()
+            command_launcher.open(picker, config_directory .. "/launcher-data/execute.txt")
+        end },
+        { key = "T", description = "Insert snippet", run = function()
+            text_launcher.open(picker, config_directory .. "/launcher-data/snippets.txt", text_launcher.snippet)
+        end },
+    },
+})

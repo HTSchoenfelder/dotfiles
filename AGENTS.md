@@ -14,6 +14,7 @@ These instructions apply to the entire repository.
 - Keep UI surfaces minimal. Do not add onboarding, usage instructions, keyboard hints, explanatory labels, or captions to launchers, selection dialogs, or overlays unless explicitly requested. Show only the information needed to make the selection.
 - For architectural changes, explain the responsibility boundaries and trade-offs before making broad changes.
 - Prefer small, reviewable changes over large rewrites.
+- After every change or refactoring, check whether `readme.md` must be updated.
 - Inspect the current repository state before editing. Do not assume that an earlier chat summary is newer than the working tree.
 - Never discard or overwrite unrelated local changes.
 - By default, make requested changes only in the working tree and show/review the diff. Do **not** commit, push, reset, rebase, or force-update anything unless the user explicitly asks.
@@ -65,15 +66,17 @@ Prefer declarative configuration and explicit ownership of processes.
   - `config/hardware_keys.lua`
   - `config/window_rules.lua`
   - `config/navigation.lua` (application definitions and navigation preferences)
+  - `config/project_overlays.lua` (project overlay definitions)
   - `config/workspaces.lua`
   - `config/hosts/<host>/monitor.lua`
-- Reusable behavior lives in `lib/`: window/workspace navigation, Rofi selection lifecycle, media control, screenshots, application shortcut forwarding, command selection and text insertion.
+- Reusable behavior lives in `lib/`: window/workspace navigation, Rofi selection lifecycle, dot mode, project overlays, monitor control, media control, screenshots, application shortcut forwarding, command selection and text insertion.
 - `lib/rofi_mode.lua` is a standalone Lua provider invoked by Rofi. Keep blocking process I/O out of the compositor's Lua thread.
-- The active Lua configuration does not depend on `scripts/*.sh`. These scripts and the old `.conf` files remain migration references; see `docs/hyprland-lua.md` for remaining candidates.
+- The active Lua configuration does not depend on `scripts/*.sh` or legacy Hyprland `.conf` files.
 - `setup/nixos/setup-nixos.sh` creates the runtime `~/.config/hypr/config/monitor.lua` symlink for the selected host.
-- Old Hyprland `.conf` files intentionally remain as migration reference/backup. Do not delete or bulk-migrate them unless explicitly requested.
 - The workspace/keybinding concept is intentionally being redesigned. Do not blindly port the old workspace setup.
 - Current primary modifier is `SUPER + CTRL + ALT`.
+- **Comma selection** means a Rofi selection that cycles while its shortcut is held and accepts the highlighted item when the main modifier is released.
+- **Dot mode** means the Hyprland submap entered with the dot/period key while holding the main modifier.
 
 ## Desktop integration topics
 

@@ -8,6 +8,7 @@ the setup; files under `lib/` implement reusable behavior.
 | --- | --- |
 | `config/application_shortcuts.lua` | Ctrl shortcuts and application-specific mappings |
 | `config/navigation.lua` | Modifier, application commands/classes and navigation preferences |
+| `config/project_overlays.lua` | Project overlay tools and hidden workspace |
 | `config/workspaces.lua` | Master layout, workspace icons and Parking destination |
 | `config/keybindings.lua` | Bindings and composition of navigation/launcher actions |
 | `config/hardware_keys.lua` | Volume, microphone, brightness and playback keys |
@@ -17,11 +18,14 @@ the setup; files under `lib/` implement reusable behavior.
 | `lib/rofi_picker.lua` | One active selection, native cycling/release bindings, cancellation and cleanup |
 | `lib/rofi_mode.lua` | Standalone Rofi script provider and numeric selection replies |
 | `lib/shortcut_forwarding.lua` | Native shortcut delivery to the focused application |
+| `lib/dot_mode.lua` | Dot mode lifecycle and persistent native notification |
+| `lib/monitor_configuration.lua` | Host monitor rules and Rofi display toggling |
+| `lib/project_overlays.lua` | Project discovery and reusable floating Kitty overlays |
 | `lib/launcher_data.lua` | Shared launcher file loading and validation |
 | `lib/command_launcher.lua` | Configured command parsing and execution after selection |
 | `lib/text_launcher.lua` | Emoji/snippet parsing and insertion into the original window |
 | `lib/media_controls.lua` | Fixed player menu and Spotify MPRIS commands |
-| `lib/screenshots.lua` | Hyprshot region and active-output commands |
+| `lib/screenshots.lua` | Hyprshot region, active-window and active-output commands |
 | `lib/process.lua` | Quoted argument vectors and asynchronous process startup |
 | `lib/compositor.lua` | Checked dispatch, current workspace and shared selection indexing |
 
@@ -43,9 +47,11 @@ titles and snippet text are never evaluated as commands. Existing Rofi styling a
 launcher data are reused. Snippets retain the `text|alias` format and support
 `\n`, `\t` and `\\` escapes. Both text and alias are searchable.
 
-`mainMod + period` enters the action submap: `Q` captures a region, `W` captures
-the active monitor, `E` selects an emoji, `R` selects an `execute.txt` command,
-and `T` selects a snippet. The submap resets before the selected tool opens.
+`mainMod + period` enters dot mode and holds a native Hyprland notification until
+the mode ends. `Q`, `A` and `Z` capture a region, the active window and the active
+monitor. `B` selects and toggles connected displays. `G`, `Shift+G` and `J` toggle
+project LazyVim, Lazygit and terminal overlays. `E`, `R` and `T` select emojis,
+configured commands and snippets. The submap resets before the selected tool opens.
 `mainMod + R` still opens the application launcher.
 
 Command entries use `command|label`, split at the last `|` to allow shell pipelines.
@@ -57,31 +63,11 @@ Commands retain shell expansion and quoting from the original launcher.
 window. Chrome maps them to `Ctrl+Shift+A`, `Alt+Left`, `Ctrl+Shift+Tab`,
 `Ctrl+Tab`, and `Alt+Right`; other applications receive the original shortcut.
 
-## Remaining shell migrations
-
-The active configuration no longer starts any `scripts/*.sh` file. Legacy scripts
-and `.conf` files remain as references. They are not loaded by `hyprland.lua`.
-These workflows should be selected deliberately before adding more bindings:
-
-| Legacy scripts | Proposed Lua replacement |
-| --- | --- |
-| `move-current-workspace-to-monitor.sh` | Move the current workspace to the adjacent monitor through `hl.dsp.workspace.move`, preserving focus explicitly. |
-| `move-workspaces-reset.sh` | Reassign existing/configured workspaces to their intended monitors; avoid creating twenty workspaces as the old loop did. |
-| `notify-player-current-track.sh` | Query Spotify metadata in an external Lua worker, then display the selected track information. Keep network/artwork fetching outside the compositor. |
-| `launch-chrome.sh`, `launch-chrome-instances.sh` | Optional profile definitions with window-open/class events to identify each launched window, replacing fixed sleeps. |
-
-Already replaced or unnecessary:
-
-- Emoji, execute and snippet shell launchers are replaced by `period`, then `E`/`R`/`T`.
-- `send-shortcut.sh` is replaced by native Lua shortcut forwarding.
-- `launcher-focus-window.sh` is replaced by application instance pickers and `P`.
-- `list-desktop-files.sh` is covered by Rofi's `drun` mode.
-- `exec-reset-submap.sh` is covered by Lua callbacks and the shared picker lifecycle.
-- `listen-to-events.sh` is no longer started. Its project terminal handling is
-  obsolete; future compositor event handling belongs in `hl.on` callbacks.
-- `focus-code-window.sh`, `launch-code-project.sh`, `show-terminal.sh` and the old
-  `shortcut-set.sh` / `shortcut-execute.sh` project workflow are intentionally not
-  ported.
+The former shell launchers and legacy Hyprland fragments have been retired. Lua
+now owns window/application navigation, text and command selection, shortcut
+forwarding, screenshots, monitor toggling and project overlays. The discarded
+multi-project startup, Chrome-profile tagging and twenty-workspace workflows are
+outside the current design.
 
 System installation and session-service ownership remain separate from desktop
 interaction. Replacing shell navigation does not imply replacing Nix setup scripts
@@ -93,7 +79,8 @@ default configuration audit.
 
 Run `lua tests/hyprland_test.lua` from the repository root for behavioral checks.
 The scenarios cover MRU order, workspace changes, launch races, Parking/stack
-placement, cycling, cancellation, reload, player actions, shortcut forwarding, command selection and text insertion.
+placement, cycling, cancellation, reload, player actions, shortcut forwarding,
+command selection, monitor toggling, project overlays and text insertion.
 Validate configuration/API calls with the installed Hyprland's `--verify-config`.
 Use a running session for Rofi's real keyboard and layer lifecycle; Lua mocks do
 not prove compositor event ordering or Wayland input behavior.

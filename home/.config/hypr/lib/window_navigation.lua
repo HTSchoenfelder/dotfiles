@@ -173,9 +173,9 @@ function window_navigation.new(options, picker)
         process.spawn(application.command, { workspace = request.workspace .. " silent", no_initial_focus = true })
     end
 
-    function navigation.cycle(direction, key, add_to_stack)
+    function navigation.cycle(direction, key, add_to_stack, application)
         if picker.is_open() then return end
-        local windows = window_navigation.list()
+        local windows = window_navigation.list(application)
         if #windows == 0 then return end
         local request = create_request(add_to_stack)
         if not request then return end

@@ -95,7 +95,7 @@ test("repeated requests start only one process and use the latest stack preferen
     assert(session.commands[1].rules.no_initial_focus)
     local code = session.add("code", 1)
     session.emit("window.open", code)
-    session.flush()
+    session.flush(50)
     assert(session.focused == code and master.workspace.id == 1)
 end)
 
@@ -166,6 +166,21 @@ test("F can change an open window selection to stack mode", function(session)
     session.press(modifier .. "F")
     session.choose(1)
     assert(master.workspace.id == 1)
+end)
+
+test("A limits comma selection to instances of the focused application", function(session)
+    local current = session.add("unconfigured-app", 1, 0)
+    local previous = session.add("Unconfigured-App", 2, 1)
+    session.add("kitty", 1, 2)
+    session.focus(current)
+    session.held.a = true
+    session.press(modifier .. "comma")
+    local request = assert(session.picker_request())
+    local rows = assert(io.open(request.path))
+    assert(rows:read("*a") == "unconfigured-app\nUnconfigured-App\n")
+    rows:close()
+    session.press("Alt_L")
+    assert(session.focused == previous)
 end)
 
 test("Escape cancels and stale callbacks cannot select a later picker", function(session)
@@ -299,22 +314,28 @@ test("literal text remains one safely quoted command argument", function()
     assert(not pcall(process.command, { "wtype", "a\0b" }))
 end)
 
-test("action mode waits for Q before capturing a region", function(session)
+test("dot mode stays visible until Q captures a region", function(session)
     session.press(modifier .. "period")
-    assert(session.submap == "actions" and #session.commands == 0)
+    assert(session.submap == "dot" and #session.commands == 0)
+    local notice = session.notices[#session.notices]
+    assert(notice.options.text == "dot mode" and notice.paused and notice.alive)
     session.press("Q")
-    assert(session.submap == "reset")
+    assert(session.submap == "reset" and not notice.alive)
     assert(table.concat(session.commands[1].arguments, " ") == "hyprshot --mode region")
 end)
 
-test("action mode captures the active output with W", function(session)
+test("dot mode captures the active window with A and active output with Z", function(session)
+    session.focus(session.add("code", 1))
     session.press(modifier .. "period")
-    session.press("W")
+    session.press("A")
     assert(session.submap == "reset")
-    assert(table.concat(session.commands[1].arguments, " ") == "hyprshot --mode output --mode active")
+    assert(table.concat(session.commands[1].arguments, " ") == "hyprshot --mode window --mode active")
+    session.press(modifier .. "period")
+    session.press("Z")
+    assert(table.concat(session.commands[2].arguments, " ") == "hyprshot --mode output --mode active")
 end)
 
-test("Escape and unknown keys leave action mode without capturing", function(session)
+test("Escape and unknown keys leave dot mode without capturing", function(session)
     for _, key in ipairs({ "Escape", "X" }) do
         session.press(modifier .. "period")
         session.press(key)
@@ -322,7 +343,7 @@ test("Escape and unknown keys leave action mode without capturing", function(ses
     end
 end)
 
-test("entering action mode cancels pending Rofi selections", function(session)
+test("entering dot mode cancels pending Rofi selections", function(session)
     session.press(modifier .. "Y")
     local request = session.map_picker()
     session.press(modifier .. "period")
@@ -330,7 +351,7 @@ test("entering action mode cancels pending Rofi selections", function(session)
     session.emit("layer.closed", { pid = 5000 })
     session.flush()
     for _, command in ipairs(session.commands) do assert(command.arguments[1] ~= "playerctl") end
-    assert(session.submap == "actions")
+    assert(session.submap == "dot")
 end)
 
 test("dispatch failures stop navigation before focus changes", function(session)
@@ -420,6 +441,103 @@ test("period T inserts snippets and direct R remains the application launcher", 
     session.press(modifier .. "R")
     assert(table.concat(session.commands[#session.commands].arguments, " ") == "rofi -show drun")
     assert(not session.bindings[modifier .. "E"] and not session.bindings[modifier .. "Q"])
+end)
+
+test("dot B shows display status and enables the selected output", function(session)
+    session.press(modifier .. "period")
+    session.press("B")
+    local request = assert(session.picker_request())
+    local rows = assert(io.open(request.path))
+    local labels = rows:read("*a")
+    rows:close()
+    assert(labels:find("🟢 HDMI%-A%-1 · enabled") and labels:find("⚫ HDMI%-A%-2 · disabled"))
+    session.choose(1)
+    assert(session.monitors[2].enabled)
+    assert(session.monitor_rules[#session.monitor_rules].output == "HDMI-A-2")
+end)
+
+test("dot B refuses to disable the last active display", function(session)
+    session.press(modifier .. "period")
+    session.press("B")
+    session.choose(0)
+    assert(session.monitors[1].enabled and #session.monitor_rules == 0)
+    assert(session.notices[#session.notices].options.text == "The last enabled display must remain on.")
+end)
+
+test("project overlays reuse one floating Kitty window per project and tool", function(session)
+    local code = session.add("code", 1)
+    code.title = "/home/henrik/dotfiles | Code"
+    session.focus(code)
+    session.press(modifier .. "period")
+    session.press("J")
+    local launch = session.commands[#session.commands]
+    local class
+    for index, argument in ipairs(launch.arguments) do
+        if argument == "--class" then class = launch.arguments[index + 1] end
+    end
+    assert(class and launch.arguments[#launch.arguments] == "zsh")
+    assert(launch.rules.no_initial_focus)
+    local terminal = session.add(class, 1)
+    session.emit("window.open", terminal)
+    session.flush(50)
+    session.flush(30)
+    session.flush(30)
+    session.flush(30)
+    assert(session.focused == terminal and terminal.floating)
+    assert(terminal.centered and terminal.size[1] == 1824 and terminal.size[2] == 972 and session.group_denied)
+    session.press(modifier .. "period")
+    session.press("J")
+    assert(terminal.workspace.addressable_name == "special:project-overlays")
+    assert(#session.commands == 1)
+end)
+
+test("project overlays remain floating across repeated hide and restore cycles", function(session)
+    local code = session.add("code", 1)
+    code.title = "/home/henrik/dotfiles | Code"
+    session.focus(code)
+    session.press(modifier .. "period")
+    session.press("J")
+    local launch = session.commands[#session.commands]
+    local class
+    for index, argument in ipairs(launch.arguments) do
+        if argument == "--class" then class = launch.arguments[index + 1] end
+    end
+    local terminal = session.add(assert(class), 1)
+    terminal.retile_on_move = true
+    session.emit("window.open", terminal)
+    session.flush(50)
+    for _ = 1, 3 do session.flush(30) end
+
+    for _ = 1, 3 do
+        assert(terminal.workspace.addressable_name == "1" and terminal.floating and terminal.centered)
+        session.press(modifier .. "period")
+        session.press("J")
+        assert(terminal.workspace.addressable_name == "special:project-overlays")
+        terminal.centered = false
+        session.focus(code)
+        session.press(modifier .. "period")
+        session.press("J")
+        session.flush(30)
+        session.flush(30)
+        session.retile_on_next_center(terminal)
+        session.flush(30)
+        session.flush(30)
+        session.flush(30)
+        session.flush(30)
+    end
+    assert(terminal.workspace.addressable_name == "1" and terminal.floating and terminal.centered)
+    assert(#session.commands == 1)
+end)
+
+test("dot G opens LazyVim and Shift G opens Lazygit for the active project", function(session)
+    local code = session.add("code", 1)
+    code.title = "/home/henrik/dotfiles | Code"
+    session.focus(code)
+    for _, expected in ipairs({ { "G", "nvim" }, { "SHIFT + G", "lazygit" } }) do
+        session.press(modifier .. "period")
+        session.press(expected[1])
+        assert(session.commands[#session.commands].arguments[#session.commands[#session.commands].arguments] == expected[2])
+    end
 end)
 
 print(string.format("%d Hyprland scenarios passed", passed))
