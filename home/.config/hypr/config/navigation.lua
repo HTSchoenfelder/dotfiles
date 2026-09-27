@@ -8,6 +8,12 @@ return {
         { name = "Kitty / Zellij", key = "J", class = "kitty", command = { "env", "START_ZELLIJ=1", "kitty" } },
         { name = "VS Code", key = "K", class = "code", command = { "code" } },
         { name = "Chrome", key = "L", class = "google-chrome", command = { "google-chrome-stable" } },
+        {
+            name = "Google Chat",
+            key = "I",
+            class = "chrome-chat.google.com__-Default",
+            command = { "google-chrome-stable", "--profile-directory=Default", "--app=https://chat.google.com/" },
+        },
         { name = "Obsidian", key = "semicolon", class = "obsidian", command = { "obsidian" } },
         { name = "KeePassXC", key = "O", class = "org.keepassxc.KeePassXC", command = { "keepassxc" } },
         { name = "Spotify", key = "U", class = "spotify", command = { "spotify" } },

@@ -11,17 +11,12 @@ function media_controls.cycle(picker, options)
         { label = "Play/Pause", command = "play-pause" },
         { label = "Next", command = "next" },
         { label = "Previous", command = "previous" },
-        { label = "Spotify" },
     }
     picker.open(items, {
         cycle_key = options.key,
         initial_index = options.direction > 0 and 1 or #items,
         on_select = function(item)
-            if item.command then
-                media_controls.control(options.player, item.command)
-            else
-                options.open_spotify()
-            end
+            media_controls.control(options.player, item.command)
         end,
     })
 end

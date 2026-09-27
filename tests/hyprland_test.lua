@@ -61,6 +61,19 @@ test("a launched application opens on the active workspace and parks existing wi
     assert(code.workspace.id == 1 and current.workspace.id == 10 and session.focused == code)
 end)
 
+test("Google Chat launches as a distinct Chrome app and follows navigation", function(session)
+    local current = session.add("kitty", 1)
+    session.press(modifier .. "I")
+    local command = session.commands[1]
+    assert(command.arguments[1] == "google-chrome-stable")
+    assert(command.arguments[2] == "--profile-directory=Default")
+    assert(command.arguments[3] == "--app=https://chat.google.com/")
+    local chat = session.add("chrome-chat.google.com__-Default", 1)
+    session.emit("window.class", chat)
+    session.flush(50)
+    assert(session.focused == chat and current.workspace.id == 10)
+end)
+
 test("parking workspace never parks its own windows", function(session)
     local code = session.add("code", 10)
     local other = session.add("kitty", 10)
@@ -288,22 +301,20 @@ test("Y starts with Play/Pause and is confirmed by a quick release", function(se
     assert(command[1] == "playerctl" and command[3] == "spotify" and command[4] == "play-pause")
 end)
 
-test("Y has a fixed Next, Previous, Spotify order", function(session)
-    for index, command in ipairs({ "next", "previous", "spotify" }) do
+test("Y has a fixed Next and Previous order after Play/Pause", function(session)
+    for index, command in ipairs({ "next", "previous" }) do
         session.press(modifier .. "Y")
         session.choose(index)
         local arguments = session.commands[#session.commands].arguments
-        assert(command == "spotify" and arguments[1] == "spotify" or arguments[4] == command)
+        assert(arguments[1] == "playerctl" and arguments[4] == command)
     end
 end)
 
-test("reverse Y starts at Spotify and reuses navigation for an existing instance", function(session)
-    local spotify = session.add("spotify", 10)
-    local master = session.add("kitty", 1)
-    session.focus(master)
+test("reverse Y starts at Previous", function(session)
     session.press(modifier .. "SHIFT + Y")
     session.press("Control_L")
-    assert(session.focused == spotify and master.workspace.id == 10)
+    local arguments = session.commands[#session.commands].arguments
+    assert(arguments[1] == "playerctl" and arguments[4] == "previous")
 end)
 
 test("text launchers preserve Unicode and snippet escapes", function()

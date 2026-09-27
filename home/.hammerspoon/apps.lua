@@ -17,6 +17,7 @@ return {
     bundleID = "com.google.Chrome",
     newWindowShortcut = {modifiers = {"cmd"}, key = "n"},
   },
+  {key = "i", name = "Google Chat"},
   {key = ";", name = "Obsidian", bundleID = "md.obsidian"},
   {key = "o", name = "KeePassXC", bundleID = "org.keepassxc.keepassxc"},
   {key = "u", name = "Spotify", bundleID = "com.spotify.client"},

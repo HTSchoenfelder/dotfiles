@@ -25,6 +25,15 @@ manually switching to Parking. Configure the primary and Parking workspace rules
 as persistent using the current Hyprland Lua API so their names and navigation
 targets remain stable.
 
+## Port media Comma Selection to macOS
+
+Implement `mainMod + Y` and `mainMod + Shift + Y` in Hammerspoon with the same
+Comma Selection lifecycle as Hyprland: cycle through `Play/Pause`, `Next` and
+`Previous`, then execute the highlighted Spotify action when `mainMod` is released.
+Use the shared compact chooser and keep media control asynchronous. This is separate
+from the initial AeroSpace migration and must only be implemented when explicitly
+requested.
+
 ## Add an optional macOS look-and-feel layer
 
 Improve the visual consistency between macOS and the Hyprland setup without

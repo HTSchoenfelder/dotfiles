@@ -37,7 +37,7 @@ and display focus targets are resolved only when their shortcut is pressed.
 
 | Shortcut | Action |
 | --- | --- |
-| `mainMod + J/K/L/;/O/U` | Focus Kitty / VS Code / Chrome / Obsidian / KeePassXC / Spotify on the focused display |
+| `mainMod + J/K/L/I/;/O/U` | Focus Kitty / VS Code / Chrome / Google Chat / Obsidian / KeePassXC / Spotify on the focused display |
 | `mainMod + F + app key` | Keep the focused window left and place the app right |
 | `mainMod + A + app key` | Select an application window before placing it |
 | `mainMod + P` | Select any window; hold `F` to place it right of the focused window |
@@ -70,6 +70,7 @@ stack. Hold `A` to choose an existing instance.
 | `mainMod + J` | Kitty with Zellij |
 | `mainMod + K` | VS Code |
 | `mainMod + L` | Chrome |
+| `mainMod + I` | Google Chat |
 | `mainMod + ;` | Obsidian |
 | `mainMod + O` | KeePassXC |
 | `mainMod + U` | Spotify |
@@ -78,7 +79,7 @@ stack. Hold `A` to choose an existing instance.
 | `mainMod + ,` / `mainMod + Shift + ,` | Comma selection through windows forward/backward; release `mainMod` to accept |
 | `mainMod + A + ,` | Comma selection through instances of the focused app |
 | `mainMod + G` / `mainMod + Shift + G` | Comma selection through workspaces forward/backward |
-| `mainMod + Y` / `mainMod + Shift + Y` | Comma selection through Play/Pause, Next, Previous and Spotify |
+| `mainMod + Y` / `mainMod + Shift + Y` | Comma selection through Play/Pause, Next and Previous |
 | `mainMod + H` | Switch between workspaces 1 and 2 |
 | `mainMod + M` | Focus the next layout window |
 | `mainMod + N` | Rotate window positions while retaining the focused slot |

@@ -118,4 +118,12 @@ appNavigation:requestNewWindow({
 assert(keyStroke.key == "n" and keyStroke.owner == secondApp)
 assert(keyStroke.modifiers[1] == "cmd" and keyStroke.modifiers[2] == "shift")
 
+local applicationDefinitions = require("apps")
+local applicationKeys = {}
+for _, definition in ipairs(applicationDefinitions) do
+  applicationKeys[definition.key] = definition
+end
+assert(applicationKeys.i.name == "Google Chat")
+assert(applicationKeys.u.bundleID == "com.spotify.client")
+
 print("Hammerspoon navigation tests passed")

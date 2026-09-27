@@ -41,7 +41,7 @@ affects muscle memory should be recorded in the relevant quick reference or in t
 | `lib/launcher_data.lua` | Shared launcher file loading and validation |
 | `lib/command_launcher.lua` | Configured command parsing and execution after selection |
 | `lib/text_launcher.lua` | Emoji/snippet parsing and insertion into the original window |
-| `lib/media_controls.lua` | Fixed player menu and Spotify MPRIS commands |
+| `lib/media_controls.lua` | Three-action player menu and Spotify MPRIS commands |
 | `lib/screenshots.lua` | Hyprshot region, active-window and active-output commands |
 | `lib/process.lua` | Quoted argument vectors and asynchronous process startup |
 | `lib/compositor.lua` | Checked dispatch, current workspace and shared selection indexing |

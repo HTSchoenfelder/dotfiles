@@ -314,11 +314,18 @@ Keep application configuration declarative and use bundle IDs as stable identity
 | `J` | Kitty with Zellij | `net.kovidgoyal.kitty` |
 | `K` | Visual Studio Code | `com.microsoft.VSCode` |
 | `L` | Google Chrome | `com.google.Chrome` |
+| `I` | Google Chat | Installed Chrome PWA bundle ID; verify on target |
 | `;` | Obsidian | `md.obsidian` |
 | `O` | KeePassXC | `org.keepassxc.keepassxc` |
 | `U` | Spotify | `com.spotify.client` |
 
 `mainMod` on macOS is `Option + Control + Command`.
+
+Google Chat is a Chrome PWA rather than the normal Chrome window. The current
+Hammerspoon fallback launches it by the installed application name `Google Chat`.
+Inspect the PWA wrapper under `~/Applications/Chrome Apps.localized/`, record its
+real bundle ID and use that identity after migration. Do not match it as generic
+`com.google.Chrome`, which would mix Chat with ordinary browser windows.
 
 Launching Kitty through the application shortcut must preserve the intended Zellij
 startup (`START_ZELLIJ=1` in the current shell configuration). Verify the correct
@@ -400,21 +407,8 @@ For `N`, distinguish window identity from visual slot. The windows rotate, and t
 window that arrives at the previously focused position receives focus, matching the
 current Hyprland behavior. Test one, two, three and more windows.
 
-## Media selection
-
-Port the Hyprland media Comma Selection to macOS:
-
-| Position | Action |
-| --- | --- |
-| 1 | `Play/Pause` |
-| 2 | `Next` |
-| 3 | `Previous` |
-| 4 | `Spotify` |
-
-`mainMod + Y` cycles forward, `mainMod + Shift + Y` cycles backward and releasing
-`mainMod` performs the highlighted action. The Spotify entry uses the normal
-application navigation behavior, including `F` when held. Use a reliable native
-media or Spotify interface available on the Mac and keep it asynchronous.
+Media Comma Selection on `mainMod + Y` is explicitly deferred in
+`docs/deferred-work.md`; do not implement it as part of this migration.
 
 ## Application launcher and shared chooser UI
 
@@ -586,7 +580,7 @@ home/.hammerspoon/
 |  |- chooser.lua                   shared compact chooser styling/lifecycle
 |  |- comma_selection.lua           cycle and release-to-accept sessions
 |  |- dot_mode.lua                  modal lifecycle and status notice
-|  `- ...                           focused launcher/media/text modules
+|  `- ...                           focused launcher/text modules
 |- midi.lua                         RØDECaster integration
 |- remapping.lua                    application-specific input remapping
 `- shortcut_catalog.lua             generated searchable reference
@@ -635,7 +629,7 @@ settled in this brief blocks further work.
 1. Centralize compact `hs.chooser` presentation.
 2. Migrate `P` and application instance selection.
 3. Migrate window Comma Selection with release acceptance.
-4. Add workspace and media Comma Selection.
+4. Add workspace Comma Selection.
 5. Replace Seal with the application launcher.
 6. Keep the shortcut catalog synchronized.
 
@@ -734,7 +728,7 @@ For every configured application, test:
 - Window Comma Selection cycles in both directions and accepts on modifier release.
 - `A + ,` contains only the focused application's windows.
 - Escape cancels without changing layout.
-- Workspace and media selection use the same release lifecycle.
+- Workspace selection uses the same release lifecycle.
 - The application launcher finds installed apps and launches/focuses them.
 - Choosers appear on the intended screen and contain no instructional labels.
 
@@ -770,7 +764,7 @@ The migration is complete only when all of the following are true:
 3. Managed window geometry and workspace mutations go through AeroSpace.
 4. The Terminal, Display and Parking model works on the real Mac.
 5. The required application navigation and combinable modifiers work.
-6. Window, workspace and media Comma Selection accept on modifier release.
+6. Window and workspace Comma Selection accept on modifier release.
 7. `hs.chooser` replaces Seal for the application launcher and serves the shared
    selection UI.
 8. Existing Ctrl remapping and RØDECaster behavior have no regressions.

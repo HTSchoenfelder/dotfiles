@@ -60,7 +60,7 @@ bind("N", window_navigation.rotate_positions, "Rotate window positions", "Window
 bind(settings.stack_key, picker.add_to_stack, "Add selection to stack", "Applications")
 bind(settings.instance_key, hl.dsp.no_op(), "Select application instance", "Applications")
 shortcut_catalog.add("Applications", shortcut_catalog.main("F + App"), "Add application to stack")
-local spotify, terminal
+local terminal
 local function focused_application()
     local active = hl.get_active_window()
     if not active then return end
@@ -71,13 +71,11 @@ local function focused_application()
 end
 
 for _, application in ipairs(settings.applications) do
-    if application.class == "spotify" then spotify = application end
     if application.class == "kitty" then terminal = application end
     bind(application.key, function()
         windows.activate(application, navigation_options(), hl.is_key_down(settings.instance_key:lower()))
     end, "Navigate to " .. application.name, "Applications")
 end
-assert(spotify, "Spotify must be configured as a navigation application")
 assert(terminal, "Kitty must be configured as a navigation application")
 local reset_workspaces = workspace_reset.new({
     workspaces = workspaces,
@@ -104,10 +102,8 @@ shortcut_catalog.add("Navigation", shortcut_catalog.main("SHIFT + G"), "Cycle wo
 picker.bind_cycle("Y", function(direction)
     if picker.is_open() then return end
     windows.invalidate_pending_focus()
-    local stack = add_to_stack()
     media_controls.cycle(picker, {
         key = "Y", direction = direction, player = "spotify",
-        open_spotify = function() windows.activate(spotify, { add_to_stack = stack }, false) end,
     })
 end, "Cycle player actions")
 shortcut_catalog.add("Media", shortcut_catalog.main("Y"), "Cycle player actions")
