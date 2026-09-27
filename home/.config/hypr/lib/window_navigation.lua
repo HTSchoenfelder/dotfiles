@@ -50,16 +50,9 @@ function window_navigation.show(window, destination, parking_workspace)
     if window.floating then
         compositor.dispatch(hl.dsp.window.float({ window = window, action = "unset" }))
     end
-    if destination.placement or destination.add_to_stack then
+    if destination.add_to_stack then
         local workspace = hl.get_workspace(destination.workspace)
         if workspace and workspace.fullscreen_window then leave_fullscreen(workspace.fullscreen_window) end
-        if destination.placement then
-            compositor.dispatch(hl.dsp.focus({ window = window }))
-            compositor.dispatch(hl.dsp.layout("orientation" .. destination.placement.position))
-            compositor.dispatch(hl.dsp.layout("swapwithmaster master ignoremaster"))
-            compositor.dispatch(hl.dsp.focus({ window = window }))
-            return
-        end
         -- master.new_status = "slave" preserves existing master and stack positions for F.
     elseif destination.workspace ~= parking_workspace then
         for _, other in ipairs(hl.get_windows({ workspace = destination.workspace, mapped = true })) do
@@ -91,27 +84,13 @@ function window_navigation.new(options, picker)
         return request == latest_request and compositor.workspace_is_active(request.origin_workspace)
     end
 
-    local function placement_target(placement)
-        local screen = placement.screen
-        local monitor_name = (options.placement_monitors or {})[screen]
-        local monitor = monitor_name and monitor_name ~= "" and hl.get_monitor(monitor_name) or nil
-        if monitor and monitor.enabled == false then monitor = nil end
-        if screen == "secondary" and not monitor then screen = "primary" end
-        return tostring(assert(options.placement_workspaces[screen]))
-    end
-
     local function create_request(request_options)
         local origin = compositor.active_workspace()
         if not origin then return nil end
         request_options = request_options or {}
-        local workspace = origin.addressable_name
-        if request_options.placement then
-            workspace = placement_target(request_options.placement)
-        end
         latest_request = {
             origin_workspace = origin.addressable_name,
-            workspace = workspace,
-            placement = request_options.placement,
+            workspace = origin.addressable_name,
             add_to_stack = request_options.add_to_stack == true,
         }
         return latest_request
@@ -132,7 +111,6 @@ function window_navigation.new(options, picker)
             is_current = function() return request_is_current(request) end,
             on_stack = function()
                 request.add_to_stack = true
-                request.placement = nil
             end,
             on_select = function(item)
                 if item.window.mapped and matches_application(item.window, application) then

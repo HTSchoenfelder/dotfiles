@@ -118,7 +118,7 @@ function WindowNavigation:activate(window, request)
         window:setFrame(layout.frame(screen:frame(), "full"), 0)
       end
     else
-      window:setFrame(layout.frame(screen:frame(), request.position), 0)
+      window:setFrame(layout.frame(screen:frame(), "full"), 0)
     end
     window:focus()
   end)

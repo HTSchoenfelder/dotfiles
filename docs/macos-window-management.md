@@ -4,9 +4,10 @@
 
 This document defines the target architecture. The active Hammerspoon implementation
 still performs window placement on demand and does not integrate with AeroSpace. A
-legacy `home/.aerospace.toml` exists with its own direct bindings, but AeroSpace is
-not declared in the macOS `Brewfile` and the legacy configuration does not implement
-the target responsibility split.
+disposable test `home/.aerospace.toml` exists with its own direct bindings, but its
+contents are not a migration baseline. AeroSpace is not declared in the macOS
+`Brewfile`, and the test configuration does not implement the target responsibility
+split.
 
 The executable implementation brief is
 [`aerospace-migration.md`](../aerospace-migration.md). It is intentionally

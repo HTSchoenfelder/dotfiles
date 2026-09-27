@@ -35,10 +35,6 @@ and display focus targets are resolved only when their shortcut is pressed.
 | --- | --- |
 | `mainMod + J/K/L/;/O/U` | Focus Kitty / VS Code / Chrome / Obsidian / KeePassXC / Spotify on the focused display |
 | `mainMod + F + app key` | Keep the focused window left and place the app right |
-| `mainMod + Z + app key` | Use the left half of the secondary display |
-| `mainMod + X + app key` | Use the right half of the secondary display |
-| `mainMod + C + app key` | Use the left half of the primary display |
-| `mainMod + V + app key` | Use the right half of the primary display |
 | `mainMod + A + app key` | Select an application window before placing it |
 | `mainMod + P` | Select any window; hold `F` to place it right of the focused window |
 | `mainMod + ,` / `mainMod + Shift + ,` | Cycle windows forward/backward; release `mainMod` to accept |
@@ -51,12 +47,9 @@ and display focus targets are resolved only when their shortcut is pressed.
 | `mainMod + Shift + R` | Show the searchable shortcut catalog |
 | `mainMod + Shift + M` | Toggle the RØDECaster mute state |
 
-Application and comma cycling use the same compact `hs.chooser` presentation.
-The placement key is held while pressing the application key, for example
-`mainMod + Z + J` for Kitty on the left half of the secondary display. If no
-secondary display is connected, secondary-display actions fall back to the
-primary display. The implementation does not require AeroSpace or manipulate
-Mission Control Spaces.
+Application and comma cycling use the same compact `hs.chooser` presentation. The
+current implementation does not require AeroSpace or manipulate Mission Control
+Spaces.
 
 `mainMod + .` opens the existing window action mode. Its bindings and all other
 macOS bindings are included in the read-only shortcut catalog.
@@ -77,8 +70,6 @@ stack. Hold `A` to choose an existing instance.
 | `mainMod + O` | KeePassXC |
 | `mainMod + U` | Spotify |
 | `mainMod + F + app key` | Keep the current layout and add the selected app to its stack |
-| `mainMod + Z/X + app key` | Make the app the left/right master on workspace 2 |
-| `mainMod + C/V + app key` | Make the app the left/right master on workspace 1 |
 | `mainMod + P` | Select any window by recent focus |
 | `mainMod + ,` / `mainMod + Shift + ,` | Comma selection through windows forward/backward; release `mainMod` to accept |
 | `mainMod + A + ,` | Comma selection through instances of the focused app |
@@ -90,12 +81,6 @@ stack. Hold `A` to choose an existing instance.
 | `mainMod + W` | Close the focused window |
 | `mainMod + R` | Toggle the Rofi application launcher |
 | `mainMod + Shift + R` | Show the searchable shortcut catalog |
-
-`Z`, `X`, `C` and `V` can also modify `P`, Comma Selection and instance selection
-with `A`. They move only the selected window, keep it tiled, promote it to master,
-set the target workspace's master side explicitly and preserve its existing windows
-as the opposite stack. Without a secondary monitor, `Z` and `X` fall back to
-workspace 1 on the primary monitor. `F` retains its normal add-to-stack behavior.
 
 ## Dot mode
 

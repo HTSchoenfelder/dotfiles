@@ -18,34 +18,16 @@ function navigation.start()
   local heldKeys = HeldKeys.new(config.hyper)
 
   heldKeys:track(settings.stackKey)
-  for _, placement in ipairs(settings.placementModifiers) do
-    heldKeys:track(placement.key)
-  end
   heldKeys:track(settings.instanceKey)
 
   local function selectionRequest()
-    for _, placement in ipairs(settings.placementModifiers) do
-      if heldKeys:isDown(placement.key) then
-        return {
-          mode = "placement",
-          screenKind = placement.screen,
-          position = placement.position,
-        }
-      end
-    end
-
     local focused = hs.window.focusedWindow()
     local screen = windowNavigation:isUsableWindow(focused)
         and focused:screen() or windowNavigation:activeScreen()
     if heldKeys:isDown(settings.stackKey) then
-      return {mode = "stack", screenKind = "current", screen = screen, anchor = focused}
+      return {mode = "stack", screen = screen, anchor = focused}
     end
-    return {
-      mode = "placement",
-      screenKind = settings.defaultPlacement.screen,
-      screen = screen,
-      position = settings.defaultPlacement.position,
-    }
+    return {mode = "single", screen = screen}
   end
 
   for _, application in ipairs(applications) do
@@ -61,14 +43,6 @@ function navigation.start()
 
   catalog.add("Applications", "MainMod + A + App", "Select application window")
   catalog.add("Applications", "MainMod + F + App", "Place current window left and application right")
-  for _, placement in ipairs(settings.placementModifiers) do
-    local display = placement.screen == "primary" and "primary" or "secondary"
-    catalog.add(
-      "Applications",
-      "MainMod + " .. placement.key:upper() .. " + App",
-      "Place on " .. display .. " " .. placement.position
-    )
-  end
 
   hs.hotkey.bind(config.hyper, "m", function() windowNavigation:focusNext() end)
   hs.hotkey.bind(config.hyper, "n", function() windowNavigation:swapPositions() end)

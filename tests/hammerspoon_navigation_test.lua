@@ -87,8 +87,8 @@ assert(anchor.placed.x == 0 and anchor.placed.w == 600)
 assert(target.placed.x == 600 and target.placed.w == 600 and target.focused)
 
 target.focused = false
-navigation:activate(target, {mode = "placement", screen = screen, position = "left"})
-assert(target.placed.x == 0 and target.placed.w == 600 and target.focused)
+navigation:activate(target, {mode = "single", screen = screen})
+assert(target.placed.x == 0 and target.placed.w == 1200 and target.focused)
 
 local activated
 local chooserNavigation = {

@@ -14,7 +14,9 @@ These instructions apply to the entire repository.
 - Keep UI surfaces minimal. Do not add onboarding, usage instructions, keyboard hints, explanatory labels, or captions to launchers, selection dialogs, or overlays unless explicitly requested. Show only the information needed to make the selection.
 - For architectural changes, explain the responsibility boundaries and trade-offs before making broad changes.
 - Prefer small, reviewable changes over large rewrites.
-- After every change or refactoring, check whether `readme.md` must be updated.
+- Every behavior, configuration or architecture change must update all affected
+  documentation and generated/manual shortcut references in the same change. At a
+  minimum, inspect `readme.md`; documentation is part of the definition of done.
 - `docs/deferred-work.md` contains postponed ideas only. Never implement or investigate an entry unless Henrik explicitly requests that specific item.
 - Inspect the current repository state before editing. Do not assume that an earlier chat summary is newer than the working tree.
 - Never discard or overwrite unrelated local changes.

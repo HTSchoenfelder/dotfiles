@@ -1,39 +1,6 @@
 local ApplicationNavigation = {}
 ApplicationNavigation.__index = ApplicationNavigation
 
-local function screenIdentifier(screen)
-  if not screen then
-    return nil
-  end
-  return screen:getUUID() or tostring(screen:id())
-end
-
-local function sameScreen(first, second)
-  return first and second and screenIdentifier(first) == screenIdentifier(second)
-end
-
-local function secondaryScreen(primary)
-  for _, screen in ipairs(hs.screen.allScreens()) do
-    if not sameScreen(screen, primary) then
-      return screen
-    end
-  end
-end
-
-local function targetScreen(kind, currentScreen)
-  if kind == "current" then
-    return currentScreen or hs.screen.mainScreen(), false
-  end
-
-  local primary = hs.screen.primaryScreen()
-  if kind ~= "secondary" then
-    return primary, false
-  end
-
-  local secondary = secondaryScreen(primary)
-  return secondary or primary, secondary == nil
-end
-
 local function runningApplication(application)
   if application.bundleID then
     return hs.application.get(application.bundleID)
@@ -70,12 +37,6 @@ function ApplicationNavigation:matchingWindows(application)
 end
 
 function ApplicationNavigation:showWindow(window, request)
-  local screen, usedFallback = targetScreen(request.screenKind, request.screen)
-
-  if usedFallback then
-    hs.alert.show("Secondary display unavailable; using primary", 1.5)
-  end
-  request.screen = screen
   self.navigation:activate(window, request)
 end
 

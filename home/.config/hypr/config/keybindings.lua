@@ -25,8 +25,6 @@ local picker = rofi_picker.new({
 local windows = window_navigation.new({
     parking_workspace = workspaces.parking,
     launch_timeout_ms = settings.launch_timeout_ms,
-    placement_workspaces = settings.placement_workspaces,
-    placement_monitors = monitor_configuration.workspace_roles(),
 }, picker)
 local spaces = workspace_navigation.new(picker)
 local overlays = project_overlays.new(require("config.project_overlays"))
@@ -42,14 +40,8 @@ local function add_to_stack()
     return hl.is_key_down(settings.stack_key:lower())
 end
 
-local function selected_placement()
-    for _, placement in ipairs(settings.placement_modifiers) do
-        if hl.is_key_down(placement.key:lower()) then return placement end
-    end
-end
-
 local function navigation_options()
-    return { add_to_stack = add_to_stack(), placement = selected_placement() }
+    return { add_to_stack = add_to_stack() }
 end
 
 hl.layer_rule({ match = { namespace = "rofi" }, no_anim = true })
@@ -68,17 +60,6 @@ bind("N", window_navigation.rotate_positions, "Rotate window positions", "Window
 bind(settings.stack_key, picker.add_to_stack, "Add selection to stack", "Applications")
 bind(settings.instance_key, hl.dsp.no_op(), "Select application instance", "Applications")
 shortcut_catalog.add("Applications", shortcut_catalog.main("F + App"), "Add application to stack")
-for _, placement in ipairs(settings.placement_modifiers) do
-    hl.bind(settings.modifier .. " + " .. placement.key, hl.dsp.no_op(), {
-        description = "Hold application placement modifier",
-    })
-    shortcut_catalog.add(
-        "Applications",
-        shortcut_catalog.main(placement.key .. " + App"),
-        "Make application " .. placement.position .. " master on workspace "
-            .. tostring(settings.placement_workspaces[placement.screen])
-    )
-end
 local spotify, terminal
 local function focused_application()
     local active = hl.get_active_window()

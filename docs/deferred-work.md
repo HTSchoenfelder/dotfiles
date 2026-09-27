@@ -35,10 +35,9 @@ system settings and background services.
 
 ### Window spacing
 
-Add configurable outer and inner gaps to Hammerspoon-managed full, left, right,
-and stack placements. Keep the current edge-to-edge geometry available when gaps
-are disabled. Do not introduce an active tiling or reflow loop merely to maintain
-the gaps.
+Add configurable outer and inner gaps to the macOS window-management backend. Keep
+the current edge-to-edge geometry available when gaps are disabled. Do not add a
+second tiling or reflow loop in Hammerspoon merely to maintain the gaps.
 
 ### Focus border
 

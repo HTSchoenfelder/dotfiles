@@ -46,8 +46,9 @@ runtime evidence on the Mac proves one of them infeasible:
 9. AeroSpace uses its supported TOML configuration. Do not generate TOML from Lua.
 10. Do not use native Mission Control Spaces as the workflow model. AeroSpace
     workspaces represent Terminal, Display and Parking.
-11. Introduce and install AeroSpace through the repository's macOS package setup.
-    Starting AeroSpace at login is intended and already present in the legacy TOML.
+11. Install AeroSpace through the official Homebrew cask and declare it in the
+    repository's macOS `Brewfile`. Do not install a second AeroSpace package through
+    Nix. Starting AeroSpace at login is intended.
 12. Preserve RØDECaster support in Hammerspoon; AeroSpace has no MIDI
     responsibility.
 
@@ -128,10 +129,11 @@ The current application launcher uses the Seal Spoon. Window activation and layo
 use `hs.window:setFrame`, minimization/unminimization and Hammerspoon screen objects.
 Existing tests in `tests/hammerspoon_*_test.lua` cover parts of that behavior.
 
-`home/.aerospace.toml` already exists. It is a legacy standalone configuration
-with direct AeroSpace bindings such as `alt-h/j/k/l`, `mainMod` workspace bindings
-and an AeroSpace mode. It must be migrated in place into the backend-only target
-configuration. Do not create a second active AeroSpace config. Verify the path with
+`home/.aerospace.toml` already exists, but it was only an experiment. Its options,
+bindings, modes and comments are disposable and must not be treated as requirements
+or a migration baseline. Replace its contents wholesale with the backend-only
+target configuration if that remains the chosen repository path. Do not create a
+second active AeroSpace config. Verify the path with
 `aerospace config --config-path` after installation.
 
 `setup/macos/Brewfile` currently declares Hammerspoon but not AeroSpace. The macOS
@@ -341,21 +343,6 @@ Existing right-side windows must stay in place relative to each other.
 The modifiers are combinable. `A + F + app key` first chooses the instance and then
 adds that selected instance to the stack.
 
-The placement modifiers remain available:
-
-| Modifier | Destination |
-| --- | --- |
-| `Z` | Secondary display / workspace 2, target as left master |
-| `X` | Secondary display / workspace 2, target as right master |
-| `C` | Primary display / workspace 1, target as left master |
-| `V` | Primary display / workspace 1, target as right master |
-
-If no secondary display exists, `Z` and `X` fall back to the primary display and
-the fallback must be predictable. These modifiers apply to application shortcuts,
-the all-window chooser and Comma Selection. They move only the selected window,
-keep it tiled, promote it to the requested master side and preserve existing target
-workspace windows as the opposite stack.
-
 ## Window history and selection
 
 AeroSpace does not provide the complete Hyprland focus-history model required by
@@ -371,15 +358,14 @@ because they currently live in Parking.
 `mainMod + P` opens an `hs.chooser` containing all managed windows ordered by recent
 focus. Show only the information needed to distinguish the window, normally
 `Application — Title`; do not show the current workspace. Enter confirms the
-choice. `F`, `Z`, `X`, `C` and `V` modify the resulting placement exactly as they
-do for application shortcuts.
+choice. Holding `F` applies the normal add-to-stack behavior to the selected window.
 
 `mainMod + ,` starts or advances Comma Selection forward.
 `mainMod + Shift + ,` starts or advances it backward. The chooser is visible while
 cycling and accepts the highlighted window when the base `mainMod` combination is
 released. It must not require Enter. `A + ,` restricts candidates to instances of
-the currently focused application. Placement modifiers, including `F`, apply to the
-accepted window.
+the currently focused application. Holding `F` applies add-to-stack to the accepted
+window.
 
 The chooser must also open when there is only one candidate where an explicit
 selection was requested. Escape cancels without changing focus or layout. A screen,
@@ -524,8 +510,9 @@ requires a narrow correction.
 
 ## AeroSpace TOML requirements
 
-Migrate `home/.aerospace.toml` rather than adding a competing config. Validate every
-option against the installed AeroSpace version. The finished file should include:
+Replace the disposable test contents of `home/.aerospace.toml` rather than adding a
+competing config. Validate every new option against the installed AeroSpace
+version. The finished file should include:
 
 - the current required `config-version`
 - `start-at-login = true`
@@ -548,10 +535,11 @@ insufficient if AeroSpace is loading a different path.
 
 ## Package and startup integration
 
-Add AeroSpace using the official Homebrew cask/tap syntax current at implementation
-time. Update `setup/macos/Brewfile` and any existing setup step necessary to make
-the repository declaration effective. Do not duplicate ownership between Nix and
-Homebrew.
+Install AeroSpace with the official Homebrew cask/tap syntax current at
+implementation time (`nikitabobko/tap/aerospace` at the time this brief was
+written). Update `setup/macos/Brewfile` and any existing setup step necessary to
+make the repository declaration effective. Homebrew is the sole package owner for
+AeroSpace; do not also add `pkgs.aerospace` or another Nix package declaration.
 
 Do not add Hammerspoon or AeroSpace startup through multiple mechanisms. Retain the
 established Hammerspoon startup path and use AeroSpace's declared login startup
@@ -626,8 +614,7 @@ settled in this brief blocks further work.
 1. Migrate application matching and launch lifecycle.
 2. Implement default Parking behavior.
 3. Implement `F`, `A`, and combined modifiers.
-4. Implement `Z`, `X`, `C` and `V` placements.
-5. Ensure late launches and rapid requests cannot steal focus.
+4. Ensure late launches and rapid requests cannot steal focus.
 
 ### Phase 4: chooser workflows
 
@@ -672,7 +659,6 @@ Cover at least:
 - late application launch behavior
 - default Parking plan
 - add-to-stack plan and order preservation
-- left/right placement plan
 - single-display fallback
 - one-, two-, three- and multi-window layout planning
 - focus-slot-preserving rotation
@@ -725,7 +711,6 @@ For every configured application, test:
 - `F`
 - `A`, including one instance
 - `A + F`
-- each placement modifier
 - rapid requests for two different applications
 - a slow/late launch followed by another action
 
