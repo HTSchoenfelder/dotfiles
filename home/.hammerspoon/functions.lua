@@ -1,7 +1,6 @@
--- Behalte deine bestehende objectToJson-Funktion
 function objectToJson(obj, maxDepth)
-  maxDepth = maxDepth or 5 -- Standard-Rekursionstiefe
-  if maxDepth <= 0 then return "[Maximale Tiefe erreicht]" end
+  maxDepth = maxDepth or 5
+  if maxDepth <= 0 then return "[Maximum depth reached]" end
 
   local objType = type(obj)
 
@@ -34,14 +33,13 @@ function objectToJson(obj, maxDepth)
   return result
 end
 
--- ÄNDERE DIESE FUNKTION
 ---
---- Inspiziert ein Hammerspoon-Objekt und gibt das Ergebnis als JSON-String zurück.
---- @param objectPath string Der Pfad zum Objekt, z.B. "hs.window.focusedWindow()".
---- @param maxDepth number Die maximale Rekursionstiefe.
---- @return string Ein JSON-String mit der rekursiven Inspektion.
+--- Inspects a Hammerspoon object and returns the result as JSON.
+--- @param objectPath string Expression that resolves to the object.
+--- @param maxDepth number Maximum recursion depth.
+--- @return string JSON containing the recursive inspection.
 ---
-function getInspectionJson(objectPath, maxDepth) -- <--- ZWEITEN PARAMETER HINZUGEFÜGT
+function getInspectionJson(objectPath, maxDepth)
   require("hs.json")
 
   local success, obj = pcall(function() return load("return " .. objectPath)() end)
@@ -50,7 +48,6 @@ function getInspectionJson(objectPath, maxDepth) -- <--- ZWEITEN PARAMETER HINZU
     return hs.json.encode({ error = "Error evaluating '" .. objectPath .. "'", message = tostring(obj) })
   end
 
-  -- Rufe die rekursive Funktion mit der übergebenen maxDepth auf
   local jsonData = objectToJson(obj, maxDepth)
   
   return hs.json.encode(jsonData)

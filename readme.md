@@ -24,6 +24,10 @@ implementation is still Hammerspoon-only. See the
 target design and migration boundaries. The complete implementation brief lives in
 [`aerospace-migration.md`](aerospace-migration.md).
 
+The interaction model is shared, while the requested split ratio intentionally
+differs: Hyprland currently uses a 70/30 master/stack split and the macOS target
+uses 1:1.
+
 ## macOS / Hammerspoon quick reference
 
 `mainMod` = `Option + Control + Command`. Application shortcuts bring the

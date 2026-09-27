@@ -2,20 +2,20 @@ local windowsModule = {}
 
 windowsModule.modal = hs.hotkey.modal.new()
 
--- Hilfsfunktion 1: Bildschirme von links nach rechts sortieren
+-- Sort displays from left to right.
 local function getScreens()
     local screens = hs.screen.allScreens()
     table.sort(screens, function(a, b) return a:frame().x < b:frame().x end)
     return screens
 end
 
--- Hilfsfunktion 2: Den nächsten Monitor relativ zum aktuellen Fenster finden
+-- Find the next display relative to the current window.
 local function getRelativeScreen(win, step)
     local screens = getScreens()
     local currentScreen = win:screen()
     local currentIndex = 1
 
-    -- Finde heraus, auf welchem Monitor das Fenster gerade ist
+    -- Find the display that currently contains the window.
     for i, screen in ipairs(screens) do
         if screen == currentScreen then
             currentIndex = i
@@ -23,7 +23,7 @@ local function getRelativeScreen(win, step)
         end
     end
 
-    -- Berechne den Ziel-Monitor (mit Endlos-Schleife / Wrap-Around)
+    -- Wrap around when moving beyond either end of the display list.
     local targetIndex = currentIndex + step
     if targetIndex < 1 then targetIndex = #screens end
     if targetIndex > #screens then targetIndex = 1 end
@@ -31,14 +31,12 @@ local function getRelativeScreen(win, step)
     return screens[targetIndex]
 end
 
--- ==========================================
--- Fenster-Aktionen (Logik)
--- ==========================================
+-- Window actions
 
 function windowsModule.moveFocusedLeft()
   local win = hs.window.focusedWindow()
   if win then
-    win:moveToScreen(getRelativeScreen(win, -1)) -- -1 = Ein Monitor nach links
+    win:moveToScreen(getRelativeScreen(win, -1))
     win:maximize()
   end
   windowsModule.modal:exit()
@@ -47,19 +45,19 @@ end
 function windowsModule.moveFocusedRight()
   local win = hs.window.focusedWindow()
   if win then
-    win:moveToScreen(getRelativeScreen(win, 1))  -- 1 = Ein Monitor nach rechts
+    win:moveToScreen(getRelativeScreen(win, 1))
     win:maximize()
   end
   windowsModule.modal:exit()
 end
 
 function windowsModule.moveAllLeft()
-  -- Wir nutzen das aktuelle Fenster als Referenz für die Richtung
+  -- Use the focused window as the directional reference.
   local referenceWin = hs.window.focusedWindow()
   if referenceWin then
     local targetScreen = getRelativeScreen(referenceWin, -1)
     
-    -- hs.window.visibleWindows() holt alle nicht-versteckten Fenster aller Apps
+    -- Move every standard window currently visible across all applications.
     for _, win in ipairs(hs.window.visibleWindows()) do
       if win:isStandard() then
         win:moveToScreen(targetScreen)
@@ -71,7 +69,7 @@ function windowsModule.moveAllLeft()
 end
 
 function windowsModule.moveAllRight()
-  -- Wir nutzen das aktuelle Fenster als Referenz für die Richtung
+  -- Use the focused window as the directional reference.
   local referenceWin = hs.window.focusedWindow()
   if referenceWin then
     local targetScreen = getRelativeScreen(referenceWin, 1)
@@ -104,7 +102,6 @@ function windowsModule.maximizeAll()
   windowsModule.modal:exit()
 end
 
--- Modal betreten und verlassen
 function windowsModule.enterMode()
   hs.alert.show("Window-Action", 1.5)
   windowsModule.modal:enter()

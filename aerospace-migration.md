@@ -137,9 +137,11 @@ second active AeroSpace config. Verify the path with
 `aerospace config --config-path` after installation.
 
 `setup/macos/Brewfile` currently declares Hammerspoon but not AeroSpace. The macOS
-setup uses nix-darwin plus Homebrew casks. Install AeroSpace through Homebrew and
-verify how the Brewfile is applied rather than assuming it is already executed by
-`setup-macos.sh`.
+setup uses nix-darwin plus Homebrew casks, but `setup-macos.sh` does not currently
+run `brew bundle`. Its hard-coded flake selector also differs from the `macbook`
+configuration exported by `setup/macos/flake.nix`. Repair this setup path as part
+of package integration, use the requested configuration argument consistently and
+make the repository's Brewfile effective without adding a second package owner.
 
 ## Final responsibility model
 
@@ -244,6 +246,11 @@ belongs on the secondary display when one is connected. Parking holds windows th
 should disappear from the active workflow. Do not use native macOS minimization as
 the normal Parking implementation once AeroSpace is active.
 
+Use monitor-pattern fallbacks rather than a transient numeric ID: workspace 1 and
+Parking target `main`; workspace 2 prefers `secondary` and falls back to `main`
+when no second display exists. Validate the exact pattern list against the installed
+AeroSpace version.
+
 The logical workspaces must remain addressable even while empty. With two displays,
 workspaces 1 and 2 should normally be visible on their assigned displays. With one
 display, workspace navigation must still provide both without errors. Do not
@@ -283,6 +290,11 @@ Required visual behavior:
   to the stack.
 - Dialogs and intentional overlays must not corrupt the tiled tree.
 - Focus remains on the intended window after every tree mutation.
+
+The 1:1 ratio is an explicit macOS requirement. Hyprland currently uses
+`mfact = 0.70`, so its master/stack ratio is 70/30. Preserve the shared interaction
+semantics and treat this ratio as a documented platform difference; do not change
+the macOS target to 70/30 merely to copy that implementation detail.
 
 Keep AeroSpace normalization enabled unless a reproducible tree operation requires
 a documented exception. Prefer `join-with` over legacy `split`. Use
@@ -514,13 +526,15 @@ Replace the disposable test contents of `home/.aerospace.toml` rather than addin
 competing config. Validate every new option against the installed AeroSpace
 version. The finished file should include:
 
-- the current required `config-version`
+- `config-version = 2`
+- `persistent-workspaces = ["1", "2", "10"]`
 - `start-at-login = true`
 - enabled container normalizations unless a tested exception is documented
 - horizontal tile root defaults
 - deliberate gaps matching the desired compact desktop
 - automatic unhide behavior if it remains compatible with app navigation
-- workspace/monitor policy for workspaces 1 and 2
+- workspace/monitor policy for workspaces 1, 2 and 10, including the single-display
+  fallback
 - window-detection rules only where backed by observed bundle IDs, roles or titles
 - an empty/minimal required main binding table with no normal workflow shortcuts
 - English comments only

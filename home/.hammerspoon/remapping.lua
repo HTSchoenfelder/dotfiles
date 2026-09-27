@@ -39,7 +39,7 @@ M.start = function()
         local isChrome = (bundleID == "com.google.Chrome")
         local isVsCode = (bundleID == "com.microsoft.VSCode")
 
-        -- 1. TERMINAL PRIORITÄT
+        -- Preserve terminal-native Ctrl shortcuts first.
         if isTerm then
             if flags.ctrl and flags.shift and not (flags.cmd or flags.alt) then
                 if keyCode == 8 then
@@ -62,7 +62,7 @@ M.start = function()
             return false
         end
 
-        -- 2. CHROME SPEZIAL LOGIK
+        -- Chrome-specific mappings.
         if isChrome and flags.ctrl and not (flags.cmd or flags.alt or flags.shift) then
             if keyCode == 40 then
                 hs.eventtap.keyStroke({"ctrl"}, "tab", 0);
@@ -76,7 +76,7 @@ M.start = function()
             end
         end
 
-        -- 3. ALLGEMEINE GUI LOGIK
+        -- General GUI mappings.
         if flags.ctrl and not (flags.cmd or flags.alt) then
             -- Navigation
             if ctrlToOptionMap[keyCode] then
@@ -84,7 +84,7 @@ M.start = function()
                 return true
             end
 
-            -- Editier-Befehle
+            -- Editing commands
             if ctrlToCmdMap[keyCode] then
                 local target = ctrlToCmdMap[keyCode]
                 local mods = {"cmd"}

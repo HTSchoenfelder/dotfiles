@@ -1,11 +1,9 @@
 local midiModule = {}
 
--- ==========================================
--- 1. Status und Overlay-Setup
--- ==========================================
+-- Status and overlay setup
 
 local isMuted = false
-local lastToggleTime = 0 -- Verhindert, dass Signale sich überschlagen (Debounce)
+local lastToggleTime = 0
 
 local screen = hs.screen.primaryScreen():frame()
 local canvasWidth = 200
@@ -33,15 +31,11 @@ muteOverlay:appendElements({
 })
 muteOverlay:level(hs.canvas.windowLevels.status)
 
--- ==========================================
--- 2. Zentrale Logik zum Umschalten
--- ==========================================
-
--- Diese Funktion wird sowohl vom Hotkey als auch vom echten Knopf aufgerufen
+-- Shared by the keyboard shortcut and the physical button.
 local function flipMuteState()
     local now = hs.timer.secondsSinceEpoch()
     
-    -- Nur umschalten, wenn der letzte Wechsel mehr als 0.3 Sekunden her ist
+    -- Debounce duplicate signals from the device.
     if (now - lastToggleTime) > 0.3 then
         isMuted = not isMuted
         lastToggleTime = now
@@ -51,46 +45,37 @@ local function flipMuteState()
         else
             muteOverlay:hide()
         end
-        print("Mute-Status geändert! Ist jetzt: " .. tostring(isMuted))
+        print("Mute state changed: " .. tostring(isMuted))
     end
 end
 
--- ==========================================
--- 3. MIDI Setup & Hardware-Listener
--- ==========================================
-
--- Gerät initialisieren (global, wegen Garbage Collection)
+-- Keep the MIDI object global so it survives garbage collection.
 rodeMidi = hs.midi.new("RODECaster Pro II")
 
 if rodeMidi then
     rodeMidi:callback(function(object, deviceName, commandType, description, metadata)
-        -- HIER IST DIE ÄNDERUNG: Wir prüfen jetzt auch explizit, ob metadata.channel == 0 ist!
         if commandType == "controlChange" and metadata.channel == 0 and metadata.controllerNumber == 27 and metadata.controllerValue == 1 then
-            -- Physischer Knopf (nur auf Channel 0) wurde gedrückt -> Hammerspoon Status anpassen
+            -- Mirror physical button presses from channel 0 in Hammerspoon.
             flipMuteState()
         end
     end)
-    print("MIDI Listener bereit. Lausche auf physische Knopfdrücke (nur Channel 0).")
+    print("MIDI listener ready for physical button presses on channel 0.")
 else
-    print("Fehler: Rodecaster MIDI ist nicht verbunden.")
+    print("Rodecaster MIDI is not connected.")
 end
-
--- ==========================================
--- 4. Modul-Funktionen (Für die keymapping.lua)
--- ==========================================
 
 function midiModule.toggleRodecasterMute()
     if rodeMidi then
-        -- 1. Hardware schalten: Signal an den Rodecaster senden
+        -- Send the button press and release to the Rodecaster.
         rodeMidi:sendCommand("controlChange", { channel = 0, controllerNumber = 27, controllerValue = 1 })
         hs.timer.doAfter(0.1, function()
             rodeMidi:sendCommand("controlChange", { channel = 0, controllerNumber = 27, controllerValue = 0 })
         end)
         
-        -- 2. Software schalten: Overlay und Status updaten
+        -- Keep the local state and overlay synchronized.
         flipMuteState()
     else
-        print("Fehler beim Senden: Rodecaster MIDI nicht verbunden.")
+        print("Cannot send mute command: Rodecaster MIDI is not connected.")
     end
 end
 

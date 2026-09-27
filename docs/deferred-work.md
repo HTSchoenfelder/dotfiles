@@ -82,8 +82,8 @@ keyboard behavior remain intact. The theme should support:
 - a setting to hide window titles entirely or show them only as subdued subtext;
 - the existing forward and reverse cycle behavior and acceptance on MainMod release.
 
-Investigate how far the same theme can be applied to the Seal launcher without
-maintaining a fragile fork. The native chooser cannot provide fully arbitrary
+Apply the same helper to the Hammerspoon application launcher after Seal is removed
+by the AeroSpace migration. The native chooser cannot provide fully arbitrary
 background colors, window shapes, or container-level rounded-corner styling; keep
 that limitation explicit.
 
@@ -102,22 +102,10 @@ existing values. Provide a restore command and restart only the affected process
 such as Dock or SystemUIServer. Treat internal defaults as version-sensitive and
 verify them on the target macOS release before enabling them.
 
-### Alternatives considered
+### Architecture boundary
 
-AeroSpace could provide a complete i3-like tiling and workspace model without
-disabling System Integrity Protection, but it would overlap with or replace much
-of the Hammerspoon navigation built here. Do not add it merely for appearance.
-
-Yabai provides deeper control over windows, spaces, shadows, and opacity, but its
-advanced integration can require a scripting addition and reduced system security.
-Do not adopt it for this appearance layer.
-
-Alfred or Raycast could replace the launcher, but introducing another launcher is
-not justified while the fast native Hammerspoon chooser remains sufficient. A
-replacement requires a separate explicit decision.
-
-The preferred end state is therefore Hammerspoon for navigation and window
-placement, JankyBorders for the optional rounded Catppuccin focus border,
-application-specific decoration settings, optional macOS Dock and menu-bar
-defaults, and a shared native chooser theme. Keep installation, activation, and
-rollback scriptable and documented.
+This optional appearance work must follow the established target architecture:
+AeroSpace owns managed window geometry, Hammerspoon owns interaction and chooser
+UI, and JankyBorders may own the optional focus border. Alfred, Raycast and Yabai
+remain outside this work. Keep installation, activation and rollback scriptable
+and documented.

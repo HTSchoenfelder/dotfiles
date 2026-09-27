@@ -46,6 +46,11 @@ affects muscle memory should be recorded in the relevant quick reference or in t
 | `lib/process.lua` | Quoted argument vectors and asynchronous process startup |
 | `lib/compositor.lua` | Checked dispatch, current workspace and shared selection indexing |
 
+The active master layout uses `mfact = 0.70`: the master occupies 70% and the
+right stack 30%. The planned macOS AeroSpace layout deliberately uses a 1:1 split,
+as specified for that platform. Shortcut meaning and stack behavior remain aligned;
+the ratio is the only intended layout difference.
+
 Focus and window transitions are intentionally restrained. Focus opacity and border
 changes complete in 100 ms, window movement in 150 ms and window open/close motion
 uses a short non-overshooting curve. Border-angle interpolation is disabled, while

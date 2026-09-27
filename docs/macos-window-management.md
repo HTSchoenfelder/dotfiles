@@ -62,6 +62,11 @@ recommended installation path and already owns macOS GUI applications in this
 repository. Nix must not install a second AeroSpace package. The TOML remains
 repository-managed independently of the package source.
 
+The current `setup/macos/setup-macos.sh` does not apply `setup/macos/Brewfile`, and
+its hard-coded flake selector does not match the `macbook` configuration declared
+by `setup/macos/flake.nix`. The migration must repair that setup path so the
+Homebrew declaration is effective and there is still one package owner.
+
 Dynamic interaction remains Lua because it belongs to Hammerspoon. Hammerspoon can
 use `hs.task` to invoke explicit AeroSpace commands such as `focus`, `swap`,
 `move-node-to-workspace`, `join-with` and `balance-sizes`. Multi-step mutations
@@ -84,6 +89,11 @@ h_tiles
 One window naturally occupies the available area. Two windows use an `h_tiles`
 root and balanced sizes for a 1:1 split. For three windows, `join-with` creates the
 vertical stack on the right.
+
+This ratio is a deliberate platform difference: the current Hyprland master uses
+70% for the master and 30% for the stack, while the requested macOS layout is 1:1.
+The navigation keys, Parking behavior and master/right-stack semantics stay the
+same.
 
 Hammerspoon supplies the missing semantics: it decides which window is master,
 where a selected application belongs and when the expected tree needs to be
