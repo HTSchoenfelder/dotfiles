@@ -46,6 +46,11 @@ affects muscle memory should be recorded in the relevant quick reference or in t
 | `lib/process.lua` | Quoted argument vectors and asynchronous process startup |
 | `lib/compositor.lua` | Checked dispatch, current workspace and shared selection indexing |
 
+Focus and window transitions are intentionally restrained. Focus opacity and border
+changes complete in 100 ms, window movement in 150 ms and window open/close motion
+uses a short non-overshooting curve. Border-angle interpolation is disabled, while
+workspace transitions retain their separate timing.
+
 Rofi owns the keyboard after its layer opens. Hyprland temporarily disables the
 cycle bindings so Rofi can process repeated presses, Shift and modifier releases.
 A release before the layer opens confirms the initial selection directly.

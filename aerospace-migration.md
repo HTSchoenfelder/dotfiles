@@ -137,9 +137,9 @@ second active AeroSpace config. Verify the path with
 `aerospace config --config-path` after installation.
 
 `setup/macos/Brewfile` currently declares Hammerspoon but not AeroSpace. The macOS
-setup uses nix-darwin plus Homebrew casks. Integrate AeroSpace with the established
-package-management approach and verify how the Brewfile is applied rather than
-assuming it is already executed by `setup-macos.sh`.
+setup uses nix-darwin plus Homebrew casks. Install AeroSpace through Homebrew and
+verify how the Brewfile is applied rather than assuming it is already executed by
+`setup-macos.sh`.
 
 ## Final responsibility model
 
@@ -595,7 +595,7 @@ settled in this brief blocks further work.
 ### Phase 1: backend and declarative setup
 
 1. Integrate the AeroSpace package.
-2. Replace the legacy TOML with the minimal backend policy.
+2. Replace the disposable test TOML contents with the minimal backend policy.
 3. Confirm the active config path and reload behavior.
 4. Implement and test the asynchronous AeroSpace client.
 5. Add clear failure behavior when AeroSpace is unavailable.

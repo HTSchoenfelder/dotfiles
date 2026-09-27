@@ -57,6 +57,11 @@ default layouts, gaps, workspace-to-monitor assignments and lifecycle callbacks.
 It may be installed and linked declaratively by the macOS setup without generating
 TOML from Lua.
 
+Homebrew owns the AeroSpace application and CLI because it is the upstream
+recommended installation path and already owns macOS GUI applications in this
+repository. Nix must not install a second AeroSpace package. The TOML remains
+repository-managed independently of the package source.
+
 Dynamic interaction remains Lua because it belongs to Hammerspoon. Hammerspoon can
 use `hs.task` to invoke explicit AeroSpace commands such as `focus`, `swap`,
 `move-node-to-workspace`, `join-with` and `balance-sizes`. Multi-step mutations
