@@ -617,5 +617,8 @@
   ],
   "workbench.secondarySideBar.defaultVisibility": "hidden",
   "workbench.sideBar.location": "right",
-  "workbench.secondarySideBar.showLabels": false
+  "workbench.secondarySideBar.showLabels": false,
+  "chat.titleBar.signIn.enabled": false,
+  "chat.titleBar.openInAgentsWindow.enabled": false,
+  "workbench.browser.showInTitleBar": false
 }

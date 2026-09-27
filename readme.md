@@ -2,6 +2,28 @@
 
 Personal NixOS, Hyprland and macOS configuration for Henrik's desktop workflow.
 
+## Workflow goal
+
+Hyprland is the reference environment for building Henrik's keyboard-driven
+workflow. The macOS configuration reproduces that interaction model as closely as
+its native APIs allow so the same muscle memory applies on both systems. Shortcut
+shapes, modifier combinations, navigation semantics and selection flows should
+remain aligned. The underlying mechanisms may differ: Hyprland's native master
+layout and AeroSpace's container tree can implement the same user-facing operation.
+
+Reliable platform-native behavior takes precedence when exact parity would be
+fragile. Intentional differences that affect muscle memory must stay explicit and
+documented.
+
+The planned macOS architecture keeps Hammerspoon as the only input and UI layer
+and uses AeroSpace as the window-management backend. Hammerspoon owns all
+shortcuts, modes, choosers and MIDI integration and invokes the AeroSpace CLI for
+tree, workspace, monitor, focus, move and swap operations. The existing macOS
+implementation is still Hammerspoon-only. See the
+[macOS window-management architecture](docs/macos-window-management.md) for the
+target design and migration boundaries. The complete implementation brief lives in
+[`aerospace-migration.md`](aerospace-migration.md).
+
 ## macOS / Hammerspoon quick reference
 
 `mainMod` = `Option + Control + Command`. Application shortcuts bring the
@@ -108,5 +130,8 @@ The read-only shortcut catalogs use `Shortcut — Description` rows and include
 global bindings, modifier combinations, Dot mode and hardware/media bindings.
 Hyprland's Lua entry point is `home/.config/hypr/hyprland.lua`; architecture and
 desktop integration notes live in [`docs/hyprland-lua.md`](docs/hyprland-lua.md)
-and [`docs/hyprland-desktop.md`](docs/hyprland-desktop.md). Explicitly postponed
-fixes and refactorings are tracked in [`docs/deferred-work.md`](docs/deferred-work.md).
+and [`docs/hyprland-desktop.md`](docs/hyprland-desktop.md). The planned macOS
+responsibility split is documented in
+[`docs/macos-window-management.md`](docs/macos-window-management.md). Explicitly
+postponed fixes and refactorings are tracked in
+[`docs/deferred-work.md`](docs/deferred-work.md).

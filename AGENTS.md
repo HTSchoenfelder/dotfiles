@@ -24,6 +24,34 @@ These instructions apply to the entire repository.
 
 ## Architectural direction
 
+The primary product goal is a highly efficient Hyprland workflow whose interaction
+model can be reproduced on macOS closely enough that the same muscle memory works
+on both systems. Hyprland is the reference environment for developing the workflow;
+macOS should preserve the same shortcut shapes, modifier combinations, action
+semantics and selection flows wherever its platform APIs allow reliable behavior.
+
+Do not require identical implementation primitives. Prefer behavioral parity over
+literal architectural parity. When changing navigation or another cross-platform
+interaction, assess both implementations and document any intentional divergence
+that materially affects muscle memory.
+
+The planned macOS architecture has strict ownership boundaries:
+
+- Hammerspoon is the only keyboard-input and interaction layer. It owns all global
+  shortcuts, held modifiers, Comma Selection, Dot Mode, chooser UI, application
+  intentions, MIDI/hardware integration and master-layout orchestration.
+- AeroSpace is the window-management engine. It owns the window tree, geometry,
+  workspaces, monitor assignment, focus, move and swap operations. It does not need
+  regular keybindings; Hammerspoon invokes its CLI asynchronously.
+- Hyprland remains the behavioral source of truth. AeroSpace's tree represents the
+  visual master/stack arrangement while Hammerspoon supplies master semantics that
+  AeroSpace does not implement natively.
+
+Keep window geometry out of Hammerspoon once AeroSpace is active, avoid duplicate
+bindings in both tools and keep blocking CLI I/O out of Hammerspoon's main Lua
+thread. See `docs/macos-window-management.md` for the target architecture. The
+current macOS implementation remains Hammerspoon-only until that migration occurs.
+
 The repository should become easier to understand by keeping responsibilities separate:
 
 1. **NixOS / system services**

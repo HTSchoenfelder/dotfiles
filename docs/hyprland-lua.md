@@ -4,6 +4,22 @@
 input, appearance, session startup and keybindings. Files under `config/` describe
 the setup; files under `lib/` implement reusable behavior.
 
+## Cross-platform interaction model
+
+Hyprland is the reference implementation for the interaction design in this
+repository. Its navigation, application keys, held modifiers, Comma Selection and
+Dot Mode define the muscle memory that the macOS Hammerspoon configuration should
+reproduce wherever macOS exposes a reliable equivalent.
+
+Parity is measured by what a shortcut means and how the interaction feels, rather
+than by matching compositor internals. In the planned macOS architecture,
+Hammerspoon reproduces the input and selection model while AeroSpace represents
+workspaces, Parking and the master/stack geometry with its window tree.
+Platform-specific implementation details are acceptable when the keys, sequence
+and visible outcome remain aligned. Any deliberate behavioral difference that
+affects muscle memory should be recorded in the relevant quick reference or in the
+[macOS window-management architecture](macos-window-management.md).
+
 | File | Responsibility |
 | --- | --- |
 | `config/application_shortcuts.lua` | Ctrl shortcuts and application-specific mappings |
