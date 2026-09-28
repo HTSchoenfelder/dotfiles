@@ -1,24 +1,29 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+script_directory=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 
 if [ "$#" -eq 1 ]; then
   configuration=$1
 else
-  read -p "Enter the configuration: " configuration
+  read -r -p "Enter the configuration [macbook]: " configuration
+  configuration=${configuration:-macbook}
 fi
 
-### Check if nix is available
+# Check if Nix is available.
 if ! command -v nix &>/dev/null; then
     echo "Nix is not available."
     curl -fsSL https://install.determinate.systems/nix | sh -s -- install --determinate
 fi
 
-### Check if nix is available
+# Check if Homebrew is available.
 if ! command -v brew &>/dev/null; then
     echo "Homebrew is not available."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-### Check if git is available
+# Check if Git is available.
 if ! command -v git &>/dev/null; then
     echo "Git is not available."
     echo "Use the command 'nix-shell -p git' to use git."
@@ -26,9 +31,10 @@ if ! command -v git &>/dev/null; then
 fi
 echo "Git is available, continuing..."
 
-sudo nix run nix-darwin/master#darwin-rebuild -- switch
-sudo darwin-rebuild switch --flake ~/dotfiles/setup/macos#SIT-SMBP-YF0X2F
+brew bundle --file "$script_directory/Brewfile"
+sudo nix run nix-darwin/master#darwin-rebuild -- switch \
+    --flake "$script_directory#$configuration"
 
-mkdir -p ~/projects/dev
-mkdir -p ~/projects/temp
-mkdir -p ~/projects/work
+mkdir -p "$HOME/projects/dev"
+mkdir -p "$HOME/projects/temp"
+mkdir -p "$HOME/projects/work"

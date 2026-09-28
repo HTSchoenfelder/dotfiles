@@ -91,10 +91,10 @@ keyboard behavior remain intact. The theme should support:
 - a setting to hide window titles entirely or show them only as subdued subtext;
 - the existing forward and reverse cycle behavior and acceptance on MainMod release.
 
-Apply the same helper to the Hammerspoon application launcher after Seal is removed
-by the AeroSpace migration. The native chooser cannot provide fully arbitrary
-background colors, window shapes, or container-level rounded-corner styling; keep
-that limitation explicit.
+The AeroSpace migration removed Seal and now routes the Hammerspoon application
+launcher through the shared native chooser helper. The native chooser cannot
+provide fully arbitrary background colors, window shapes, or container-level
+rounded-corner styling; keep that limitation explicit.
 
 As an optional second phase, evaluate a pre-created `hs.webview` or similarly
 custom launcher only if the themed native chooser is still visually insufficient.

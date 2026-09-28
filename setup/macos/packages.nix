@@ -19,6 +19,7 @@
           terraform
           zellij
           neovim
+          lazygit
           nodejs
           bat
           gnumake

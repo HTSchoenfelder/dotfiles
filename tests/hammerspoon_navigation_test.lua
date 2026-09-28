@@ -1,129 +1,83 @@
 -- Run from the repository root: lua tests/hammerspoon_navigation_test.lua
 package.path = "home/.hammerspoon/?.lua;home/.hammerspoon/?/init.lua;" .. package.path
 
-local screen = {
-  frame = function() return {x = 0, y = 20, w = 1200, h = 800} end,
-  getUUID = function() return "screen-1" end,
-}
+local WindowHistory = require("modules.window_history")
+local WindowRepository = require("modules.window_repository")
+local RequestGate = require("modules.request_gate")
 
-local function application(pid, name)
-  return {
-    pid = function() return pid end,
-    name = function() return name end,
-    isHidden = function() return false end,
-  }
-end
+local history = WindowHistory.new()
+history:seed({3, 2, 1})
+history:remember(2)
+local ordered = history:sort({{id = 1}, {id = 2}, {id = 3}, {id = 4}})
+assert(ordered[1].id == 2)
+assert(ordered[2].id == 3 and ordered[3].id == 1)
+assert(ordered[4].id == 4)
 
-local function window(id, owner, title)
-  return {
-    id = function() return id end,
-    application = function() return owner end,
-    title = function() return title end,
-    isStandard = function() return true end,
-    isFullScreen = function() return false end,
-    isMinimized = function() return false end,
-    screen = function() return screen end,
-    setFrame = function(self, frame) self.placed = frame end,
-    focus = function(self) self.focused = true end,
-  }
-end
+local normalized = WindowRepository.normalize({
+  ["window-id"] = 42,
+  ["app-bundle-id"] = "example.app",
+  ["app-name"] = "Example",
+  ["window-title"] = "Title",
+  ["window-parent-container-layout"] = "h_tiles",
+  workspace = "1",
+  ["workspace-is-focused"] = true,
+  ["workspace-is-visible"] = true,
+  ["monitor-id"] = 2,
+})
+assert(normalized.id == 42 and normalized.bundleID == "example.app")
+assert(normalized.tiled and normalized.workspaceFocused and normalized.workspaceVisible)
 
-local focused
-local choosers = {}
-local keyStroke
-hs = {
-  window = {
-    focusedWindow = function() return focused end,
-    orderedWindows = function() return {} end,
-    allWindows = function() return {} end,
-  },
-  screen = {
-    mainScreen = function() return screen end,
-    primaryScreen = function() return screen end,
-    allScreens = function() return {screen} end,
-  },
-  timer = {
-    doAfter = function(_, callback) callback() end,
-  },
-  chooser = {
-    new = function(callback)
-      local chooser = {callback = callback}
-      function chooser:rows() return self end
-      function chooser:searchSubText() return self end
-      function chooser:placeholderText() return self end
-      function chooser:choices(choices) self.items = choices; return self end
-      function chooser:query() return self end
-      function chooser:show() self.visible = true; return self end
-      function chooser:selectedRow(row) self.row = row; return self end
-      function chooser:select(row) self.callback(self.items[row]); return self end
-      choosers[#choosers + 1] = chooser
-      return chooser
-    end,
-  },
-  eventtap = {
-    event = {types = {flagsChanged = 1}},
-    new = function(_, callback)
-      local tap = {callback = callback}
-      function tap:start() self.running = true; return self end
-      function tap:stop() self.running = false; return self end
-      return tap
-    end,
-    keyStroke = function(modifiers, key, delay, owner)
-      keyStroke = {modifiers = modifiers, key = key, delay = delay, owner = owner}
-    end,
-  },
-}
+local repository = WindowRepository.new({}, history, {
+  getWindow = function() return nil end,
+  focusedWindow = function() return {id = function() return 2 end} end,
+})
+local records = {{id = 1, bundleID = "a"}, {id = 2, bundleID = "b"}, {id = 3, bundleID = "a"}}
+assert(repository:focusedRecord(records).id == 2)
+local matches = repository:matchingBundle(records, "a")
+assert(#matches == 2 and matches[1].bundleID == "a")
+
+local gate = RequestGate.new()
+local first = gate:next()
+local second = gate:next()
+assert(not gate:isCurrent(first) and gate:isCurrent(second))
+
+local definitions = require("apps")
+local byKey = {}
+for _, definition in ipairs(definitions) do byKey[definition.key] = definition end
+assert(byKey.i.bundleID == "com.google.Chrome.app.pommaclcbfghclhalboakcipcmmndhcj")
+assert(byKey.j.launchEnvironment.START_ZELLIJ == "1")
 
 local WindowNavigation = require("modules.window_navigation")
-local navigation = WindowNavigation.new({restoreDelaySeconds = 0})
-local firstApp = application(1, "First")
-local secondApp = application(2, "Second")
-local anchor = window(1, firstApp, "Anchor")
-local target = window(2, secondApp, "Target")
-focused = anchor
-
-navigation:activate(target, {mode = "stack", screen = screen, anchor = anchor})
-assert(anchor.placed.x == 0 and anchor.placed.w == 600)
-assert(target.placed.x == 600 and target.placed.w == 600 and target.focused)
-
-target.focused = false
-navigation:activate(target, {mode = "single", screen = screen})
-assert(target.placed.x == 0 and target.placed.w == 1200 and target.focused)
-
-local activated
-local chooserNavigation = {
-  allWindows = function() return {anchor, target} end,
-  activate = function(_, selected, request) activated = {window = selected, request = request} end,
+local executed
+local fakeRepository = {
+  listAll = function(_, callback)
+    callback({
+      {id = 10, bundleID = "a", appName = "A", title = "One", workspace = "1", tiled = true},
+      {id = 11, bundleID = "a", appName = "A", title = "Two", workspace = "1", tiled = true},
+      {id = 12, bundleID = "b", appName = "B", title = "Three", workspace = "1", tiled = true},
+      {id = 13, bundleID = "a", appName = "A", title = "Dialog", workspace = "1", tiled = false},
+    })
+  end,
+  focusedRecord = function()
+    return {id = 10, bundleID = "a", appName = "A", title = "One", workspace = "1", tiled = true}
+  end,
+  orderedByHistory = function(_, values) return values end,
 }
-local CommaSelection = require("modules.comma_selection")
-local comma = CommaSelection.new(chooserNavigation, {rows = 7})
-local request = {mode = "stack", anchor = anchor, screen = screen}
-comma:cycle(1, false, request)
-assert(choosers[#choosers].visible and choosers[#choosers].row == 2)
-comma.session.releaseTap.callback({getFlags = function() return {} end})
-assert(activated.window == target and activated.request == request)
+local fakeClient = {
+  execute = function(_, command) executed = command end,
+}
+local windowNavigation = WindowNavigation.new({
+  client = fakeClient,
+  repository = fakeRepository,
+  gate = RequestGate.new(),
+  workspaces = {terminal = "1"},
+})
+windowNavigation:rotatePositions()
+assert(table.concat(executed, " ") ==
+  "swap --window-id 10 --swap-focus --wrap-around dfs-next")
 
-activated = nil
-focused = anchor
-comma:cycle(1, true, request)
-assert(choosers[#choosers].row == 1)
-comma.session.releaseTap.callback({getFlags = function() return {} end})
-assert(activated.window == anchor)
-
-local ApplicationNavigation = require("modules.application_navigation")
-local appNavigation = ApplicationNavigation.new({}, {}, chooserNavigation)
-appNavigation:requestNewWindow({
-  newWindowShortcut = {modifiers = {"cmd", "shift"}, key = "n"},
-}, secondApp)
-assert(keyStroke.key == "n" and keyStroke.owner == secondApp)
-assert(keyStroke.modifiers[1] == "cmd" and keyStroke.modifiers[2] == "shift")
-
-local applicationDefinitions = require("apps")
-local applicationKeys = {}
-for _, definition in ipairs(applicationDefinitions) do
-  applicationKeys[definition.key] = definition
-end
-assert(applicationKeys.i.name == "Google Chat")
-assert(applicationKeys.u.bundleID == "com.spotify.client")
+local filtered
+windowNavigation:commaItems(true, function(items) filtered = items end)
+assert(#filtered == 2 and filtered[1].id == 10 and filtered[2].id == 11)
 
 print("Hammerspoon navigation tests passed")

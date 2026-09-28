@@ -37,10 +37,7 @@ end
 
 function catalog.show()
   if not catalog.chooser then
-    catalog.chooser = hs.chooser.new(function() end)
-    catalog.chooser:placeholderText("")
-    catalog.chooser:searchSubText(false)
-    catalog.chooser:rows(12)
+    catalog.chooser = catalog.chooserFactory()
   end
 
   local choices = {}
@@ -49,12 +46,11 @@ function catalog.show()
       text = entry.shortcut .. " — " .. entry.description,
     }
   end
-  catalog.chooser:choices(choices)
-  catalog.chooser:query("")
-  catalog.chooser:show()
+  catalog.chooser:show(choices, function() end)
 end
 
-function catalog.start(modifiers)
+function catalog.start(modifiers, chooserFactory)
+  catalog.chooserFactory = chooserFactory
   catalog.add("Launchers", "MainMod + Shift + R", "Show shortcut catalog")
   local shiftedModifiers = {}
   for _, modifier in ipairs(modifiers) do

@@ -2,17 +2,14 @@
 
 ## Status
 
-This document defines the target architecture. The active Hammerspoon implementation
-still performs window placement on demand and does not integrate with AeroSpace. A
-disposable test `home/.aerospace.toml` exists with its own direct bindings, but its
-contents are not a migration baseline. AeroSpace is not declared in the macOS
-`Brewfile`, and the test configuration does not implement the target responsibility
-split.
+This document describes the active architecture. Hammerspoon owns interaction and
+AeroSpace 0.21+ owns managed window state and geometry. The repository-managed
+`home/.aerospace.toml` is a backend-only policy with no workflow bindings, and the
+official AeroSpace Homebrew cask is declared in `setup/macos/Brewfile`.
 
-The executable implementation brief is
+The completed implementation brief is
 [`aerospace-migration.md`](../aerospace-migration.md). It is intentionally
-self-contained so a macOS agent can perform the migration without conversation
-history.
+self-contained and remains the acceptance record for the migration.
 
 Hyprland remains the behavioral source of truth. The macOS implementation should
 preserve shortcut shapes, held modifiers, navigation semantics and selection
@@ -44,7 +41,7 @@ AeroSpace CLI and socket
 AeroSpace window tree
 ```
 
-Hammerspoon must not become a second source of window geometry after the migration.
+Hammerspoon is not a second source of managed window geometry.
 It decides the intended operation and asks AeroSpace to execute it. Current window,
 workspace and monitor state should be queried from AeroSpace instead of maintained
 as a competing long-lived model in Lua.
@@ -62,13 +59,12 @@ recommended installation path and already owns macOS GUI applications in this
 repository. Nix must not install a second AeroSpace package. The TOML remains
 repository-managed independently of the package source.
 
-The current `setup/macos/setup-macos.sh` does not apply `setup/macos/Brewfile`, and
-its hard-coded flake selector does not match the `macbook` configuration declared
-by `setup/macos/flake.nix`. The migration must repair that setup path so the
-Homebrew declaration is effective and there is still one package owner.
+`setup/macos/setup-macos.sh` applies `setup/macos/Brewfile` and passes its selected
+configuration consistently to the `nix-darwin` flake. Homebrew is the sole
+AeroSpace package owner.
 
-Dynamic interaction remains Lua because it belongs to Hammerspoon. Hammerspoon can
-use `hs.task` to invoke explicit AeroSpace commands such as `focus`, `swap`,
+Dynamic interaction remains Lua because it belongs to Hammerspoon. Hammerspoon
+uses `hs.task` to invoke explicit AeroSpace commands such as `focus`, `swap`,
 `move-node-to-workspace`, `join-with` and `balance-sizes`. Multi-step mutations
 should use one `aerospace eval` call where possible so ordering stays inside
 AeroSpace and the interaction requires only one client/socket round trip.
@@ -131,14 +127,28 @@ modifier release.
 RØDECaster handling stays in Hammerspoon. `hs.midi` owns MIDI input/output,
 device lifecycle and feedback overlays; AeroSpace has no MIDI responsibility.
 
-## Migration constraints
+## Implemented modules
 
-- Keep the existing Hammerspoon workflow operational while AeroSpace operations
-  are introduced incrementally.
-- Do not add overlapping AeroSpace and Hammerspoon shortcuts.
-- Move geometry, workspace and monitor mutations to AeroSpace together rather than
-  maintaining two active layout engines.
-- Preserve the Hyprland action semantics even where the macOS implementation uses
-  a different primitive.
-- Record any deliberate difference that changes muscle memory in the quick
-  reference.
+- `modules/aerospace_client.lua` is the only raw CLI/task boundary and retains all
+  active `hs.task` objects.
+- `modules/window_repository.lua` joins AeroSpace records with Accessibility
+  windows; `modules/window_history.lua` owns MRU metadata.
+- `modules/layout_planner.lua` and `modules/layout_orchestrator.lua` translate
+  Parking and master/stack intentions into ordered AeroSpace expressions.
+- Application, window and workspace navigation keep independent high-level logic
+  and share the compact chooser lifecycle.
+- Dot Mode owns screenshots, trusted text/command launchers and project overlays;
+  managed window mutations still go through AeroSpace.
+
+## Platform limits
+
+AeroSpace and supported macOS APIs cannot enable or disable physical displays.
+Dot Mode can enumerate connected enabled displays, but selecting one reports that
+no supported toggle API is available. Adding a third-party display-control utility
+requires a separate package and trust decision.
+
+VS Code project overlays require a path-bearing title such as
+`~/dotfiles | Code`. This signal is present on the target Mac. Titles that expose
+only a folder name are rejected instead of guessing a project directory. Lazygit
+is declared in the macOS Nix package set and becomes available after the next
+normal configuration activation.

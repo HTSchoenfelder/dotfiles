@@ -1,28 +1,30 @@
 require("hs.ipc")
-require("windows")
 require("functions")
-require("midi")
-require("shortcuts")
-local launcher = require("launcher")
-local linuxshortcuts = require("remapping")
-local navigation = require("navigation")
-local shortcutCatalog = require("shortcut_catalog")
+
 local config = require("config")
+local Chooser = require("modules.chooser")
+local Launcher = require("launcher")
+local navigation = require("navigation")
+local remapping = require("remapping")
+local shortcutCatalog = require("shortcut_catalog")
+local shortcuts = require("shortcuts")
 
-launcher.init()
-linuxshortcuts.start()
-navigation.start()
-shortcutCatalog.start(config.hyper)
+local services = navigation.start()
+remapping.start()
 
--- Reload automatically after a Lua configuration change.
-function reloadConfig(files)
+local launcher = Launcher.new({
+  chooserFactory = function() return Chooser.new(config.chooser) end,
+  modifiers = config.hyper,
+  gate = services.gate,
+})
+launcher:start()
+shortcuts.start(services, services.applications)
+shortcutCatalog.start(config.hyper, services.chooserFactory)
+
+local function reloadConfig(files)
   for _, file in ipairs(files) do
-    if file:sub(-4) == ".lua" then
-      hs.reload()
-      return
-    end
+    if file:sub(-4) == ".lua" then hs.reload(); return end
   end
 end
-hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConfig):start()
 
-hs.alert.show("Hammerspoon ready")
+configWatcher = hs.pathwatcher.new(hs.configdir, reloadConfig):start()

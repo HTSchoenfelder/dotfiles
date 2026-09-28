@@ -1,109 +1,119 @@
 local CommaSelection = {}
 CommaSelection.__index = CommaSelection
 
-local function windowLabel(window)
-  local owner = window:application()
-  local applicationName = owner and owner:name() or "Window"
-  local title = window:title()
-  if not title or title == "" then
-    title = applicationName
-  end
-  return applicationName .. " — " .. title
+function CommaSelection.new(chooserFactory)
+  return setmetatable({
+    chooserFactory = chooserFactory,
+    session = nil,
+    serial = 0,
+  }, CommaSelection)
 end
 
-function CommaSelection.new(navigation, options)
-  return setmetatable({
-    navigation = navigation,
-    rows = options.rows or 7,
-    session = nil,
-  }, CommaSelection)
+function CommaSelection:cancel()
+  local session = self.session
+  self.session = nil
+  self.serial = self.serial + 1
+  if not session then return end
+  if session.releaseTap then session.releaseTap:stop() end
+  if session.chooser and session.chooser:isVisible() then session.chooser:hide() end
+  if session.onCancel then session.onCancel() end
 end
 
 function CommaSelection:complete(choice)
   local session = self.session
-  if not session then
-    return
-  end
+  if not session then return end
   self.session = nil
-  if session.releaseTap then
-    session.releaseTap:stop()
-  end
-
-  local window = choice and session.windowsByID[choice.windowID] or nil
-  if window then
-    self.navigation:activate(window, session.request)
-  end
+  if session.releaseTap then session.releaseTap:stop() end
+  if choice and session.onSelect then session.onSelect(choice.item) end
 end
 
-function CommaSelection:createSession(instancesOnly, request)
-  local focused = hs.window.focusedWindow()
-  local application = instancesOnly and focused and focused:application() or nil
-  local applicationPID = application and application:pid() or nil
-  local windows = {}
-  local windowsByID = {}
+local function nextIndex(index, count, direction)
+  return (index - 1 + direction) % count + 1
+end
+
+function CommaSelection:_show(session, items)
+  if self.session ~= session or session.released then return end
+  if not items or #items == 0 then self:cancel(); return end
+
   local choices = {}
-  local focusedIndex
-
-  for _, window in ipairs(self.navigation:allWindows()) do
-    local owner = window:application()
-    if not applicationPID or owner and owner:pid() == applicationPID then
-      windows[#windows + 1] = window
-      local windowID = window:id()
-      windowsByID[windowID] = window
-      choices[#choices + 1] = {text = windowLabel(window), windowID = windowID}
-      if focused and focused:id() == windowID then
-        focusedIndex = #windows
-      end
-    end
+  local focusedIndex = 0
+  for index, item in ipairs(items) do
+    choices[index] = {
+      text = item.text,
+      subText = item.subText,
+      image = item.image,
+      item = item,
+    }
+    if item.id == session.currentID then focusedIndex = index end
+  end
+  session.count = #items
+  session.index = focusedIndex
+  for _ = 1, math.abs(session.pendingDirection) do
+    session.index = nextIndex(
+      session.index,
+      session.count,
+      session.pendingDirection > 0 and 1 or -1
+    )
   end
 
-  if #windows == 0 then
-    return nil
-  end
+  session.chooser = self.chooserFactory()
+  session.chooser:show(choices, function(choice) self:complete(choice) end, session.screen)
+  hs.timer.doAfter(0.01, function()
+    if self.session == session then session.chooser:selectedRow(session.index) end
+  end)
+end
 
-  local chooser = hs.chooser.new(function(choice) self:complete(choice) end)
-  chooser:rows(self.rows)
-  chooser:searchSubText(false)
-  chooser:placeholderText("")
-  chooser:choices(choices)
-  chooser:query("")
-
+function CommaSelection:_newSession(kind, direction, options)
+  self:cancel()
+  self.serial = self.serial + 1
   local session = {
-    chooser = chooser,
-    count = #windows,
-    index = focusedIndex or 0,
-    request = request,
-    windowsByID = windowsByID,
+    kind = kind,
+    pendingDirection = direction,
+    currentID = options.currentID,
+    onSelect = options.onSelect,
+    onCancel = options.onCancel,
+    screen = options.screen,
+    serial = self.serial,
   }
   session.releaseTap = hs.eventtap.new({hs.eventtap.event.types.flagsChanged}, function(event)
     local flags = event:getFlags()
-    if not flags.alt and not flags.cmd and not flags.ctrl and not flags.shift then
+    if not flags.alt and not flags.cmd and not flags.ctrl then
       local active = self.session
-      if active then
-        active.chooser:select(active.index)
+      if active == session then
+        active.released = true
+        if active.chooser and active.index then
+          active.chooser:select(active.index)
+        else
+          self:cancel()
+        end
       end
     end
     return false
   end)
   session.releaseTap:start()
   self.session = session
-  chooser:show()
-  hs.timer.doAfter(0.01, function()
-    if self.session == session then
-      chooser:selectedRow(session.index)
+  options.load(function(items)
+    if self.session == session and session.serial == self.serial then
+      self:_show(session, items)
     end
   end)
   return session
 end
 
-function CommaSelection:cycle(direction, instancesOnly, request)
-  local session = self.session or self:createSession(instancesOnly, request)
-  if not session then
+function CommaSelection:cycle(kind, direction, options)
+  local session = self.session
+  if not session or session.kind ~= kind then
+    self:_newSession(kind, direction, options)
     return
   end
-
-  session.index = (session.index - 1 + direction) % session.count + 1
-  session.chooser:selectedRow(session.index)
+  if session.count then
+    session.index = nextIndex(session.index, session.count, direction)
+    session.chooser:selectedRow(session.index)
+  else
+    session.pendingDirection = session.pendingDirection + direction
+  end
 end
+
+CommaSelection.nextIndex = nextIndex
 
 return CommaSelection
