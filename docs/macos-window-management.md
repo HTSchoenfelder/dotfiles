@@ -120,9 +120,10 @@ make the interaction feel slower and must be avoided.
 ## Launcher and hardware integration
 
 `hs.chooser` is the shared native selection surface for applications, windows,
-instances, emoji, snippets, commands and the shortcut catalog. It also supports
-Comma Selection because Hammerspoon can track the selected row and accept it on
-modifier release.
+instances, Spotify actions, emoji, snippets, commands and the shortcut catalog.
+It also supports Comma Selection because Hammerspoon can track the selected row
+and accept it on modifier release. Media Comma Selection invokes Spotify through
+an asynchronous `osascript` task after the highlighted action is accepted.
 
 RØDECaster handling stays in Hammerspoon. `hs.midi` owns MIDI input/output,
 device lifecycle and feedback overlays; AeroSpace has no MIDI responsibility.
@@ -137,6 +138,8 @@ device lifecycle and feedback overlays; AeroSpace has no MIDI responsibility.
   Parking and master/stack intentions into ordered AeroSpace expressions.
 - Application, window and workspace navigation keep independent high-level logic
   and share the compact chooser lifecycle.
+- `modules/media_controls.lua` applies the same chooser lifecycle to Spotify's
+  Play/Pause, Next and Previous actions without blocking Hammerspoon.
 - Dot Mode owns screenshots, trusted text/command launchers and project overlays;
   managed window mutations still go through AeroSpace.
 

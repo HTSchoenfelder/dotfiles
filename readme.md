@@ -45,6 +45,7 @@ keeps the current layout and adds the selected window to the right stack. Holdin
 | `mainMod + ,` / `mainMod + Shift + ,` | Cycle windows forward/backward; release `mainMod` to accept |
 | `mainMod + A + ,` | Cycle through windows of the focused application |
 | `mainMod + G` / `mainMod + Shift + G` | Cycle workspaces by recent focus; release `mainMod` to accept |
+| `mainMod + Y` / `mainMod + Shift + Y` | Cycle through Spotify Play/Pause, Next and Previous; release `mainMod` to accept |
 | `mainMod + M` | Focus the next tiled window on the active workspace |
 | `mainMod + N` | Rotate positions while retaining focus on the visual slot |
 | `mainMod + H` | Switch between Terminal Workspace 1 and Display Workspace 2 |

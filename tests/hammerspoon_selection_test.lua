@@ -28,6 +28,7 @@ local function chooserFactory()
 end
 
 local CommaSelection = require("modules.comma_selection")
+local MediaControls = require("modules.media_controls")
 local comma = CommaSelection.new(chooserFactory)
 local selected
 comma:cycle("windows", 1, {
@@ -57,5 +58,34 @@ comma:cycle("workspaces", 1, {
 comma:cycle("workspaces", 1, {})
 pending({{id = "1", text = "One"}, {id = "2", text = "Two"}})
 assert(chooser.row == 2)
+
+comma:cancel()
+local tasks = {}
+local function taskNew(path, callback, arguments)
+  local task = {path = path, callback = callback, arguments = arguments}
+  function task:start() tasks[#tasks + 1] = self; return true end
+  return task
+end
+local media = MediaControls.new({
+  commaSelection = comma,
+  taskNew = taskNew,
+  notify = function() error("Media action unexpectedly failed") end,
+})
+media:cycle(1)
+assert(chooser.row == 1 and chooser.choices[1].text == "Play/Pause")
+taps[#taps].callback({getFlags = function() return {} end})
+assert(tasks[1].path == "/usr/bin/osascript")
+assert(tasks[1].arguments[2]:match("playpause$"))
+
+media:cycle(1)
+media:cycle(1)
+assert(chooser.row == 2 and chooser.choices[2].text == "Next")
+taps[#taps].callback({getFlags = function() return {} end})
+assert(tasks[2].arguments[2]:match("next track$"))
+
+media:cycle(-1)
+assert(chooser.row == 3 and chooser.choices[3].text == "Previous")
+taps[#taps].callback({getFlags = function() return {} end})
+assert(tasks[3].arguments[2]:match("previous track$"))
 
 print("Hammerspoon selection tests passed")

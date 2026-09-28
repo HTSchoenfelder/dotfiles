@@ -407,8 +407,8 @@ For `N`, distinguish window identity from visual slot. The windows rotate, and t
 window that arrives at the previously focused position receives focus, matching the
 current Hyprland behavior. Test one, two, three and more windows.
 
-Media Comma Selection on `mainMod + Y` is explicitly deferred in
-`docs/deferred-work.md`; do not implement it as part of this migration.
+Media Comma Selection on `mainMod + Y` was deferred from this migration and was
+implemented later as an independent Hammerspoon feature.
 
 ## Application launcher and shared chooser UI
 
