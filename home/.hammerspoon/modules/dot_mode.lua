@@ -97,26 +97,10 @@ function DotMode:_captureScreen()
   self:_run("/usr/sbin/screencapture", {"-R", rectangle, screenshotPath()})
 end
 
-function DotMode:_chooseDisplay()
-  local choices = {}
-  for _, screen in ipairs(hs.screen.allScreens()) do
-    choices[#choices + 1] = {text = screen:name() .. " — enabled"}
-  end
-  local chooser = self.chooserFactory()
-  chooser:show(choices, function(selected)
-    if selected then
-      hs.notify.new({
-        title = "Display control",
-        informativeText = "No supported display-toggle API is available",
-      }):send()
-    end
-  end)
-end
-
 function DotMode:_commands()
   local chooser = self.chooserFactory()
-  chooser:show({{text = "Reset workspaces", action = self.resetWorkspaces}}, function(selected)
-    if selected then selected.action() end
+  chooser:show({{text = "Reset window layout"}}, function(selected)
+    if selected then self.resetLayout() end
   end)
 end
 
@@ -135,32 +119,21 @@ function DotMode:start()
   self:_bind({}, "q", function() self:_captureRegion() end, "Capture region")
   self:_bind({}, "a", function() self:_captureWindow() end, "Capture focused window")
   self:_bind({}, "z", function() self:_captureScreen() end, "Capture focused monitor")
-  self:_bind({}, "b", function() self:_chooseDisplay() end, "Choose connected display")
   self:_bind({}, "g", function() self.overlays:toggle("editor") end, "Toggle project editor")
   self:_bind({"shift"}, "g", function() self.overlays:toggle("git") end, "Toggle project Git client")
   self:_bind({}, "j", function() self.overlays:toggle("terminal") end, "Toggle project terminal")
   self:_bind({}, "e", function()
     self.textLauncher:open(self.emojiPath, textData.emoji)
   end, "Insert emoji")
-  self:_bind({}, "r", function() self:_commands() end, "Run configured command")
+  self:_bind({}, "r", function() self:_commands() end, "Reset window layout")
   self:_bind({}, "t", function()
     self.textLauncher:open(self.snippetPath, textData.snippet)
   end, "Insert snippet")
-  self:_bind({}, "h", function() self.windows:moveFocusedToMonitor("prev") end,
-    "Move focused window to previous display")
-  self:_bind({}, "l", function() self.windows:moveFocusedToMonitor("next") end,
-    "Move focused window to next display")
-  self:_bind({"shift"}, "h", function() self.windows:moveVisibleToMonitor("prev") end,
-    "Move visible windows to previous display")
-  self:_bind({"shift"}, "l", function() self.windows:moveVisibleToMonitor("next") end,
-    "Move visible windows to next display")
-  self:_bind({}, "/", function() self.windows:toggleFullscreen() end,
-    "Toggle focused window fullscreen")
   self.modal:bind({}, "escape", function() self:exit() end)
   catalog.add("Dot mode", "MainMod + . → Escape", "Leave dot mode")
 
   local recognized = {}
-  for _, key in ipairs({"q", "a", "z", "b", "g", "j", "e", "r", "t", "h", "l", "/", "escape"}) do
+  for _, key in ipairs({"q", "a", "z", "g", "j", "e", "r", "t", "escape"}) do
     recognized[hs.keycodes.map[key]] = true
   end
   self.keyTap = hs.eventtap.new({hs.eventtap.event.types.keyDown}, function(event)

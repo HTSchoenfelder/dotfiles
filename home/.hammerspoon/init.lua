@@ -18,7 +18,7 @@ local launcher = Launcher.new({
   gate = services.gate,
 })
 launcher:start()
-shortcuts.start(services, services.applications)
+shortcuts.start(services)
 shortcutCatalog.start(config.hyper, services.chooserFactory)
 
 local function reloadConfig(files)

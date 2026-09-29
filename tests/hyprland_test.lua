@@ -45,8 +45,8 @@ test("stack navigation preserves existing windows and clears fullscreen", functi
     master.fullscreen = 2
     master.workspace.fullscreen_window = master
     session.focus(master)
-    session.held.f = true
-    session.press(modifier .. "K")
+    session.held.shift = true
+    session.press(modifier .. "SHIFT + K")
     assert(master.workspace.id == 1 and slave.workspace.id == 1 and code.workspace.id == 1)
     assert(master.fullscreen == 0 and session.focused == code)
 end)
@@ -92,7 +92,7 @@ end)
 
 test("an instance picker opens even for a single window", function(session)
     local code = session.add("code", 2)
-    session.held.a = true
+    session.held.f = true
     session.press(modifier .. "K")
     assert(session.picker_request() and code.workspace.id == 2)
     session.choose(0)
@@ -110,7 +110,7 @@ end)
 
 test("closed and reclassified windows cannot be selected", function(session)
     local code = session.add("code", 2)
-    session.held.a = true
+    session.held.f = true
     session.press(modifier .. "K")
     code.class = "other"
     session.choose(0)
@@ -125,8 +125,8 @@ test("repeated requests start only one process and use the latest stack preferen
     local master = session.add("kitty", 1)
     session.focus(master)
     session.press(modifier .. "K")
-    session.held.f = true
-    session.press(modifier .. "K")
+    session.held.shift = true
+    session.press(modifier .. "SHIFT + K")
     assert(#session.commands == 1 and session.commands[1].arguments[1] == "code")
     assert(session.commands[1].rules.no_initial_focus)
     local code = session.add("code", 1)
@@ -180,6 +180,18 @@ test("quick comma release selects the previous window without mapping Rofi", fun
     assert(session.focused == previous)
 end)
 
+test("Shift comma selects backwards without adding to the current stack", function(session)
+    local current = session.add("kitty", 1, 0)
+    local previous = session.add("code", 10, 1)
+    session.focus(current)
+    session.held.shift = true
+    session.press(modifier .. "SHIFT + comma")
+    session.press("Alt_L")
+    assert(session.focused == previous)
+    assert(previous.workspace.id == 1)
+    assert(current.workspace.id == 10)
+end)
+
 test("mapped cycles defer actions until the Rofi layer has closed", function(session)
     session.focus(session.add("kitty", 1, 0))
     local code = session.add("code", 10, 1)
@@ -194,22 +206,22 @@ test("mapped cycles defer actions until the Rofi layer has closed", function(ses
     assert(session.focused == code)
 end)
 
-test("F can change an open window selection to stack mode", function(session)
+test("Shift P adds the selected window to the current stack", function(session)
     local master = session.add("kitty", 1, 0)
     session.focus(master)
     session.add("code", 10, 1)
-    session.press(modifier .. "comma")
-    session.press(modifier .. "F")
+    session.held.shift = true
+    session.press(modifier .. "SHIFT + P")
     session.choose(1)
     assert(master.workspace.id == 1)
 end)
 
-test("A limits comma selection to instances of the focused application", function(session)
+test("F limits comma selection to instances of the focused application", function(session)
     local current = session.add("unconfigured-app", 1, 0)
     local previous = session.add("Unconfigured-App", 2, 1)
     session.add("kitty", 1, 2)
     session.focus(current)
-    session.held.a = true
+    session.held.f = true
     session.press(modifier .. "comma")
     local request = assert(session.picker_request())
     local rows = assert(io.open(request.path))

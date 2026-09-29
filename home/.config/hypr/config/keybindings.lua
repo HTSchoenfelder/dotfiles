@@ -36,14 +36,6 @@ local function bind(key, action, description, section)
     return hl.bind(settings.modifier .. " + " .. key, action, { description = description })
 end
 
-local function add_to_stack()
-    return hl.is_key_down(settings.stack_key:lower())
-end
-
-local function navigation_options()
-    return { add_to_stack = add_to_stack() }
-end
-
 hl.layer_rule({ match = { namespace = "rofi" }, no_anim = true })
 bind("R", function()
     windows.invalidate_pending_focus()
@@ -57,9 +49,9 @@ bind("H", function() spaces.switch_between(workspaces.primary) end, "Switch betw
 bind("M", hl.dsp.layout("cyclenext"), "Focus next window", "Navigation")
 bind("N", window_navigation.rotate_positions, "Rotate window positions", "Windows")
 
-bind(settings.stack_key, picker.add_to_stack, "Add selection to stack", "Applications")
 bind(settings.instance_key, hl.dsp.no_op(), "Select application instance", "Applications")
-shortcut_catalog.add("Applications", shortcut_catalog.main("F + App"), "Add application to stack")
+shortcut_catalog.add("Applications", shortcut_catalog.main("F + App"), "Select application instance")
+shortcut_catalog.add("Applications", shortcut_catalog.main("SHIFT + App"), "Add application to stack")
 local terminal
 local function focused_application()
     local active = hl.get_active_window()
@@ -73,8 +65,11 @@ end
 for _, application in ipairs(settings.applications) do
     if application.class == "kitty" then terminal = application end
     bind(application.key, function()
-        windows.activate(application, navigation_options(), hl.is_key_down(settings.instance_key:lower()))
+        windows.activate(application, {}, hl.is_key_down(settings.instance_key:lower()))
     end, "Navigate to " .. application.name, "Applications")
+    hl.bind(settings.modifier .. " + SHIFT + " .. application.key, function()
+        windows.activate(application, { add_to_stack = true }, hl.is_key_down(settings.instance_key:lower()))
+    end, { description = "Add " .. application.name .. " to stack" })
 end
 assert(terminal, "Kitty must be configured as a navigation application")
 local reset_workspaces = workspace_reset.new({
@@ -82,16 +77,18 @@ local reset_workspaces = workspace_reset.new({
     activate_terminal = function() windows.activate(terminal, {}, false) end,
 })
 
-bind("P", function() windows.activate(nil, navigation_options(), true) end, "Select window by last focus", "Windows")
+bind("P", function() windows.activate(nil, {}, true) end, "Select window by last focus", "Windows")
+hl.bind(settings.modifier .. " + SHIFT + P", function()
+    windows.activate(nil, { add_to_stack = true }, true)
+end, { description = "Select window and add it to stack" })
 picker.bind_cycle("comma", function(direction)
     local application = hl.is_key_down(settings.instance_key:lower()) and focused_application() or nil
-    windows.cycle(direction, "comma", navigation_options(), application)
+    windows.cycle(direction, "comma", {}, application)
 end, "Cycle windows by last focus")
 shortcut_catalog.add("Windows", shortcut_catalog.main("comma"), "Cycle windows by last focus")
 shortcut_catalog.add("Windows", shortcut_catalog.main("SHIFT + comma"), "Cycle windows backwards")
-shortcut_catalog.add("Windows", shortcut_catalog.main("A + comma"), "Cycle application windows")
-shortcut_catalog.add("Windows", shortcut_catalog.main("F + P"), "Choose window and add it to stack")
-shortcut_catalog.add("Windows", shortcut_catalog.main("F + comma"), "Cycle and add selected window to stack")
+shortcut_catalog.add("Windows", shortcut_catalog.main("F + comma"), "Cycle application windows")
+shortcut_catalog.add("Windows", shortcut_catalog.main("SHIFT + P"), "Choose window and add it to stack")
 picker.bind_cycle("G", function(direction)
     if picker.is_open() then return end
     windows.invalidate_pending_focus()

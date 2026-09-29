@@ -12,13 +12,18 @@ Dot Mode define the muscle memory that the macOS Hammerspoon configuration shoul
 reproduce wherever macOS exposes a reliable equivalent.
 
 Parity is measured by what a shortcut means and how the interaction feels, rather
-than by matching compositor internals. In the planned macOS architecture,
-Hammerspoon reproduces the input and selection model while AeroSpace represents
-workspaces, Parking and the master/stack geometry with its window tree.
+than by matching compositor internals. On macOS, Hammerspoon reproduces the input,
+selection and master/stack model directly through Accessibility. It deliberately
+does not reproduce Hyprland workspaces or Parking.
 Platform-specific implementation details are acceptable when the keys, sequence
 and visible outcome remain aligned. Any deliberate behavioral difference that
 affects muscle memory should be recorded in the relevant quick reference or in the
 [macOS window-management architecture](macos-window-management.md).
+
+Shift adds an application shortcut or `P` selection to the current layout. `F`
+chooses an application instance or restricts Comma Selection to the focused
+application. Shift remains exclusively the backward direction during Comma
+Selection and media/workspace cycling.
 
 | File | Responsibility |
 | --- | --- |
@@ -47,9 +52,9 @@ affects muscle memory should be recorded in the relevant quick reference or in t
 | `lib/compositor.lua` | Checked dispatch, current workspace and shared selection indexing |
 
 The active master layout uses `mfact = 0.70`: the master occupies 70% and the
-right stack 30%. The planned macOS AeroSpace layout deliberately uses a 1:1 split,
-as specified for that platform. Shortcut meaning and stack behavior remain aligned;
-the ratio is the only intended layout difference.
+right stack 30%. The macOS Accessibility layout deliberately uses a 1:1 split.
+Hyprland moves replaced windows to Parking; macOS leaves them unchanged behind the
+new full-size window. Workspace cycling remains Hyprland-only.
 
 Focus and window transitions are intentionally restrained. Focus opacity and border
 changes complete in 100 ms, window movement in 150 ms and window open/close motion

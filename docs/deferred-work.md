@@ -33,12 +33,6 @@ optional, independently configurable where practical, and reproducible from the
 dotfiles. Provide an idempotent setup script plus a documented restore path for
 system settings and background services.
 
-### Window spacing
-
-Add configurable outer and inner gaps to the macOS window-management backend. Keep
-the current edge-to-edge geometry available when gaps are disabled. Do not add a
-second tiling or reflow loop in Hammerspoon merely to maintain the gaps.
-
 ### Focus border
 
 Use JankyBorders as the preferred focused-window border implementation rather than
@@ -82,8 +76,7 @@ keyboard behavior remain intact. The theme should support:
 - a setting to hide window titles entirely or show them only as subdued subtext;
 - the existing forward and reverse cycle behavior and acceptance on MainMod release.
 
-The AeroSpace migration removed Seal and now routes the Hammerspoon application
-launcher through the shared native chooser helper. The native chooser cannot
+The Hammerspoon application launcher uses the shared native chooser helper. The native chooser cannot
 provide fully arbitrary background colors, window shapes, or container-level
 rounded-corner styling; keep that limitation explicit.
 
@@ -104,8 +97,8 @@ verify them on the target macOS release before enabling them.
 
 ### Architecture boundary
 
-This optional appearance work must follow the established target architecture:
-AeroSpace owns managed window geometry, Hammerspoon owns interaction and chooser
-UI, and JankyBorders may own the optional focus border. Alfred, Raycast and Yabai
-remain outside this work. Keep installation, activation and rollback scriptable
-and documented.
+This optional appearance work must follow the established architecture:
+Hammerspoon owns explicit Accessibility geometry, interaction and chooser UI;
+JankyBorders may own the optional focus border. Stage Manager, Mission Control,
+Alfred, Raycast, AeroSpace and Yabai remain outside this work. Keep installation,
+activation and rollback scriptable and documented.

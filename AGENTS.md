@@ -26,18 +26,17 @@ modifier combinations, action semantics and selection lifecycle wherever reliabl
 Behavioral parity matters more than using identical platform mechanisms. Document
 any deliberate difference that affects muscle memory.
 
-The planned macOS architecture is:
+The macOS architecture is:
 
 - Hammerspoon owns global input, held-key state, Comma Selection, Dot Mode,
-  `hs.chooser`, application intentions, MRU state and MIDI integration.
-- AeroSpace owns the window tree, geometry, workspaces, monitor assignment and
-  window operations. It has no regular workflow bindings.
-- Hammerspoon invokes AeroSpace asynchronously and decides master/stack intent. It
-  must not remain a second geometry engine after the migration.
+  `hs.chooser`, application intentions, MRU state, MIDI integration and passive
+  master/stack geometry through macOS Accessibility.
+- macOS owns native windows and displays. Mission Control Spaces, Stage Manager
+  and third-party window managers are not workflow backends.
+- Hammerspoon changes geometry only for explicit user actions. It must not run a
+  permanent tiling/reflow loop or hide unrelated windows to emulate Parking.
 
-The current macOS implementation remains Hammerspoon-only. The target architecture
-is in `docs/macos-window-management.md`; the complete implementation task is in
-`aerospace-migration.md`.
+The active design is documented in `docs/macos-window-management.md`.
 
 System and session ownership stays explicit:
 
@@ -59,6 +58,9 @@ See `docs/hyprland-desktop.md` for the current service, portal and toolkit owner
   symlink.
 - `mainMod` is `SUPER + CTRL + ALT`.
 - **Comma Selection** cycles in Rofi and accepts on `mainMod` release.
+- `Shift + App` and `Shift + P` add a selected window to the current layout.
+- `F + App` chooses an instance and `F + comma` filters by the focused app.
+- During Comma Selection, Shift always means backward and never add-to-stack.
 - **Dot Mode** is the submap entered with `mainMod + period`.
 - **Terminal Workspace** is workspace 1 (``) on the primary display.
 - **Display Workspace** is workspace 2 (`󰍹`) on the secondary display.

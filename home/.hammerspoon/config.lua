@@ -4,24 +4,12 @@ config.hyper = {"alt", "ctrl", "cmd"}
 config.log = hs.logger.new("hammerspoon", "debug")
 
 config.navigation = {
-  stackKey = "f",
-  instanceKey = "a",
+  instanceKey = "f",
   launchTimeoutSeconds = 15,
   launchPollIntervalSeconds = 0.1,
+  restoreDelaySeconds = 0.08,
+  gap = 5,
   chooserRows = 7,
-  workspaces = {
-    terminal = "1",
-    display = "2",
-    parking = "10",
-    overlays = "99",
-  },
-}
-
-config.aerospace = {
-  executableCandidates = {
-    "/opt/homebrew/bin/aerospace",
-    "/usr/local/bin/aerospace",
-  },
 }
 
 config.paths = {

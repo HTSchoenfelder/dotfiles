@@ -1,4 +1,4 @@
-local orchestratorModule = require("modules.layout_orchestrator")
+local WindowRepository = require("modules.window_repository")
 
 local WindowNavigation = {}
 WindowNavigation.__index = WindowNavigation
@@ -9,14 +9,21 @@ local function windowChoice(record)
 end
 
 function WindowNavigation.new(options)
+  options.allScreens = options.allScreens or function() return hs.screen.allScreens() end
   return setmetatable(options, WindowNavigation)
 end
 
-function WindowNavigation:_records(callback, key)
-  self.repository:listAll(function(records, requestError)
-    if requestError then orchestratorModule.report(requestError); return end
-    callback(records)
-  end, key)
+function WindowNavigation:_records(callback)
+  self.repository:listAll(function(records) callback(records or {}) end)
+end
+
+function WindowNavigation:_request(mode, focused, generation)
+  return {
+    anchorID = focused and focused.id,
+    generation = generation,
+    mode = mode,
+    screen = focused and focused.screen or self.orchestrator:activeScreen(),
+  }
 end
 
 function WindowNavigation:chooseAny(mode)
@@ -24,22 +31,18 @@ function WindowNavigation:chooseAny(mode)
   self:_records(function(records)
     if not self.gate:isCurrent(generation) then return end
     local focused = self.repository:focusedRecord(records)
-    local workspace = focused and focused.workspace or self.workspaces.terminal
     local choices = {}
     for _, record in ipairs(self.repository:orderedByHistory(records)) do
-      if record.tiled ~= false then choices[#choices + 1] = windowChoice(record) end
+      choices[#choices + 1] = windowChoice(record)
     end
+    local request = self:_request(mode, focused, generation)
     local chooser = self.chooserFactory()
     chooser:show(choices, function(selected)
       if selected and self.gate:isCurrent(generation) then
-        self.orchestrator:activate(selected.record, {
-          generation = generation,
-          mode = mode,
-          workspace = workspace,
-        })
+        self.orchestrator:activate(selected.record, request)
       end
-    end)
-  end, "window_chooser")
+    end, request.screen)
+  end)
 end
 
 function WindowNavigation:commaItems(instancesOnly, callback)
@@ -48,123 +51,62 @@ function WindowNavigation:commaItems(instancesOnly, callback)
     local ordered = self.repository:orderedByHistory(records)
     local items = {}
     for _, record in ipairs(ordered) do
-      if record.tiled ~= false and (not instancesOnly or (focused and record.bundleID == focused.bundleID)) then
+      if not instancesOnly or (focused and record.bundleID == focused.bundleID) then
         items[#items + 1] = windowChoice(record)
       end
     end
     callback(items, focused)
-  end, "window_comma")
+  end)
 end
 
-function WindowNavigation:activateComma(record, mode, workspace, generation)
-  if self.gate:isCurrent(generation) then
-    self.orchestrator:activate(record, {
-      generation = generation,
-      mode = mode,
-      workspace = workspace,
-    })
+function WindowNavigation:activateComma(record, request)
+  if self.gate:isCurrent(request.generation) then
+    self.orchestrator:activate(record, request)
   end
 end
 
 function WindowNavigation:focusNext()
   self.gate:next()
-  self:_records(function(records)
-    local focused = self.repository:focusedRecord(records)
-    if not focused then return end
-    local workspaceWindows = {}
-    local focusedIndex
-    for _, record in ipairs(records) do
-      if record.workspace == focused.workspace and record.tiled then
-        workspaceWindows[#workspaceWindows + 1] = record
-        if record.id == focused.id then focusedIndex = #workspaceWindows end
-      end
-    end
-    if #workspaceWindows < 2 then return end
-    local target = workspaceWindows[(focusedIndex or 0) % #workspaceWindows + 1]
-    self.client:focusWindow(target.id, function(_, requestError)
-      if requestError then orchestratorModule.report(requestError) end
-    end, "direct_navigation")
-  end, "direct_snapshot")
+  self.orchestrator:focusNext()
 end
 
 function WindowNavigation:rotatePositions()
   self.gate:next()
-  self:_records(function(records)
-    local focused = self.repository:focusedRecord(records)
-    if not focused then return end
-    local count = 0
-    for _, record in ipairs(records) do
-      if record.workspace == focused.workspace and record.tiled then count = count + 1 end
-    end
-    if count < 2 then return end
-    self.client:execute({
-      "swap", "--window-id", tostring(focused.id), "--swap-focus", "--wrap-around", "dfs-next",
-    }, function(_, requestError)
-      if requestError then orchestratorModule.report(requestError) end
-    end, "direct_navigation")
-  end, "direct_snapshot")
+  self.orchestrator:rotatePositions()
 end
 
 function WindowNavigation:closeFocused()
   self.gate:next()
-  self:_records(function(records)
-    local focused = self.repository:focusedRecord(records)
-    if not focused then return end
-    self.client:execute({"close", "--window-id", tostring(focused.id)}, function(_, requestError)
-      if requestError then orchestratorModule.report(requestError) end
-    end, "direct_navigation")
-  end, "direct_snapshot")
+  self.orchestrator:closeFocused()
 end
 
-function WindowNavigation:moveFocusedToMonitor(direction)
+function WindowNavigation:focusOtherDisplay()
   self.gate:next()
+  local current = self.orchestrator:activeScreen()
+  local screens = self.allScreens()
+  if #screens < 2 or not current then return end
+  table.sort(screens, function(first, second)
+    local firstFrame, secondFrame = first:frame(), second:frame()
+    if firstFrame.x ~= secondFrame.x then return firstFrame.x < secondFrame.x end
+    return firstFrame.y < secondFrame.y
+  end)
+  local currentID = WindowRepository.screenIdentifier(current)
+  local currentIndex = 1
+  for index, screen in ipairs(screens) do
+    if WindowRepository.screenIdentifier(screen) == currentID then currentIndex = index; break end
+  end
+  local targetScreen = screens[currentIndex % #screens + 1]
+  local targetID = WindowRepository.screenIdentifier(targetScreen)
   self:_records(function(records)
-    local focused = self.repository:focusedRecord(records)
-    if not focused then return end
-    self.client:execute({
-      "move-node-to-monitor", "--window-id", tostring(focused.id),
-      "--focus-follows-window", "--wrap-around", direction,
-    }, function(_, requestError)
-      if requestError then orchestratorModule.report(requestError) end
-    end, "direct_navigation")
-  end, "direct_snapshot")
-end
-
-function WindowNavigation:moveVisibleToMonitor(direction)
-  self.gate:next()
-  self:_records(function(records)
-    local focused = self.repository:focusedRecord(records)
-    if not focused or not focused.monitorID then return end
-    self.client:listMonitors(function(monitors, monitorError)
-      if monitorError then orchestratorModule.report(monitorError); return end
-      local count = #monitors
-      if count < 2 then return end
-      local offset = direction == "prev" and -1 or 1
-      local target = (focused.monitorID - 1 + offset) % count + 1
-      local commands = {}
-      for _, record in ipairs(records) do
-        if record.workspaceVisible then
-          commands[#commands + 1] = {
-            "move-node-to-monitor", "--window-id", tostring(record.id), tostring(target),
-          }
-        end
+    local candidates = {}
+    for _, record in ipairs(self.repository:orderedByHistory(records)) do
+      if record.screenID == targetID and not record.minimized then
+        candidates[#candidates + 1] = record
       end
-      self.client:eval(commands, function(_, requestError)
-        if requestError then orchestratorModule.report(requestError) end
-      end, "direct_navigation")
-    end, "monitor_snapshot")
-  end, "direct_snapshot")
-end
-
-function WindowNavigation:toggleFullscreen()
-  self.gate:next()
-  self:_records(function(records)
-    local focused = self.repository:focusedRecord(records)
-    if not focused then return end
-    self.client:execute({"fullscreen", "--window-id", tostring(focused.id)}, function(_, requestError)
-      if requestError then orchestratorModule.report(requestError) end
-    end, "direct_navigation")
-  end, "direct_snapshot")
+    end
+    local target = candidates[1]
+    if target and target.window then target.window:focus() end
+  end)
 end
 
 WindowNavigation.windowChoice = windowChoice

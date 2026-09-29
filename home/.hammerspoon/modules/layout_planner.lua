@@ -1,63 +1,39 @@
 local planner = {}
 
-local function move(windowID, workspace)
-  return {"move-node-to-workspace", "--window-id", tostring(windowID), tostring(workspace)}
+local function inset(frame, gap)
+  return {
+    x = frame.x + gap,
+    y = frame.y + gap,
+    w = math.max(1, frame.w - gap * 2),
+    h = math.max(1, frame.h - gap * 2),
+  }
 end
 
-local function tiledWindows(windows, targetID)
-  local result = {}
-  for _, window in ipairs(windows or {}) do
-    if window.tiled ~= false and window.id ~= targetID then
-      result[#result + 1] = window
-    end
-  end
-  return result
-end
+function planner.frames(screenFrame, count, gap)
+  if count <= 0 then return {} end
+  gap = gap or 0
+  local area = inset(screenFrame, gap)
+  if count == 1 then return {area} end
 
-function planner.activation(target, destination, windows, parking, mode)
-  assert(target and target.id, "Target window is required")
-  destination = tostring(destination)
-  parking = tostring(parking)
-  local existing = tiledWindows(windows, target.id)
-  local commands = {}
-
-  if mode == "stack" then
-    if target.workspace == destination and destination ~= parking then
-      commands[#commands + 1] = move(target.id, parking)
-    end
-    commands[#commands + 1] = move(target.id, destination)
-    commands[#commands + 1] = {"layout", "--window-id", tostring(target.id), "tiling"}
-    commands[#commands + 1] = {"flatten-workspace-tree", "--workspace", destination}
-    commands[#commands + 1] = {"layout", "--workspace", destination, "--root", "h_tiles"}
-
-    local stack = {}
-    for index = 2, #existing do stack[#stack + 1] = existing[index] end
-    stack[#stack + 1] = target
-    if #stack >= 2 then
-      for index = 1, #stack - 1 do
-        commands[#commands + 1] = {
-          "join-with", "--window-id", tostring(stack[index].id), "right",
-        }
-      end
-      commands[#commands + 1] = {
-        "layout", "--window-id", tostring(stack[1].id), "v_tiles",
-      }
-    end
-  else
-    commands[#commands + 1] = move(target.id, destination)
-    commands[#commands + 1] = {"layout", "--window-id", tostring(target.id), "tiling"}
-    if destination ~= parking then
-      for _, window in ipairs(existing) do
-        commands[#commands + 1] = move(window.id, parking)
-      end
-    end
-    commands[#commands + 1] = {"flatten-workspace-tree", "--workspace", destination}
-    commands[#commands + 1] = {"layout", "--workspace", destination, "--root", "h_tiles"}
+  local inner = gap
+  local leftWidth = math.floor((area.w - inner) / 2)
+  local rightX = area.x + leftWidth + inner
+  local rightWidth = area.w - leftWidth - inner
+  local frames = {{x = area.x, y = area.y, w = leftWidth, h = area.h}}
+  if count == 2 then
+    frames[2] = {x = rightX, y = area.y, w = rightWidth, h = area.h}
+    return frames
   end
 
-  commands[#commands + 1] = {"balance-sizes", "--workspace", destination}
-  commands[#commands + 1] = {"focus", "--window-id", tostring(target.id)}
-  return commands
+  local stackCount = count - 1
+  local stackHeight = math.floor((area.h - inner * (stackCount - 1)) / stackCount)
+  local y = area.y
+  for index = 2, count do
+    local height = index == count and area.y + area.h - y or stackHeight
+    frames[index] = {x = rightX, y = y, w = rightWidth, h = height}
+    y = y + height + inner
+  end
+  return frames
 end
 
 return planner

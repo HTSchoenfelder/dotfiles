@@ -12,11 +12,14 @@ function Chooser.new(options)
     rows = options.rows or 7,
     width = options.width or 40,
     callback = nil,
+    originalChoices = {},
   }, Chooser)
   self.instance = hs.chooser.new(function(choice)
     local callback = self.callback
+    local original = choice and self.originalChoices[tonumber(choice.uuid)] or nil
     self.callback = nil
-    if callback then callback(choice) end
+    self.originalChoices = {}
+    if callback then callback(original) end
   end)
   self.instance:rows(self.rows)
   self.instance:width(self.width)
@@ -27,7 +30,18 @@ end
 
 function Chooser:show(choices, callback, screen)
   self.callback = callback
-  self.instance:choices(choices)
+  self.originalChoices = choices
+  local displayChoices = {}
+  for index, choice in ipairs(choices) do
+    displayChoices[index] = {
+      text = choice.text,
+      subText = choice.subText,
+      image = choice.image,
+      valid = choice.valid,
+      uuid = tostring(index),
+    }
+  end
+  self.instance:choices(displayChoices)
   self.instance:query("")
   screen = screen or activeScreen()
   local frame = screen and screen:frame()

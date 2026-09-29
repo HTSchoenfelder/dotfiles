@@ -1,5 +1,3 @@
-local orchestratorModule = require("modules.layout_orchestrator")
-
 local ProjectOverlays = {}
 ProjectOverlays.__index = ProjectOverlays
 
@@ -41,6 +39,17 @@ local function projectFromWindow(window)
   return overlayProject(title)
 end
 
+local function centeredFrame(screen)
+  local frame = screen:frame()
+  local width, height = math.floor(frame.w * 0.8), math.floor(frame.h * 0.8)
+  return {
+    x = frame.x + math.floor((frame.w - width) / 2),
+    y = frame.y + math.floor((frame.h - height) / 2),
+    w = width,
+    h = height,
+  }
+end
+
 function ProjectOverlays.new(options)
   options.tools = {
     editor = {command = {"/run/current-system/sw/bin/nvim"}},
@@ -52,61 +61,51 @@ function ProjectOverlays.new(options)
 end
 
 function ProjectOverlays:start()
-  self.client:onEvent("focused-workspace-changed", function(event)
-    if self.visibleOverlayID and event.workspace ~= self.visibleWorkspace then
-      local windowID = self.visibleOverlayID
-      self.visibleOverlayID = nil
-      self.visibleWorkspace = nil
-      self.client:moveWindowToWorkspace(windowID, self.workspaces.overlays, function(_, requestError)
-        if requestError then orchestratorModule.report(requestError) end
-      end, "project_overlay_hide")
-    end
-  end)
   self.repository:listAll(function(records)
     for _, record in ipairs(records or {}) do
-      if record.workspaceVisible and record.title:match("^" .. prefix) then
+      if not record.minimized and record.title:match("^" .. prefix) then
         self.visibleOverlayID = record.id
-        self.visibleWorkspace = record.workspace
         return
       end
     end
-  end, "project_overlay_seed")
+  end)
 end
 
-function ProjectOverlays:_show(record, workspace, generation)
-  if not self.gate:isCurrent(generation) then return end
-  self.client:eval({
-    {"move-node-to-workspace", "--window-id", tostring(record.id), workspace},
-    {"layout", "--window-id", tostring(record.id), "floating"},
-    {"focus", "--window-id", tostring(record.id)},
-  }, function(_, requestError)
-    if requestError then orchestratorModule.report(requestError) end
-    if not requestError then
-      self.visibleOverlayID = record.id
-      self.visibleWorkspace = workspace
-    end
-  end, "project_overlay")
+function ProjectOverlays:_hide(record)
+  if record and record.window and not record.window:isMinimized() then record.window:minimize() end
+  if record and self.visibleOverlayID == record.id then self.visibleOverlayID = nil end
 end
 
-function ProjectOverlays:_wait(title, workspace, generation)
+function ProjectOverlays:_show(record, screen, generation)
+  if not self.gate:isCurrent(generation) or not record or not record.window then return end
+  if record.window:isMinimized() then record.window:unminimize() end
+  hs.timer.doAfter(0.08, function()
+    if not self.gate:isCurrent(generation)
+        or not self.repository:isUsable(record.window) then return end
+    record.window:setFrameWithWorkarounds(centeredFrame(screen), 0)
+    record.window:focus()
+    self.visibleOverlayID = record.id
+  end)
+end
+
+function ProjectOverlays:_wait(title, screen, generation)
   local deadline = hs.timer.secondsSinceEpoch() + 15
   local function poll()
-    self.repository:listAll(function(records, requestError)
-      if requestError then orchestratorModule.report(requestError); return end
+    self.repository:listAll(function(records)
       for _, record in ipairs(records) do
-        if record.title == title then self:_show(record, workspace, generation); return end
+        if record.title == title then self:_show(record, screen, generation); return end
       end
       if hs.timer.secondsSinceEpoch() < deadline and self.gate:isCurrent(generation) then
         hs.timer.doAfter(0.1, poll)
       elseif self.gate:isCurrent(generation) then
         hs.notify.new({title = "Project overlay", informativeText = "Overlay window did not open"}):send()
       end
-    end, "overlay_poll_" .. tostring(generation))
+    end)
   end
   poll()
 end
 
-function ProjectOverlays:_launch(tool, project, workspace, generation)
+function ProjectOverlays:_launch(tool, project, screen, generation)
   local definition = self.tools[tool]
   if not definition or not hs.fs.attributes(definition.command[1]) then
     hs.notify.new({title = "Project overlay", informativeText = "Tool is not installed"}):send()
@@ -114,21 +113,22 @@ function ProjectOverlays:_launch(tool, project, workspace, generation)
   end
   local title = overlayTitle(tool, project)
   local arguments = {
-    "-na", self.kittyApp, "--args", "-o", "dynamic_title=no",
+    "-g", "-na", self.kittyApp, "--args", "-o", "dynamic_title=no",
     "--title", title, "--directory", project,
   }
   for _, argument in ipairs(definition.command) do arguments[#arguments + 1] = argument end
   local task
   task = hs.task.new("/usr/bin/open", function(exitCode)
     self.tasks[generation] = nil
-    if exitCode == 0 then self:_wait(title, workspace, generation) end
+    if exitCode == 0 then self:_wait(title, screen, generation) end
   end, arguments)
   self.tasks[generation] = task
-  task:start()
+  if not task:start() then self.tasks[generation] = nil end
 end
 
 function ProjectOverlays:toggle(tool)
-  local project = projectFromWindow(hs.window.focusedWindow())
+  local focusedWindow = hs.window.focusedWindow()
+  local project = projectFromWindow(focusedWindow)
   if not project then
     hs.notify.new({
       title = "Project overlay",
@@ -136,41 +136,26 @@ function ProjectOverlays:toggle(tool)
     }):send()
     return
   end
+  local screen = focusedWindow and focusedWindow:screen() or hs.screen.mainScreen()
   local generation = self.gate:next()
-  self.repository:listAll(function(records, requestError)
-    if requestError then orchestratorModule.report(requestError); return end
+  self.repository:listAll(function(records)
     if not self.gate:isCurrent(generation) then return end
-    local focused = self.repository:focusedRecord(records)
-    local workspace = focused and focused.workspace or self.workspaces.terminal
     local title = overlayTitle(tool, project)
     local selected
-    local commands = {}
     for _, record in ipairs(records) do
       if record.title:match("^" .. prefix) then
-        if record.title == title then selected = record end
-        if record.workspaceVisible and record.title ~= title then
-          commands[#commands + 1] = {
-            "move-node-to-workspace", "--window-id", tostring(record.id), self.workspaces.overlays,
-          }
-        end
+        if record.title == title then selected = record
+        elseif not record.minimized then self:_hide(record) end
       end
     end
-    if selected and selected.workspace == workspace then
-      self.visibleOverlayID = nil
-      self.visibleWorkspace = nil
-      commands[#commands + 1] = {
-        "move-node-to-workspace", "--window-id", tostring(selected.id), self.workspaces.overlays,
-      }
+    if selected and not selected.minimized and selected.id == self.visibleOverlayID then
+      self:_hide(selected)
+    elseif selected then
+      self:_show(selected, screen, generation)
+    else
+      self:_launch(tool, project, screen, generation)
     end
-    self.client:eval(commands, function(_, mutationError)
-      if mutationError then orchestratorModule.report(mutationError); return end
-      if selected and selected.workspace ~= workspace then
-        self:_show(selected, workspace, generation)
-      elseif not selected then
-        self:_launch(tool, project, workspace, generation)
-      end
-    end, "project_overlay")
-  end, "project_overlay_snapshot")
+  end)
 end
 
 ProjectOverlays.projectFromWindow = projectFromWindow

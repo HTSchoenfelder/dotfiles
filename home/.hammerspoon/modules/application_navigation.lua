@@ -8,12 +8,10 @@ end
 
 function ApplicationNavigation.new(options)
   return setmetatable({
-    client = options.client,
     repository = options.repository,
     orchestrator = options.orchestrator,
     chooserFactory = options.chooserFactory,
     gate = options.gate,
-    workspaces = options.workspaces,
     timeout = options.launchTimeoutSeconds or 15,
     pollInterval = options.launchPollIntervalSeconds or 0.1,
     launchTasks = {},
@@ -24,9 +22,10 @@ function ApplicationNavigation:_request(application, mode, generation, records)
   local focused = self.repository:focusedRecord(records)
   return {
     application = application,
+    anchorID = focused and focused.id,
     generation = generation,
     mode = mode,
-    workspace = focused and focused.workspace or self.workspaces.terminal,
+    screen = focused and focused.screen or self.orchestrator:activeScreen(),
   }
 end
 
@@ -40,7 +39,7 @@ function ApplicationNavigation:_showOrChoose(windows, request, chooseInstance)
       if selected and self.gate:isCurrent(request.generation) then
         self.orchestrator:activate(selected.record, request)
       end
-    end)
+    end, request.screen)
     return
   end
   self.orchestrator:activate(windows[1], request)
@@ -58,7 +57,7 @@ function ApplicationNavigation:_launch(application, running, generation, callbac
     return
   end
 
-  local arguments = {}
+  local arguments = {"-g"}
   for name, value in pairs(application.launchEnvironment or {}) do
     arguments[#arguments + 1] = "--env"
     arguments[#arguments + 1] = name .. "=" .. value
@@ -77,26 +76,14 @@ function ApplicationNavigation:_launch(application, running, generation, callbac
   end
 end
 
-function ApplicationNavigation:_waitForWindow(application, request, chooseInstance, initialIDs)
+function ApplicationNavigation:_waitForWindow(application, request, chooseInstance)
   local deadline = hs.timer.secondsSinceEpoch() + self.timeout
   local function poll()
-    self.repository:listAll(function(records, requestError)
-      if requestError then
-        if self.gate:isCurrent(request.generation) then
-          require("modules.layout_orchestrator").report(requestError)
-        end
-        return
-      end
+    self.repository:listAll(function(records)
       local windows = self.repository:matchingBundle(records, application.bundleID)
       if #windows > 0 then
         if self.gate:isCurrent(request.generation) then
           self:_showOrChoose(windows, request, chooseInstance)
-        else
-          for _, window in ipairs(windows) do
-            if not initialIDs[window.id] then
-              self.client:moveWindowToWorkspace(window.id, self.workspaces.parking)
-            end
-          end
         end
         return
       end
@@ -110,15 +97,14 @@ function ApplicationNavigation:_waitForWindow(application, request, chooseInstan
         return
       end
       hs.timer.doAfter(self.pollInterval, poll)
-    end, "launch_poll_" .. tostring(request.generation))
+    end)
   end
   poll()
 end
 
 function ApplicationNavigation:activate(application, mode, chooseInstance)
   local generation = self.gate:next()
-  self.repository:listAll(function(records, requestError)
-    if requestError then require("modules.layout_orchestrator").report(requestError); return end
+  self.repository:listAll(function(records)
     if not self.gate:isCurrent(generation) then return end
     local request = self:_request(application, mode, generation, records)
     local windows = self.repository:matchingBundle(records, application.bundleID)
@@ -127,8 +113,6 @@ function ApplicationNavigation:activate(application, mode, chooseInstance)
       return
     end
 
-    local initialIDs = {}
-    for _, record in ipairs(records) do initialIDs[record.id] = true end
     local running = hs.application.get(application.bundleID)
     self:_launch(application, running, generation, function(launched)
       if not launched then
@@ -140,9 +124,9 @@ function ApplicationNavigation:activate(application, mode, chooseInstance)
         end
         return
       end
-      self:_waitForWindow(application, request, chooseInstance, initialIDs)
+      self:_waitForWindow(application, request, chooseInstance)
     end)
-  end, "application_intent")
+  end)
 end
 
 return ApplicationNavigation

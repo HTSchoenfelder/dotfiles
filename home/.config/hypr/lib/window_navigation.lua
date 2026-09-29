@@ -53,7 +53,7 @@ function window_navigation.show(window, destination, parking_workspace)
     if destination.add_to_stack then
         local workspace = hl.get_workspace(destination.workspace)
         if workspace and workspace.fullscreen_window then leave_fullscreen(workspace.fullscreen_window) end
-        -- master.new_status = "slave" preserves existing master and stack positions for F.
+        -- master.new_status = "slave" preserves existing positions for Shift navigation.
     elseif destination.workspace ~= parking_workspace then
         for _, other in ipairs(hl.get_windows({ workspace = destination.workspace, mapped = true })) do
             if other.address ~= window.address then window_navigation.move(other, parking_workspace) end
@@ -109,9 +109,6 @@ function window_navigation.new(options, picker)
             cycle_key = cycle_key,
             initial_index = initial_index,
             is_current = function() return request_is_current(request) end,
-            on_stack = function()
-                request.add_to_stack = true
-            end,
             on_select = function(item)
                 if item.window.mapped and matches_application(item.window, application) then
                     window_navigation.show(item.window, request, parking_workspace)

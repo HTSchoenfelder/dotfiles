@@ -13,28 +13,36 @@ assert(ordered[1].id == 2)
 assert(ordered[2].id == 3 and ordered[3].id == 1)
 assert(ordered[4].id == 4)
 
-local normalized = WindowRepository.normalize({
-  ["window-id"] = 42,
-  ["app-bundle-id"] = "example.app",
-  ["app-name"] = "Example",
-  ["window-title"] = "Title",
-  ["window-parent-container-layout"] = "h_tiles",
-  workspace = "1",
-  ["workspace-is-focused"] = true,
-  ["workspace-is-visible"] = true,
-  ["monitor-id"] = 2,
-})
-assert(normalized.id == 42 and normalized.bundleID == "example.app")
-assert(normalized.tiled and normalized.workspaceFocused and normalized.workspaceVisible)
+local screen = {}
+function screen:getUUID() return "display" end
+local application = {}
+function application:bundleID() return "example.app" end
+function application:name() return "Example" end
+local window = {}
+function window:id() return 42 end
+function window:isStandard() return true end
+function window:isFullScreen() return false end
+function window:isMinimized() return false end
+function window:title() return "Title" end
+function window:application() return application end
+function window:screen() return screen end
 
-local repository = WindowRepository.new({}, history, {
-  getWindow = function() return nil end,
-  focusedWindow = function() return {id = function() return 2 end} end,
+local normalized = WindowRepository.windowRecord(window)
+assert(normalized.id == 42 and normalized.bundleID == "example.app")
+assert(normalized.screenID == "display" and normalized.window == window)
+
+local secondWindow = setmetatable({}, {__index = window})
+function secondWindow:id() return 2 end
+local repository = WindowRepository.new(history, {
+  orderedWindows = function() return {window, secondWindow} end,
+  allWindows = function() return {secondWindow, window} end,
+  focusedWindow = function() return secondWindow end,
 })
-local records = {{id = 1, bundleID = "a"}, {id = 2, bundleID = "b"}, {id = 3, bundleID = "a"}}
-assert(repository:focusedRecord(records).id == 2)
-local matches = repository:matchingBundle(records, "a")
-assert(#matches == 2 and matches[1].bundleID == "a")
+local records
+repository:listAll(function(values) records = values end)
+assert(#records == 2 and repository:focusedRecord(records).id == 2)
+local matches = repository:matchingBundle(records, "example.app")
+assert(#matches == 2)
 
 local gate = RequestGate.new()
 local first = gate:next()
@@ -48,35 +56,26 @@ assert(byKey.i.bundleID == "com.google.Chrome.app.pommaclcbfghclhalboakcipcmmndh
 assert(byKey.j.launchEnvironment.START_ZELLIJ == "1")
 
 local WindowNavigation = require("modules.window_navigation")
-local executed
+local filtered
 local fakeRepository = {
   listAll = function(_, callback)
     callback({
-      {id = 10, bundleID = "a", appName = "A", title = "One", workspace = "1", tiled = true},
-      {id = 11, bundleID = "a", appName = "A", title = "Two", workspace = "1", tiled = true},
-      {id = 12, bundleID = "b", appName = "B", title = "Three", workspace = "1", tiled = true},
-      {id = 13, bundleID = "a", appName = "A", title = "Dialog", workspace = "1", tiled = false},
+      {id = 10, bundleID = "a", appName = "A", title = "One"},
+      {id = 11, bundleID = "a", appName = "A", title = "Two"},
+      {id = 12, bundleID = "b", appName = "B", title = "Three"},
     })
   end,
   focusedRecord = function()
-    return {id = 10, bundleID = "a", appName = "A", title = "One", workspace = "1", tiled = true}
+    return {id = 10, bundleID = "a", appName = "A", title = "One"}
   end,
   orderedByHistory = function(_, values) return values end,
 }
-local fakeClient = {
-  execute = function(_, command) executed = command end,
-}
 local windowNavigation = WindowNavigation.new({
-  client = fakeClient,
   repository = fakeRepository,
   gate = RequestGate.new(),
-  workspaces = {terminal = "1"},
+  orchestrator = {},
+  allScreens = function() return {} end,
 })
-windowNavigation:rotatePositions()
-assert(table.concat(executed, " ") ==
-  "swap --window-id 10 --swap-focus --wrap-around dfs-next")
-
-local filtered
 windowNavigation:commaItems(true, function(items) filtered = items end)
 assert(#filtered == 2 and filtered[1].id == 10 and filtered[2].id == 11)
 

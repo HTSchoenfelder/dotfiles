@@ -8,12 +8,12 @@ local midi = require("midi")
 
 local shortcuts = {}
 
-function shortcuts.start(services, applications)
+function shortcuts.start(services)
   midi:start()
-  shortcuts.midiBinding = hs.hotkey.bind({"alt", "ctrl", "cmd", "shift"}, "m", function()
+  shortcuts.midiBinding = hs.hotkey.bind(config.hyper, "\\", function()
     midi:toggleMute()
   end)
-  catalog.add("Media", "MainMod + Shift + M", "Toggle RØDECaster mute")
+  catalog.add("Media", "MainMod + \\", "Toggle RØDECaster mute")
 
   local mediaControls = MediaControls.new({commaSelection = services.commaSelection})
   hs.hotkey.bind(config.hyper, "y", function() mediaControls:cycle(1) end, nil,
@@ -28,27 +28,18 @@ function shortcuts.start(services, applications)
   shortcuts.mediaControls = mediaControls
 
   local overlays = ProjectOverlays.new({
-    client = services.client,
     repository = services.repository,
     gate = services.gate,
-    workspaces = services.workspaceNames,
     kittyApp = config.paths.kittyApp,
   })
   overlays:start()
   local textLauncher = TextLauncher.new(services.chooserFactory)
-  local function resetWorkspaces()
-    services.client:focusWorkspace(services.workspaceNames.terminal, function(_, requestError)
-      if requestError then require("modules.layout_orchestrator").report(requestError); return end
-      applications:activate(require("apps")[1], "single", false)
-    end, "workspace_reset")
-  end
   shortcuts.dotMode = DotMode.new({
     modifiers = config.hyper,
     chooserFactory = services.chooserFactory,
     overlays = overlays,
     textLauncher = textLauncher,
-    windows = services.windows,
-    resetWorkspaces = resetWorkspaces,
+    resetLayout = function() services.orchestrator:resetFocused() end,
     emojiPath = config.paths.repository .. "/home/.config/hypr/launcher-data/emoji.txt",
     snippetPath = config.paths.repository .. "/home/.config/hypr/launcher-data/snippets.txt",
   })

@@ -1,8 +1,5 @@
 # Brewfile
 
-tap "nikitabobko/tap"
-
-cask "aerospace"
 cask "yubico-authenticator"
 cask "hammerspoon"
 cask "keepassxc"

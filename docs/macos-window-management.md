@@ -2,156 +2,123 @@
 
 ## Status
 
-This document describes the active architecture. Hammerspoon owns interaction and
-AeroSpace 0.21+ owns managed window state and geometry. The repository-managed
-`home/.aerospace.toml` is a backend-only policy with no workflow bindings, and the
-official AeroSpace Homebrew cask is declared in `setup/macos/Brewfile`.
+Hammerspoon is the only macOS workflow and window-management process. It owns
+global input, application intentions, MRU history, chooser state and passive
+master/stack geometry. It uses the supported macOS Accessibility window API
+exposed by `hs.window`; AeroSpace, Stage Manager, Mission Control and native Spaces
+are not workflow backends.
 
-The completed implementation brief is
-[`aerospace-migration.md`](../aerospace-migration.md). It is intentionally
-self-contained and remains the acceptance record for the migration.
-
-Hyprland remains the behavioral source of truth. The macOS implementation should
-preserve shortcut shapes, held modifiers, navigation semantics and selection
-lifecycle wherever macOS exposes reliable behavior.
+Hyprland remains the behavioral reference. Shortcut shape, selection lifecycle and
+master/stack intent stay aligned where macOS has a reliable equivalent. macOS does
+not emulate Hyprland workspaces or Parking.
 
 ## Responsibility boundaries
 
 | Component | Responsibility |
 | --- | --- |
 | Hyprland | Reference interaction model and shortcut semantics |
-| Hammerspoon | All global shortcuts, modifier/key-release state, Comma Selection, Dot Mode, chooser UI, application intentions, MIDI/hardware integration and master-layout orchestration |
-| AeroSpace | Window tree, tiling geometry, workspace state, monitor assignment, focus, move, swap and resize operations |
+| Hammerspoon | Global shortcuts, held-key state, Comma Selection, Dot Mode, chooser UI, application launch/focus, MRU state, MIDI and explicit window geometry |
+| macOS Accessibility | Native window discovery, focus, close, minimize, restore, frame and display association |
 
-Hammerspoon is the only keyboard-input owner. AeroSpace does not need regular
-keybindings and should not duplicate Hammerspoon shortcuts. A Hammerspoon action
-invokes the `aerospace` CLI asynchronously; the CLI talks to the already-running
-AeroSpace process through its socket protocol.
+Hammerspoon changes frames only in direct response to a shortcut. It does not run
+a permanent reflow loop, create virtual workspaces, hide unrelated applications or
+maintain a competing model of every window on the desktop.
 
 ```text
 keyboard
    |
    v
-Hammerspoon hotkey and mode handling
+Hammerspoon intent and selection
    |
    v
-AeroSpace CLI and socket
-   |
-   v
-AeroSpace window tree
+macOS Accessibility window focus/frame operation
 ```
 
-Hammerspoon is not a second source of managed window geometry.
-It decides the intended operation and asks AeroSpace to execute it. Current window,
-workspace and monitor state should be queried from AeroSpace instead of maintained
-as a competing long-lived model in Lua.
+## Layout model
 
-## Configuration model
-
-AeroSpace is configured declaratively with `aerospace.toml`; it does not provide a
-Lua configuration API. The TOML file owns stable window rules, normalization,
-default layouts, gaps, workspace-to-monitor assignments and lifecycle callbacks.
-It may be installed and linked declaratively by the macOS setup without generating
-TOML from Lua.
-
-Homebrew owns the AeroSpace application and CLI because it is the upstream
-recommended installation path and already owns macOS GUI applications in this
-repository. Nix must not install a second AeroSpace package. The TOML remains
-repository-managed independently of the package source.
-
-`setup/macos/setup-macos.sh` applies `setup/macos/Brewfile` and passes its selected
-configuration consistently to the `nix-darwin` flake. Homebrew is the sole
-AeroSpace package owner.
-
-Dynamic interaction remains Lua because it belongs to Hammerspoon. Hammerspoon
-uses `hs.task` to invoke explicit AeroSpace commands such as `focus`, `swap`,
-`move-node-to-workspace`, `join-with` and `balance-sizes`. Multi-step mutations
-should use one `aerospace eval` call where possible so ordering stays inside
-AeroSpace and the interaction requires only one client/socket round trip.
-
-## Master and stack representation
-
-AeroSpace has an i3-style tree and no native master-layout role. It can represent
-the required visual structure with nested tile containers:
+Hammerspoon retains only the ordered window IDs of the current layout on each
+display:
 
 ```text
-h_tiles
-|- master window
-`- v_tiles
-   |- stack window 1
-   `- stack window 2
+master window | stack window 1
+              | stack window 2
 ```
 
-One window naturally occupies the available area. Two windows use an `h_tiles`
-root and balanced sizes for a 1:1 split. For three windows, `join-with` creates the
-vertical stack on the right.
+One selected window fills the usable display frame. Two windows use a balanced
+left/right split. Three or more retain the left master and divide the right half
+equally between stack windows. `config.navigation.gap` controls both outer and
+inner spacing; zero restores edge-to-edge geometry.
 
-This ratio is a deliberate platform difference: the current Hyprland master uses
-70% for the master and 30% for the stack, while the requested macOS layout is 1:1.
-The navigation keys, Parking behavior and master/right-stack semantics stay the
-same.
+Normal application activation replaces the tracked layout with the selected
+full-size window. Other macOS windows remain unchanged behind it. This is the
+deliberate replacement for Hyprland Parking: no unrelated window is minimized,
+hidden or moved. `Shift + App` and `Shift + P` preserve the current layout and
+append the selected window to its stack. If focus was moved manually to a window
+outside the tracked layout, that focused window becomes the new master first.
 
-Hammerspoon supplies the missing semantics: it decides which window is master,
-where a selected application belongs and when the expected tree needs to be
-restored after a high-level navigation action. AeroSpace remains responsible for
-the resulting geometry and tree mutations.
+`M` focuses the next tracked layout window. `N` rotates window identities through
+the existing visual slots and focuses the window that arrives at the previously
+focused slot. `H` focuses the most recently used visible window on the next
+display. Workspace cycling has no macOS binding.
 
-## Interaction performance
+## Selection and modifiers
 
-This split is suitable for interactive use when the boundary stays coarse:
+`F` is the application filter:
 
-- Hotkeys, held modifiers, key-up acceptance and chooser state remain inside the
-  long-running Hammerspoon process.
-- Each completed navigation action should produce one asynchronous AeroSpace CLI
-  request rather than several blocking shell calls.
-- Comma Selection should query candidate windows once when it opens, cycle locally
-  in Hammerspoon and send only the accepted focus or move operation to AeroSpace.
-- Repeated keys should reuse known selection state and coalesce or reject stale
-  asynchronous results instead of launching overlapping state queries.
-- Explicit window IDs should be passed whenever an action was derived from a
-  chooser, preventing focus changes during the request from changing its target.
+- `MainMod + F + App` always opens the instance chooser.
+- `MainMod + F + ,` limits Comma Selection to the focused application.
 
-The CLI process adds a small launch and socket cost, while actual window operations
-still depend on macOS Accessibility responses from the target application. That
-boundary is appropriate for discrete keyboard actions. Blocking process I/O in a
-hotkey callback or querying the complete window list for every repeat event would
-make the interaction feel slower and must be avoided.
+Shift has two independent, unambiguous roles:
+
+- with an application key or `P`, it adds the selected window to the layout;
+- with Comma Selection or media selection, it retains the existing backward
+  direction.
+
+Comma Selection queries native windows once, cycles locally and accepts the
+highlighted window when the base MainMod keys are released. Window and application
+choices are ordered by Hammerspoon's focus history.
+
+## Application and overlay lifecycle
+
+Application launch uses asynchronous `/usr/bin/open -g` tasks so a pending launch
+does not intentionally steal focus. A request generation prevents a late result
+from applying an obsolete layout intention. Existing hidden or minimized target
+windows are restored before their Accessibility frame is changed.
+
+Project overlays are ordinary Kitty windows. Toggling an overlay restores and
+centres that window on the active display; toggling it off minimizes only that
+window. Only one project overlay is kept visible at a time. No hidden workspace is
+required.
 
 ## Launcher and hardware integration
 
 `hs.chooser` is the shared native selection surface for applications, windows,
 instances, Spotify actions, emoji, snippets, commands and the shortcut catalog.
-It also supports Comma Selection because Hammerspoon can track the selected row
-and accept it on modifier release. Media Comma Selection invokes Spotify through
-an asynchronous `osascript` task after the highlighted action is accepted.
+Spotify actions run asynchronously through `osascript`.
 
-RØDECaster handling stays in Hammerspoon. `hs.midi` owns MIDI input/output,
-device lifecycle and feedback overlays; AeroSpace has no MIDI responsibility.
+RØDECaster MIDI remains entirely in Hammerspoon. `MainMod + Backslash` toggles its
+mute state; hardware callbacks and feedback overlays remain independent of window
+management.
 
 ## Implemented modules
 
-- `modules/aerospace_client.lua` is the only raw CLI/task boundary and retains all
-  active `hs.task` objects.
-- `modules/window_repository.lua` joins AeroSpace records with Accessibility
-  windows; `modules/window_history.lua` owns MRU metadata.
-- `modules/layout_planner.lua` and `modules/layout_orchestrator.lua` translate
-  Parking and master/stack intentions into ordered AeroSpace expressions.
-- Application, window and workspace navigation keep independent high-level logic
-  and share the compact chooser lifecycle.
-- `modules/media_controls.lua` applies the same chooser lifecycle to Spotify's
-  Play/Pause, Next and Previous actions without blocking Hammerspoon.
-- Dot Mode owns screenshots, trusted text/command launchers and project overlays;
-  managed window mutations still go through AeroSpace.
+- `modules/window_repository.lua` exposes usable native windows and joins them with
+  Hammerspoon MRU metadata.
+- `modules/layout_planner.lua` calculates full, split and master/stack frames.
+- `modules/layout_orchestrator.lua` owns the small per-display layout ID lists and
+  applies explicit Accessibility operations.
+- Application and window navigation share the compact chooser and request gate.
+- `modules/media_controls.lua` applies the same selection lifecycle to Spotify.
+- Dot Mode owns screenshots, text launchers and minimized project overlays.
 
-## Platform limits
+## Platform differences
 
-AeroSpace and supported macOS APIs cannot enable or disable physical displays.
-Dot Mode can enumerate connected enabled displays, but selecting one reports that
-no supported toggle API is available. Adding a third-party display-control utility
-requires a separate package and trust decision.
+- Hyprland has Terminal, Display and Parking workspaces; macOS has no workflow
+  workspaces and therefore no `MainMod + G` binding.
+- Hyprland uses a 70/30 master ratio; macOS uses a 1:1 left/right ratio.
+- Hyprland Dot Mode can toggle physical displays. macOS Accessibility cannot, so
+  Dot Mode has no `B` action.
+- macOS has no extra Dot Mode window movement or fullscreen actions.
 
 VS Code project overlays require a path-bearing title such as
-`~/dotfiles | Code`. This signal is present on the target Mac. Titles that expose
-only a folder name are rejected instead of guessing a project directory. Lazygit
-is declared in the macOS Nix package set and becomes available after the next
-normal configuration activation.
+`~/dotfiles | Code`. Non-path titles are rejected rather than guessed.

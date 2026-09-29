@@ -146,10 +146,6 @@ function rofi_picker.new(options)
         return true
     end
 
-    function picker.add_to_stack()
-        if active_selection and active_selection.on_stack then active_selection.on_stack() end
-    end
-
     function picker.bind_cycle(key, callback, description)
         for _, direction in ipairs({ 1, -1 }) do
             local modifier = options.modifier .. (direction < 0 and " + SHIFT" or "")
