@@ -1,7 +1,6 @@
 -- Run from the repository root: lua tests/hammerspoon_layout_borders_test.lua
 package.path = "home/.hammerspoon/?.lua;home/.hammerspoon/?/init.lua;" .. package.path
 
-local focusedID = 1
 local listener
 local canvases = {}
 local snapshots = {
@@ -38,9 +37,6 @@ local function canvasNew(frame)
   return canvas
 end
 
-local focusedWindow = {}
-function focusedWindow:id() return focusedID end
-
 local LayoutBorders = require("modules.layout_borders")
 local borders = LayoutBorders.new(orchestrator, {
   focusColor = {name = "focus"},
@@ -51,7 +47,6 @@ local borders = LayoutBorders.new(orchestrator, {
   canvasBehavior = {},
   canvasLevel = 1,
   canvasNew = canvasNew,
-  focusedWindow = function() return focusedWindow end,
 }):start()
 
 assert(#canvases == 2)
@@ -61,7 +56,7 @@ assert(canvases[1].element.strokeWidth == 4.5)
 assert(canvases[1].currentFrame.x == 5.75 and canvases[1].currentFrame.w == 608.5)
 assert(canvases[1].element.frame.x == 2.25 and canvases[1].element.frame.w == 604)
 
-focusedID = 2
+snapshots["screen-1"].focusedSlot = 2
 listener()
 assert(#canvases == 2)
 assert(canvases[1].element.strokeColor.name == "layout")
@@ -69,7 +64,6 @@ assert(canvases[2].element.strokeColor.name == "focus")
 assert(canvases[1].frameChanges == 0 and canvases[2].frameChanges == 0)
 
 snapshots["screen-1"].slots[2].windowID = 3
-focusedID = 3
 listener()
 assert(#canvases == 2)
 assert(canvases[2].element.strokeColor.name == "focus")

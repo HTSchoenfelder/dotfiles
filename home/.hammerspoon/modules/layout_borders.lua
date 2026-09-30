@@ -1,13 +1,6 @@
 local LayoutBorders = {}
 LayoutBorders.__index = LayoutBorders
 
-local function call(object, method, fallback)
-  if not object or type(object[method]) ~= "function" then return fallback end
-  local ok, value = pcall(object[method], object)
-  if ok then return value end
-  return fallback
-end
-
 local function framesMatch(first, second)
   return first and second
     and first.x == second.x
@@ -29,7 +22,6 @@ function LayoutBorders.new(orchestrator, options, runtime)
     width = options.width or 4.5,
     canvases = {},
     canvasNew = runtime.canvasNew or function(frame) return hs.canvas.new(frame) end,
-    focusedWindow = runtime.focusedWindow or function() return hs.window.focusedWindow() end,
     canvasLevel = runtime.canvasLevel or hs.canvas.windowLevels.overlay,
     canvasBehavior = runtime.canvasBehavior or {
       "canJoinAllSpaces",
@@ -87,13 +79,11 @@ end
 
 function LayoutBorders:refresh()
   if not self.enabled then return end
-  local focused = self.focusedWindow()
-  local focusedID = tonumber(call(focused, "id"))
   local present = {}
   for screenKey, layout in pairs(self.orchestrator:layoutSnapshot()) do
     for index, slot in ipairs(layout.slots) do
       local key = screenKey .. ":" .. tostring(index)
-      local focusedSlot = slot.windowID == focusedID
+      local focusedSlot = index == layout.focusedSlot
       present[key] = true
       self:_draw(
         key,
