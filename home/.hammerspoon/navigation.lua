@@ -28,7 +28,7 @@ function navigation.start()
   local history = WindowHistory.new()
   history:start()
   local repository = WindowRepository.new(history)
-  local orchestrator = LayoutOrchestrator.new(repository, gate, settings)
+  local orchestrator = LayoutOrchestrator.new(repository, gate, settings):start()
   local layoutBorders = LayoutBorders.new(
     orchestrator,
     config.appearance.layoutBorders
@@ -111,7 +111,7 @@ function navigation.start()
         end)
       end,
       onSelect = function(item)
-        windowNavigation:focusComma(item.record, generation)
+        windowNavigation:acceptComma(item.record, generation)
       end,
     })
     if commaSelection.session then commaSelection.session.generation = generation end
@@ -123,9 +123,9 @@ function navigation.start()
 
   catalog.add("Windows", "MainMod + P", "Choose window by last focus")
   catalog.add("Windows", "MainMod + Shift + P", "Choose window and add it to stack")
-  catalog.add("Windows", "MainMod + ,", "Focus windows by last focus")
-  catalog.add("Windows", "MainMod + Shift + ,", "Focus windows backwards")
-  catalog.add("Windows", "MainMod + F + ,", "Focus application windows")
+  catalog.add("Windows", "MainMod + ,", "Adopt windows by last focus")
+  catalog.add("Windows", "MainMod + Shift + ,", "Adopt windows backwards")
+  catalog.add("Windows", "MainMod + F + ,", "Adopt application windows")
   catalog.add("Navigation", "MainMod + M", "Focus next layout window")
   catalog.add("Windows", "MainMod + N", "Rotate window positions")
   catalog.add("Navigation", "MainMod + H", "Focus other display")

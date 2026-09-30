@@ -1,38 +1,36 @@
 -- Run from the repository root: lua tests/hammerspoon_layout_borders_test.lua
 package.path = "home/.hammerspoon/?.lua;home/.hammerspoon/?/init.lua;" .. package.path
 
-local focused
-local records = {}
+local focusedID = 1
 local listener
 local canvases = {}
-local subscribedEvents
-local unsubscribed = false
-
-local function window(id, frame)
-  local value = {windowID = id, currentFrame = frame}
-  function value:id() return self.windowID end
-  function value:frame() return self.currentFrame end
-  return value
-end
-
-local first = window(1, {x = 10, y = 20, w = 600, h = 700})
-local second = window(2, {x = 620, y = 20, w = 600, h = 700})
-focused = first
-records = {{id = 1, window = first}, {id = 2, window = second}}
+local snapshots = {
+  ["screen-1"] = {
+    focusedSlot = 1,
+    slots = {
+      {windowID = 1, frame = {x = 10, y = 20, w = 600, h = 700}},
+      {windowID = 2, frame = {x = 620, y = 20, w = 600, h = 700}},
+    },
+  },
+}
 
 local orchestrator = {}
-function orchestrator:layoutWindows() return records end
+function orchestrator:layoutSnapshot() return snapshots end
 function orchestrator:subscribe(callback)
   listener = callback
   return function() listener = nil end
 end
 
 local function canvasNew(frame)
-  local canvas = {currentFrame = frame}
+  local canvas = {currentFrame = frame, frameChanges = 0}
   function canvas:level() return self end
   function canvas:behavior() return self end
   function canvas:clickActivating() return self end
-  function canvas:frame(value) self.currentFrame = value; return self end
+  function canvas:frame(value)
+    self.currentFrame = value
+    self.frameChanges = self.frameChanges + 1
+    return self
+  end
   function canvas:replaceElements(element) self.element = element; return self end
   function canvas:show() self.visible = true; return self end
   function canvas:delete() self.deleted = true end
@@ -40,44 +38,48 @@ local function canvasNew(frame)
   return canvas
 end
 
-local filter = {}
-function filter:subscribe(events, callback)
-  subscribedEvents = events
-  self.callback = callback
-end
-function filter:unsubscribeAll() unsubscribed = true end
+local focusedWindow = {}
+function focusedWindow:id() return focusedID end
 
 local LayoutBorders = require("modules.layout_borders")
 local borders = LayoutBorders.new(orchestrator, {
-  activeColor = {name = "active"},
-  inactiveColor = {name = "inactive"},
+  focusColor = {name = "focus"},
+  layoutColor = {name = "layout"},
   offset = 2,
-  width = 4,
+  width = 4.5,
 }, {
   canvasBehavior = {},
   canvasLevel = 1,
   canvasNew = canvasNew,
-  events = {"focused", "moved", "destroyed"},
-  filterNew = function() return filter end,
-  focusedWindow = function() return focused end,
+  focusedWindow = function() return focusedWindow end,
 }):start()
 
-assert(#canvases == 2 and #subscribedEvents == 3)
-assert(canvases[1].element.strokeColor.name == "active")
-assert(canvases[2].element.strokeColor.name == "inactive")
-assert(canvases[1].currentFrame.x == 6 and canvases[1].currentFrame.w == 608)
-assert(canvases[1].element.frame.x == 2 and canvases[1].element.frame.w == 604)
+assert(#canvases == 2)
+assert(canvases[1].element.strokeColor.name == "focus")
+assert(canvases[2].element.strokeColor.name == "layout")
+assert(canvases[1].element.strokeWidth == 4.5)
+assert(canvases[1].currentFrame.x == 5.75 and canvases[1].currentFrame.w == 608.5)
+assert(canvases[1].element.frame.x == 2.25 and canvases[1].element.frame.w == 604)
 
-focused = second
-filter.callback()
-assert(canvases[1].element.strokeColor.name == "inactive")
-assert(canvases[2].element.strokeColor.name == "active")
-
-records = {{id = 2, window = second}}
+focusedID = 2
 listener()
-assert(canvases[1].deleted)
+assert(#canvases == 2)
+assert(canvases[1].element.strokeColor.name == "layout")
+assert(canvases[2].element.strokeColor.name == "focus")
+assert(canvases[1].frameChanges == 0 and canvases[2].frameChanges == 0)
+
+snapshots["screen-1"].slots[2].windowID = 3
+focusedID = 3
+listener()
+assert(#canvases == 2)
+assert(canvases[2].element.strokeColor.name == "focus")
+assert(canvases[2].frameChanges == 0)
+
+snapshots["screen-1"].slots[2] = nil
+listener()
+assert(canvases[2].deleted)
 
 borders:stop()
-assert(unsubscribed and listener == nil and canvases[2].deleted)
+assert(listener == nil and canvases[1].deleted)
 
 print("Hammerspoon layout border tests passed")

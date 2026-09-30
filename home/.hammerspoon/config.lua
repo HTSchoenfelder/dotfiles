@@ -9,6 +9,8 @@ config.navigation = {
   launchTimeoutSeconds = 15,
   launchPollIntervalSeconds = 0.1,
   restoreDelaySeconds = 0.08,
+  validationDelaySeconds = 0.08,
+  frameTolerance = 2,
   gap = 5,
   chooserRows = 7,
 }
@@ -31,13 +33,12 @@ config.chooser = {
 
 config.appearance = {
   layoutBorders = {
-    activeColor = {hex = "#cba6f7"},
     enabled = true,
-    highlightFocused = true,
-    inactiveColor = {hex = "#585b70"},
+    focusColor = {hex = "#a6e3a1"},
+    layoutColor = {hex = "#f5c2e7"},
     offset = 2,
     radius = 12,
-    width = 3,
+    width = 4.5,
   },
 }
 

@@ -33,9 +33,12 @@ assert(normalized.screenID == "display" and normalized.window == window)
 
 local secondWindow = setmetatable({}, {__index = window})
 function secondWindow:id() return 2 end
+local fullScreenWindow = setmetatable({}, {__index = window})
+function fullScreenWindow:id() return 3 end
+function fullScreenWindow:isFullScreen() return true end
 local repository = WindowRepository.new(history, {
-  orderedWindows = function() return {window, secondWindow} end,
-  allWindows = function() return {secondWindow, window} end,
+  orderedWindows = function() return {window, secondWindow, fullScreenWindow} end,
+  allWindows = function() return {secondWindow, window, fullScreenWindow} end,
   focusedWindow = function() return secondWindow end,
 })
 local records
@@ -43,6 +46,7 @@ repository:listAll(function(values) records = values end)
 assert(#records == 2 and repository:focusedRecord(records).id == 2)
 local matches = repository:matchingBundle(records, "example.app")
 assert(#matches == 2)
+assert(repository:borderRecord(fullScreenWindow).id == 3)
 
 local gate = RequestGate.new()
 local first = gate:next()
@@ -80,28 +84,22 @@ local windowNavigation = WindowNavigation.new({
 windowNavigation:commaItems(true, function(items) filtered = items end)
 assert(#filtered == 2 and filtered[1].id == 10 and filtered[2].id == 11)
 
-local focusedByComma = false
-local frame = {x = 17, y = 23, w = 640, h = 480}
-local commaApplication = {hidden = true}
-function commaApplication:isHidden() return self.hidden end
-function commaApplication:unhide() self.hidden = false end
-local commaWindow = {minimized = true, frame = frame}
-function commaWindow:application() return commaApplication end
-function commaWindow:isMinimized() return self.minimized end
-function commaWindow:unminimize() self.minimized = false end
-function commaWindow:focus() focusedByComma = true end
+local commaRecord = {id = 40, window = {}}
+local adoptedRecord, adoptedGeneration
 local commaGate = RequestGate.new()
 local commaGeneration = commaGate:next()
 local commaNavigation = WindowNavigation.new({
   repository = fakeRepository,
   gate = commaGate,
-  orchestrator = {activate = function() error("Comma Selection changed the layout") end},
-  after = function(_, callback) callback() end,
+  orchestrator = {
+    adopt = function(_, record, generation)
+      adoptedRecord, adoptedGeneration = record, generation
+    end,
+  },
   allScreens = function() return {} end,
 })
-commaNavigation:focusComma({window = commaWindow}, commaGeneration)
-assert(focusedByComma and not commaWindow.minimized and not commaApplication.hidden)
-assert(commaWindow.frame == frame)
+commaNavigation:acceptComma(commaRecord, commaGeneration)
+assert(adoptedRecord == commaRecord and adoptedGeneration == commaGeneration)
 
 local firstDisplay = {}
 function firstDisplay:getUUID() return "first" end
@@ -131,5 +129,22 @@ assert(placementRequest.record == focusedRecord)
 assert(placementRequest.request.mode == "single" and placementRequest.request.screen == firstDisplay)
 placementNavigation:moveFocusedToOtherDisplay("stack")
 assert(placementRequest.request.mode == "stack" and placementRequest.request.screen == secondDisplay)
+
+local otherDisplayRecord = {id = 21, window = {}, screenID = "second", minimized = false}
+local adoptedOtherDisplay
+local displayNavigation = WindowNavigation.new({
+  repository = {
+    listAll = function(_, callback) callback({focusedRecord, otherDisplayRecord}) end,
+    orderedByHistory = function(_, values) return values end,
+  },
+  gate = RequestGate.new(),
+  orchestrator = {
+    activeScreen = function() return firstDisplay end,
+    adopt = function(_, record) adoptedOtherDisplay = record end,
+  },
+  allScreens = function() return {secondDisplay, firstDisplay} end,
+})
+displayNavigation:focusOtherDisplay()
+assert(adoptedOtherDisplay == otherDisplayRecord)
 
 print("Hammerspoon navigation tests passed")

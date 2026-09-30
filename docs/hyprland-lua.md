@@ -31,8 +31,8 @@ adds the focused window to it. Workspace Comma Selection uses `B` so `G` remains
 an unambiguous display-target modifier.
 
 Comma Selection deliberately diverges after acceptance: Hyprland moves the chosen
-window from Parking into the current workspace, while macOS only restores and
-focuses the native window without changing its display, frame or tracked layout.
+window from Parking into the current workspace, while macOS adopts it into the
+focused slot on its existing display, or creates a single-window layout there.
 
 | File | Responsibility |
 | --- | --- |

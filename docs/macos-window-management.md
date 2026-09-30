@@ -17,17 +17,17 @@ not emulate Hyprland workspaces or Parking.
 | Component | Responsibility |
 | --- | --- |
 | Hyprland | Reference interaction model and shortcut semantics |
-| Hammerspoon | Global shortcuts, held-key state, Comma Selection, Dot Mode, chooser UI, application launch/focus, MRU state, MIDI, explicit window geometry and selective layout frames |
+| Hammerspoon | Global shortcuts, held-key state, Comma Selection, Dot Mode, chooser UI, application launch/focus, MRU state, MIDI, explicit window geometry and layout-slot frames |
 | macOS Accessibility | Native window discovery, focus, close, minimize, restore, frame and display association |
-| JankyBorders | Optional global focused-window border; never layout or navigation |
+| JankyBorders | Optional two-state alternative for global window borders; never layout or navigation |
 
 Hammerspoon changes frames only in direct response to a shortcut. It does not run
 a permanent reflow loop, create virtual workspaces, hide unrelated applications or
 maintain a competing model of every window on the desktop.
 
-The optional Catppuccin layout-frame module observes only the retained layout IDs
-and required native window events. Its canvases are visual and click-through; they
-never trigger geometry changes. See the
+The optional Catppuccin frame module draws only the retained layout slots. Its
+canvases are visual and click-through; replacing the window in a slot does not
+recreate or reposition that slot's frame. See the
 [macOS appearance layer](macos-appearance.md) for switches, service ownership and
 restore commands.
 
@@ -43,8 +43,14 @@ macOS Accessibility window focus/frame operation
 
 ## Layout model
 
-Hammerspoon retains only the ordered window IDs of the current layout on each
-display:
+Hammerspoon retains a compact layout record per display:
+
+```text
+display ID -> { screen, focused slot, slots [{ window ID, frame }] }
+```
+
+The slot frames are the stable visual layout. Window IDs identify the current
+occupants:
 
 ```text
 master window | stack window 1
@@ -60,8 +66,8 @@ Normal application activation replaces the tracked layout with the selected
 full-size window. Other macOS windows remain unchanged behind it. This is the
 deliberate replacement for Hyprland Parking: no unrelated window is minimized,
 hidden or moved. `Shift + App` and `Shift + P` preserve the current layout and
-append the selected window to its stack. If focus was moved manually to a window
-outside the tracked layout, that focused window becomes the new master first.
+append the selected window to its stack. After external focus has reset a layout,
+the next Shift action uses that focused window as the new master.
 
 `MainMod + /` explicitly reduces the current display's tracked layout to the
 focused window. `MainMod + G + /` moves that window to the next display and
@@ -69,10 +75,16 @@ replaces its tracked layout; `MainMod + G + H` moves it there and appends it to 
 existing tracked layout. Windows removed from a layout retain their native frame
 and remain behind the new layout rather than being minimized or hidden.
 
+Native actions outside this model invalidate the affected display's layout. This
+includes focusing an untracked window, manually moving a tracked window, closing,
+minimizing or hiding it, and changing the display configuration. The slot frames
+then disappear instead of trying to infer or repair an externally changed layout.
+
 `M` focuses the next tracked layout window. `N` rotates window identities through
 the existing visual slots and focuses the window that arrives at the previously
-focused slot. `H` focuses the most recently used visible window on the next
-display. Workspace cycling has no macOS binding.
+focused slot. `H` adopts the most recently used visible window on the next display
+into that display's focused slot, or creates a single-window layout there.
+Workspace cycling has no macOS binding.
 
 ## Selection and modifiers
 
@@ -82,8 +94,8 @@ display. Workspace cycling has no macOS binding.
 - `MainMod + F + ,` limits Comma Selection to the focused application.
 
 `G` is a held destination modifier for window placement. It changes the target
-from the current display to the next spatially ordered display and has no effect
-on focus-only actions such as Comma Selection.
+from the current display to the next spatially ordered display. Comma Selection
+never moves a window between displays.
 
 Shift has two independent, unambiguous roles:
 
@@ -92,10 +104,12 @@ Shift has two independent, unambiguous roles:
   direction.
 
 Comma Selection queries native windows once, cycles locally and accepts the
-highlighted window when the base MainMod keys are released. Acceptance only
-restores and focuses the chosen window, like an MRU application switcher; it never
-moves or resizes the window and never changes a tracked layout. Window and
-application choices are ordered by Hammerspoon's focus history.
+highlighted window when the base MainMod keys are released. A window already in a
+layout is focused in its existing slot. An untracked window replaces the focused
+slot on its own display while preserving that slot's frame; without an existing
+layout on that display it creates a single-window layout. This is a controlled
+layout action, but never a cross-display move. Window and application choices are
+ordered by Hammerspoon's focus history.
 
 ## Application and overlay lifecycle
 
@@ -127,11 +141,11 @@ management.
 - `modules/window_repository.lua` exposes usable native windows and joins them with
   Hammerspoon MRU metadata.
 - `modules/layout_planner.lua` calculates full, split and master/stack frames.
-- `modules/layout_orchestrator.lua` owns the small per-display layout ID lists and
-  applies explicit Accessibility operations. It publishes read-only layout changes
-  to visual consumers.
-- `modules/layout_borders.lua` renders event-driven Catppuccin frames for those
-  layout IDs without participating in layout decisions.
+- `modules/layout_orchestrator.lua` owns the per-display slot records, applies
+  explicit Accessibility operations and invalidates layouts after external native
+  changes. It publishes read-only snapshots to visual consumers.
+- `modules/layout_borders.lua` renders event-driven Catppuccin slot frames without
+  participating in layout decisions.
 - Application and window navigation share the compact chooser and request gate.
 - `modules/media_controls.lua` applies the same selection lifecycle to Spotify.
 - Dot Mode owns screenshots, text launchers and minimized project overlays.
@@ -144,6 +158,8 @@ management.
 - Hyprland Dot Mode can toggle physical displays. macOS Accessibility cannot, so
   Dot Mode has no `B` action.
 - macOS has no extra Dot Mode window movement or fullscreen actions.
+- Hyprland Comma Selection brings a chosen window into the current workspace;
+  macOS adopts it into a slot on the window's existing display.
 
 VS Code project overlays require a path-bearing title such as
 `~/dotfiles | Code`. Non-path titles are rejected rather than guessed.

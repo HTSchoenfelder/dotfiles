@@ -6,17 +6,24 @@ use Stage Manager, Mission Control, Spaces or another window manager.
 
 ## Window borders
 
-Hammerspoon draws rounded Catppuccin frames only around windows currently retained
-by its per-display layouts. Surface2 marks inactive layout members and Mauve marks
-the focused member. `config.appearance.layoutBorders` controls the feature, colors,
-width, radius and offset; set `enabled = false` to remove it completely. The module
-subscribes only to layout changes and native window lifecycle, visibility, focus
-and move events. It never moves or resizes a window.
+Hammerspoon draws rounded Catppuccin frames for active layout slots only. Green
+marks the slot occupied by the focused window and Pink marks the other slots.
+Untracked windows have no frame. `config.appearance.layoutBorders` controls the
+feature, colors, width, radius and offset; set `enabled = false` to remove it
+completely. The configured width is 4.5 points.
 
-JankyBorders remains an optional global focus ring. Homebrew installs `borders`,
-but the main setup does not start its service. Its Catppuccin configuration is
-stored in `home/.config/borders/bordersrc`; the inactive color is transparent so
-that Hammerspoon remains responsible for the selective layout frames.
+Frames belong to slot geometry rather than window objects. A focus change updates
+only the colors. When Comma Selection replaces a slot occupant, an unchanged slot
+needs no canvas geometry update at all. Frames are rebuilt only when the explicit
+layout geometry changes. Focusing an untracked window, manually moving a tracked
+window, changing its native lifecycle state or changing the display configuration
+invalidates the affected layout and removes its frames.
+
+JankyBorders remains an optional simpler two-state alternative. Homebrew installs
+`borders`, but the main setup does not start its service. Its Catppuccin
+configuration is stored in `home/.config/borders/bordersrc`. Do not run it together
+with Hammerspoon frames: JankyBorders cannot distinguish layout membership, and
+the two border layers would overlap.
 
 ```sh
 setup/macos/setup-appearance.sh borders-start
@@ -24,8 +31,8 @@ setup/macos/setup-appearance.sh borders-stop
 ```
 
 The Homebrew service starts at login and must remain running to follow global
-focus. When it is enabled, `highlightFocused = false` may be used in the
-Hammerspoon appearance configuration if only one active ring is desired.
+focus. Before enabling it, set the Hammerspoon frame configuration to
+`enabled = false` and reload Hammerspoon.
 
 ## Native choosers
 

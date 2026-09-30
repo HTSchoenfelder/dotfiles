@@ -16,10 +16,10 @@ documented.
 
 Hammerspoon is the only macOS workflow and window-management process. It owns
 shortcuts, modes, choosers, application intentions, MRU state, MIDI integration,
-passive master/stack geometry and selective layout frames through native windows.
+passive master/stack geometry and layout-slot frames through native windows.
 It changes frames only for explicit actions and does not use AeroSpace, Stage
-Manager, Mission Control or Spaces. JankyBorders may run as a separate optional
-focus-ring service but never owns navigation or layout. See the
+Manager, Mission Control or Spaces. JankyBorders remains an optional two-state
+alternative but must not run alongside Hammerspoon's window frames. See the
 [macOS window-management architecture](docs/macos-window-management.md) and
 [optional appearance layer](docs/macos-appearance.md).
 
@@ -41,8 +41,8 @@ keeps the current layout and adds the selected window to the right stack. Holdin
 | `mainMod + Shift + app key` | Add the selected application to the right stack |
 | `mainMod + F + app key` | Select an application window before placing it |
 | `mainMod + P` / `mainMod + Shift + P` | Select any window by recent focus; replace the layout / add it to the stack |
-| `mainMod + ,` / `mainMod + Shift + ,` | Focus windows forward/backward by MRU without changing their layout; release `mainMod` to accept |
-| `mainMod + F + ,` | Focus windows of the current application without changing their layout |
+| `mainMod + ,` / `mainMod + Shift + ,` | Adopt windows forward/backward by MRU into a slot on their current display; release `mainMod` to accept |
+| `mainMod + F + ,` | Adopt windows of the current application on their current display |
 | `mainMod + Y` / `mainMod + Shift + Y` | Cycle through Spotify Play/Pause, Next and Previous; release `mainMod` to accept |
 | `mainMod + M` | Focus the next window in the active layout |
 | `mainMod + N` | Rotate positions while retaining focus on the visual slot |
@@ -58,13 +58,18 @@ keeps the current layout and adds the selected window to the right stack. Holdin
 Application, window and comma selection use the same compact `hs.chooser`
 presentation with Catppuccin text colors, application icons and subdued window
 titles. The application launcher lists top-level bundles from the standard
-application directories with their native icons. Tracked layout windows receive a
-muted Catppuccin frame and the focused member is highlighted. Both the titles and
-layout frames can be disabled in `home/.hammerspoon/config.lua`. macOS has no
-workflow workspaces or Parking state.
+application directories with their native icons. Active layout slots receive a
+Catppuccin frame: Green for the focused occupant and Pink for other slots;
+untracked windows have no frame. Both the titles and slot frames can be disabled
+in `home/.hammerspoon/config.lua`. macOS has no workflow workspaces or Parking
+state.
 
 Managed layouts use one full-size window, a 1:1 left/right split for two windows,
 and a left master with a vertical right stack for three or more windows.
+Focusing an untracked window or manually changing a tracked window resets the
+affected display's retained layout. Comma Selection is controlled: it focuses an
+existing member or replaces the focused slot with a window already on that
+display; it never moves a window across displays.
 
 ## Hyprland quick reference
 

@@ -24,7 +24,6 @@ end
 
 function WindowNavigation.new(options)
   options.allScreens = options.allScreens or function() return hs.screen.allScreens() end
-  options.after = options.after or function(delay, callback) hs.timer.doAfter(delay, callback) end
   return setmetatable(options, WindowNavigation)
 end
 
@@ -74,24 +73,8 @@ function WindowNavigation:commaItems(instancesOnly, callback)
   end)
 end
 
-function WindowNavigation:focusComma(record, generation)
-  if not record or not record.window or not self.gate:isCurrent(generation)
-      or not self.repository:isUsable(record.window) then return end
-  local window = record.window
-  local restored = false
-  local application = window:application()
-  if application and application:isHidden() then
-    application:unhide()
-    restored = true
-  end
-  if window:isMinimized() then
-    window:unminimize()
-    restored = true
-  end
-  local function focus()
-    if self.gate:isCurrent(generation) and self.repository:isUsable(window) then window:focus() end
-  end
-  if restored then self.after(0.08, focus) else focus() end
+function WindowNavigation:acceptComma(record, generation)
+  self.orchestrator:adopt(record, generation)
 end
 
 function WindowNavigation:focusNext()
@@ -150,7 +133,7 @@ function WindowNavigation:moveFocusedToOtherDisplay(mode)
 end
 
 function WindowNavigation:focusOtherDisplay()
-  self.gate:next()
+  local generation = self.gate:next()
   local targetScreen = self:_otherScreen(self.orchestrator:activeScreen())
   if not targetScreen then return end
   local targetID = WindowRepository.screenIdentifier(targetScreen)
@@ -162,7 +145,9 @@ function WindowNavigation:focusOtherDisplay()
       end
     end
     local target = candidates[1]
-    if target and target.window then target.window:focus() end
+    if target and self.gate:isCurrent(generation) then
+      self.orchestrator:adopt(target, generation)
+    end
   end)
 end
 

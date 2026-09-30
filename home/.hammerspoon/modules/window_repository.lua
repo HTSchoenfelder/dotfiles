@@ -13,15 +13,15 @@ local function screenIdentifier(screen)
   return call(screen, "getUUID") or tostring(call(screen, "id", "unknown"))
 end
 
-local function isUsable(window)
+local function isUsable(window, allowFullScreen)
   local id = call(window, "id")
   return id ~= nil
     and call(window, "isStandard", true) ~= false
-    and call(window, "isFullScreen", false) ~= true
+    and (allowFullScreen or call(window, "isFullScreen", false) ~= true)
 end
 
-local function record(window)
-  if not isUsable(window) then return nil end
+local function record(window, allowFullScreen)
+  if not isUsable(window, allowFullScreen) then return nil end
   local application = call(window, "application")
   local screen = call(window, "screen")
   return {
@@ -53,6 +53,10 @@ end
 
 function WindowRepository:record(window)
   return record(window)
+end
+
+function WindowRepository:borderRecord(window)
+  return record(window, true)
 end
 
 function WindowRepository:recordForID(windowID)
