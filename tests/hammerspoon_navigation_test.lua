@@ -103,4 +103,33 @@ commaNavigation:focusComma({window = commaWindow}, commaGeneration)
 assert(focusedByComma and not commaWindow.minimized and not commaApplication.hidden)
 assert(commaWindow.frame == frame)
 
+local firstDisplay = {}
+function firstDisplay:getUUID() return "first" end
+function firstDisplay:frame() return {x = 0, y = 0, w = 1000, h = 800} end
+local secondDisplay = {}
+function secondDisplay:getUUID() return "second" end
+function secondDisplay:frame() return {x = 1000, y = 0, w = 1000, h = 800} end
+local nativeWindow = {}
+function nativeWindow:screen() return firstDisplay end
+local focusedRecord = {id = 20, window = nativeWindow, screen = firstDisplay}
+local placementRequest
+local placementGate = RequestGate.new()
+local placementNavigation = WindowNavigation.new({
+  repository = {
+    focusedWindow = function() return nativeWindow end,
+    record = function() return focusedRecord end,
+  },
+  gate = placementGate,
+  orchestrator = {
+    activeScreen = function() return firstDisplay end,
+    activate = function(_, record, request) placementRequest = {record = record, request = request} end,
+  },
+  allScreens = function() return {secondDisplay, firstDisplay} end,
+})
+placementNavigation:makeFocusedSingle()
+assert(placementRequest.record == focusedRecord)
+assert(placementRequest.request.mode == "single" and placementRequest.request.screen == firstDisplay)
+placementNavigation:moveFocusedToOtherDisplay("stack")
+assert(placementRequest.request.mode == "stack" and placementRequest.request.screen == secondDisplay)
+
 print("Hammerspoon navigation tests passed")

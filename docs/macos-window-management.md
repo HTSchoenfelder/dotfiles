@@ -56,6 +56,12 @@ hidden or moved. `Shift + App` and `Shift + P` preserve the current layout and
 append the selected window to its stack. If focus was moved manually to a window
 outside the tracked layout, that focused window becomes the new master first.
 
+`MainMod + /` explicitly reduces the current display's tracked layout to the
+focused window. `MainMod + G + /` moves that window to the next display and
+replaces its tracked layout; `MainMod + G + H` moves it there and appends it to the
+existing tracked layout. Windows removed from a layout retain their native frame
+and remain behind the new layout rather than being minimized or hidden.
+
 `M` focuses the next tracked layout window. `N` rotates window identities through
 the existing visual slots and focuses the window that arrives at the previously
 focused slot. `H` focuses the most recently used visible window on the next
@@ -67,6 +73,10 @@ display. Workspace cycling has no macOS binding.
 
 - `MainMod + F + App` always opens the instance chooser.
 - `MainMod + F + ,` limits Comma Selection to the focused application.
+
+`G` is a held destination modifier for window placement. It changes the target
+from the current display to the next spatially ordered display and has no effect
+on focus-only actions such as Comma Selection.
 
 Shift has two independent, unambiguous roles:
 
@@ -116,7 +126,7 @@ management.
 ## Platform differences
 
 - Hyprland has Terminal, Display and Parking workspaces; macOS has no workflow
-  workspaces and therefore no `MainMod + G` binding.
+  workspaces. Hyprland cycles them with `MainMod + B`.
 - Hyprland uses a 70/30 master ratio; macOS uses a 1:1 left/right ratio.
 - Hyprland Dot Mode can toggle physical displays. macOS Accessibility cannot, so
   Dot Mode has no `B` action.

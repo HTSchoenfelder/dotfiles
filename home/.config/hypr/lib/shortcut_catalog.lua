@@ -14,6 +14,7 @@ local key_names = {
     comma = ",",
     period = ".",
     semicolon = ";",
+    slash = "/",
     SHIFT = "Shift",
     CTRL = "Ctrl",
     CONTROL = "Ctrl",

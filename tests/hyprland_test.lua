@@ -171,6 +171,37 @@ test("position rotation retains the focused layout slot", function(session)
     assert(session.focused == third and session.layout_order[2] == third)
 end)
 
+test("slash keeps only the focused window in the current layout", function(session)
+    local focused = session.add("code", 1)
+    local other = session.add("kitty", 1)
+    session.focus(focused)
+    session.press(modifier .. "slash")
+    assert(session.focused == focused and focused.workspace.id == 1)
+    assert(other.workspace.id == 10)
+end)
+
+test("G slash moves the focused window to the other display and replaces its layout", function(session)
+    session.monitors[2].enabled = true
+    local focused = session.add("code", 1)
+    local other = session.add("kitty", 2)
+    session.focus(focused)
+    session.held.g = true
+    session.press(modifier .. "slash")
+    assert(session.focused == focused and focused.workspace.id == 2)
+    assert(other.workspace.id == 10)
+end)
+
+test("G H moves the focused window to the other display and preserves its layout", function(session)
+    session.monitors[2].enabled = true
+    local focused = session.add("code", 1)
+    local other = session.add("kitty", 2)
+    session.focus(focused)
+    session.held.g = true
+    session.press(modifier .. "H")
+    assert(session.focused == focused and focused.workspace.id == 2)
+    assert(other.workspace.id == 2)
+end)
+
 test("quick comma release selects the previous window without mapping Rofi", function(session)
     local current = session.add("kitty", 1, 0)
     local previous = session.add("code", 10, 1)
@@ -284,23 +315,23 @@ test("a reload discards a result waiting for keyboard focus restoration", functi
     for _, command in ipairs(session.commands) do assert(command.arguments[1] ~= "playerctl") end
 end)
 
-test("G cycles regular workspaces by last focus", function(session)
+test("B cycles regular workspaces by last focus", function(session)
     session.space("special:test")
     session.press(modifier .. "H")
     session.press(modifier .. "H")
-    session.press(modifier .. "G")
+    session.press(modifier .. "B")
     session.press("Control_R")
     assert(session.current.id == 2)
 end)
 
-test("Shift G starts at the opposite end of the MRU list", function(session)
-    session.press(modifier .. "SHIFT + G")
+test("Shift B starts at the opposite end of the MRU list", function(session)
+    session.press(modifier .. "SHIFT + B")
     session.press("Super_L")
     assert(session.current.id == 10)
 end)
 
 test("removed workspaces are not recreated by stale selection", function(session)
-    session.press(modifier .. "G")
+    session.press(modifier .. "B")
     session.spaces["2"] = nil
     session.choose(1)
     assert(session.current.id == 1 and not session.spaces["2"])
@@ -519,6 +550,8 @@ test("Shift R opens a read-only catalog with global, dot mode and hardware short
 
     assert(labels:find("MainMod + J — Navigate to Kitty / Zellij", 1, true))
     assert(labels:find("MainMod + Shift + R — Show shortcut catalog", 1, true))
+    assert(labels:find("MainMod + B — Cycle workspaces by last focus", 1, true))
+    assert(labels:find("MainMod + G + / — Move window to other display and replace layout", 1, true))
     assert(labels:find("MainMod + . → Q — Capture region", 1, true))
     assert(labels:find("XF86AudioRaiseVolume — Raise volume", 1, true))
     assert(not labels:find("catchall", 1, true))

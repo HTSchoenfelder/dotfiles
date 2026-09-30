@@ -30,6 +30,8 @@ function support.session()
     session.space(1).monitor = session.monitors[1]
     session.space(2).monitor = session.monitors[2]
     session.space(10).monitor = session.monitors[1]
+    session.monitors[1].active_workspace = session.space(1)
+    session.monitors[2].active_workspace = session.space(2)
 
     function session.emit(event, ...)
         for _, callback in ipairs(session.events[event] or {}) do callback(...) end
@@ -56,7 +58,10 @@ function support.session()
     end
     function session.focus(window)
         session.focused = window
-        if window then session.current = window.workspace end
+        if window then
+            session.current = window.workspace
+            if window.workspace.monitor then window.workspace.monitor.active_workspace = window.workspace end
+        end
         session.emit("window.active", window)
     end
     function session.press(key)
@@ -205,6 +210,9 @@ function support.session()
                 if window then session.focus(window)
                 else
                     session.current = session.space(arguments.workspace)
+                    if session.current.monitor then
+                        session.current.monitor.active_workspace = session.current
+                    end
                     session.emit("workspace.active", session.current)
                 end
             elseif action.kind == "float" then window.floating = arguments.action == "set"

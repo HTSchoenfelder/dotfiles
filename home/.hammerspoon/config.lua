@@ -5,6 +5,7 @@ config.log = hs.logger.new("hammerspoon", "debug")
 
 config.navigation = {
   instanceKey = "f",
+  monitorKey = "g",
   launchTimeoutSeconds = 15,
   launchPollIntervalSeconds = 0.1,
   restoreDelaySeconds = 0.08,

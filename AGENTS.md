@@ -60,6 +60,8 @@ See `docs/hyprland-desktop.md` for the current service, portal and toolkit owner
 - **Comma Selection** cycles in Rofi and accepts on `mainMod` release.
 - `Shift + App` and `Shift + P` add a selected window to the current layout.
 - `F + App` chooses an instance and `F + comma` filters by the focused app.
+- `/` keeps only the focused window in the current layout. Held `G` targets the
+  next display: `G + /` replaces its layout and `G + H` adds to it.
 - During Comma Selection, Shift always means backward and never add-to-stack.
 - On macOS, Comma Selection only restores and focuses its target; it never changes
   display assignment, frame geometry or the tracked layout.
@@ -67,6 +69,8 @@ See `docs/hyprland-desktop.md` for the current service, portal and toolkit owner
 - **Terminal Workspace** is workspace 1 (``) on the primary display.
 - **Display Workspace** is workspace 2 (`󰍹`) on the secondary display.
 - **Parking Workspace** is workspace 10 (`󰮍`).
+- Hyprland workspace Comma Selection uses `mainMod + B`; `G` is reserved as the
+  held display-target modifier.
 - Hyprpaper and Hypridle remain compositor-session processes. Do not resume the
   currently paused Hypridle process unless Henrik requests it.
 

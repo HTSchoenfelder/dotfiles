@@ -45,7 +45,27 @@ bind("SHIFT + R", function()
     shortcut_catalog.open(picker)
 end, "Show shortcut catalog", "Launchers")
 bind("W", hl.dsp.window.close(), "Close window", "Windows")
-bind("H", function() spaces.switch_between(workspaces.primary) end, "Switch between workspaces 1 and 2", "Navigation")
+hl.bind(settings.modifier .. " + " .. settings.monitor_key, hl.dsp.no_op(), {
+    description = "Target other display",
+})
+hl.bind(settings.modifier .. " + H", function()
+    if hl.is_key_down(settings.monitor_key:lower()) then
+        windows.move_focused_to_other_monitor(true)
+    else
+        spaces.switch_between(workspaces.primary)
+    end
+end, { description = "Switch workspace or move window to other display" })
+hl.bind(settings.modifier .. " + slash", function()
+    if hl.is_key_down(settings.monitor_key:lower()) then
+        windows.move_focused_to_other_monitor(false)
+    else
+        windows.keep_focused_only()
+    end
+end, { description = "Keep focused window as the only layout window" })
+shortcut_catalog.add("Navigation", shortcut_catalog.main("H"), "Switch between workspaces 1 and 2")
+shortcut_catalog.add("Windows", shortcut_catalog.main("slash"), "Keep only focused window in layout")
+shortcut_catalog.add("Windows", shortcut_catalog.main("G + slash"), "Move window to other display and replace layout")
+shortcut_catalog.add("Windows", shortcut_catalog.main("G + H"), "Move window to other display and add to layout")
 bind("M", hl.dsp.layout("cyclenext"), "Focus next window", "Navigation")
 bind("N", window_navigation.rotate_positions, "Rotate window positions", "Windows")
 
@@ -89,13 +109,13 @@ shortcut_catalog.add("Windows", shortcut_catalog.main("comma"), "Cycle windows b
 shortcut_catalog.add("Windows", shortcut_catalog.main("SHIFT + comma"), "Cycle windows backwards")
 shortcut_catalog.add("Windows", shortcut_catalog.main("F + comma"), "Cycle application windows")
 shortcut_catalog.add("Windows", shortcut_catalog.main("SHIFT + P"), "Choose window and add it to stack")
-picker.bind_cycle("G", function(direction)
+picker.bind_cycle("B", function(direction)
     if picker.is_open() then return end
     windows.invalidate_pending_focus()
-    spaces.cycle(direction, "G")
+    spaces.cycle(direction, "B")
 end, "Cycle workspaces by last focus")
-shortcut_catalog.add("Navigation", shortcut_catalog.main("G"), "Cycle workspaces by last focus")
-shortcut_catalog.add("Navigation", shortcut_catalog.main("SHIFT + G"), "Cycle workspaces backwards")
+shortcut_catalog.add("Navigation", shortcut_catalog.main("B"), "Cycle workspaces by last focus")
+shortcut_catalog.add("Navigation", shortcut_catalog.main("SHIFT + B"), "Cycle workspaces backwards")
 picker.bind_cycle("Y", function(direction)
     if picker.is_open() then return end
     windows.invalidate_pending_focus()

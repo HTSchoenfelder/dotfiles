@@ -46,6 +46,7 @@ function navigation.start()
   local heldKeys = HeldKeys.new(config.hyper)
 
   heldKeys:track(settings.instanceKey)
+  heldKeys:track(settings.monitorKey)
 
   for _, application in ipairs(applications) do
     hs.hotkey.bind(config.hyper, application.key, function()
@@ -70,7 +71,20 @@ function navigation.start()
 
   hs.hotkey.bind(config.hyper, "m", function() windowNavigation:focusNext() end)
   hs.hotkey.bind(config.hyper, "n", function() windowNavigation:rotatePositions() end)
-  hs.hotkey.bind(config.hyper, "h", function() windowNavigation:focusOtherDisplay() end)
+  hs.hotkey.bind(config.hyper, "h", function()
+    if heldKeys:isDown(settings.monitorKey) then
+      windowNavigation:moveFocusedToOtherDisplay("stack")
+    else
+      windowNavigation:focusOtherDisplay()
+    end
+  end)
+  hs.hotkey.bind(config.hyper, "/", function()
+    if heldKeys:isDown(settings.monitorKey) then
+      windowNavigation:moveFocusedToOtherDisplay("single")
+    else
+      windowNavigation:makeFocusedSingle()
+    end
+  end)
   hs.hotkey.bind(config.hyper, "w", function() windowNavigation:closeFocused() end)
   hs.hotkey.bind(config.hyper, "p", function() windowNavigation:chooseAny("single") end)
   hs.hotkey.bind(shifted(config.hyper), "p", function() windowNavigation:chooseAny("stack") end)
@@ -110,6 +124,9 @@ function navigation.start()
   catalog.add("Navigation", "MainMod + M", "Focus next layout window")
   catalog.add("Windows", "MainMod + N", "Rotate window positions")
   catalog.add("Navigation", "MainMod + H", "Focus other display")
+  catalog.add("Windows", "MainMod + /", "Keep only focused window in layout")
+  catalog.add("Windows", "MainMod + G + /", "Move window to other display and replace layout")
+  catalog.add("Windows", "MainMod + G + H", "Move window to other display and add to layout")
   catalog.add("Windows", "MainMod + W", "Close focused window")
 
   navigation.services = {

@@ -95,11 +95,9 @@ function WindowNavigation:closeFocused()
   self.orchestrator:closeFocused()
 end
 
-function WindowNavigation:focusOtherDisplay()
-  self.gate:next()
-  local current = self.orchestrator:activeScreen()
+function WindowNavigation:_otherScreen(current)
   local screens = self.allScreens()
-  if #screens < 2 or not current then return end
+  if #screens < 2 or not current then return nil end
   table.sort(screens, function(first, second)
     local firstFrame, secondFrame = first:frame(), second:frame()
     if firstFrame.x ~= secondFrame.x then return firstFrame.x < secondFrame.x end
@@ -110,7 +108,37 @@ function WindowNavigation:focusOtherDisplay()
   for index, screen in ipairs(screens) do
     if WindowRepository.screenIdentifier(screen) == currentID then currentIndex = index; break end
   end
-  local targetScreen = screens[currentIndex % #screens + 1]
+  return screens[currentIndex % #screens + 1]
+end
+
+function WindowNavigation:makeFocusedSingle()
+  local generation = self.gate:next()
+  local focused = self.repository:record(self.repository.focusedWindow())
+  if not focused then return end
+  self.orchestrator:activate(focused, {
+    generation = generation,
+    mode = "single",
+    screen = focused.screen or self.orchestrator:activeScreen(),
+  })
+end
+
+function WindowNavigation:moveFocusedToOtherDisplay(mode)
+  local generation = self.gate:next()
+  local focused = self.repository:record(self.repository.focusedWindow())
+  if not focused then return end
+  local targetScreen = self:_otherScreen(focused.screen or self.orchestrator:activeScreen())
+  if not targetScreen then return end
+  self.orchestrator:activate(focused, {
+    generation = generation,
+    mode = mode,
+    screen = targetScreen,
+  })
+end
+
+function WindowNavigation:focusOtherDisplay()
+  self.gate:next()
+  local targetScreen = self:_otherScreen(self.orchestrator:activeScreen())
+  if not targetScreen then return end
   local targetID = WindowRepository.screenIdentifier(targetScreen)
   self:_records(function(records)
     local candidates = {}

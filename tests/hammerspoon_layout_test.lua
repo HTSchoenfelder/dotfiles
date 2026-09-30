@@ -12,6 +12,9 @@ assert(frames[3].x == 502 and frames[3].y == 402 and frames[3].h == 393)
 local screen = {}
 function screen:getUUID() return "screen-1" end
 function screen:frame() return {x = 0, y = 0, w = 1000, h = 800} end
+local secondScreen = {}
+function secondScreen:getUUID() return "screen-2" end
+function secondScreen:frame() return {x = 1000, y = 0, w = 1000, h = 800} end
 
 local application = {}
 function application:isHidden() return false end
@@ -19,16 +22,17 @@ function application:unhide() self.hidden = false end
 
 local windows = {}
 local focused
-local function newWindow(id)
-  local window = {windowID = id, appliedFrames = {}}
+local function newWindow(id, initialScreen)
+  local window = {windowID = id, appliedFrames = {}, currentScreen = initialScreen or screen}
   function window:id() return self.windowID end
   function window:isStandard() return true end
   function window:isFullScreen() return false end
   function window:isMinimized() return false end
   function window:application() return application end
-  function window:screen() return screen end
+  function window:screen() return self.currentScreen end
   function window:setFrameWithWorkarounds(frame)
     self.frame = frame
+    self.currentScreen = frame.x >= 1000 and secondScreen or screen
     self.appliedFrames[#self.appliedFrames + 1] = frame
   end
   function window:focus() focused = self end
@@ -38,15 +42,16 @@ local function newWindow(id)
 end
 
 local first, second, third, fourth = newWindow(1), newWindow(2), newWindow(3), newWindow(4)
+local fifth = newWindow(5, secondScreen)
 focused = first
 local repository = {
   focusedWindow = function() return focused end,
   recordForID = function(_, id)
     local window = windows[id]
-    return window and {id = id, window = window, screen = screen}
+    return window and {id = id, window = window, screen = window:screen()}
   end,
   record = function(_, window)
-    return window and {id = window:id(), window = window, screen = screen}
+    return window and {id = window:id(), window = window, screen = window:screen()}
   end,
   isUsable = function(_, window) return window and not window.closed end,
 }
@@ -99,5 +104,22 @@ orchestrator:activate({id = 1, window = first, screen = screen}, {
 layout = orchestrator.layouts["screen-1"]
 assert(#layout.ids == 2 and layout.ids[1] == 4 and layout.ids[2] == 1,
   table.concat(layout.ids, ","))
+
+orchestrator.layouts["screen-2"] = {screen = secondScreen, ids = {5}}
+focused = first
+generation = gate:next()
+orchestrator:activate({id = 1, window = first, screen = screen}, {
+  generation = generation, mode = "stack", screen = secondScreen,
+})
+local secondLayout = orchestrator.layouts["screen-2"]
+assert(#secondLayout.ids == 2 and secondLayout.ids[1] == 5 and secondLayout.ids[2] == 1)
+assert(first:screen() == secondScreen and fifth:screen() == secondScreen)
+
+generation = gate:next()
+orchestrator:activate({id = 2, window = second, screen = screen}, {
+  generation = generation, mode = "single", screen = secondScreen,
+})
+assert(#secondLayout.ids == 1 and secondLayout.ids[1] == 2)
+assert(second:screen() == secondScreen)
 
 print("Hammerspoon layout planning tests passed")

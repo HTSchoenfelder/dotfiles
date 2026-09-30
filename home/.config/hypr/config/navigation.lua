@@ -1,6 +1,7 @@
 return {
     modifier = "SUPER + CTRL + ALT",
     instance_key = "F",
+    monitor_key = "G",
     cycle_rows = 7,
     launch_timeout_ms = 15000,
     applications = {

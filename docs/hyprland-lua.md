@@ -25,6 +25,11 @@ chooses an application instance or restricts Comma Selection to the focused
 application. Shift remains exclusively the backward direction during Comma
 Selection and media/workspace cycling.
 
+`/` reduces the current workspace layout to the focused window. Held `G` targets
+the next monitor's active workspace: `G + /` replaces that layout, while `G + H`
+adds the focused window to it. Workspace Comma Selection uses `B` so `G` remains
+an unambiguous display-target modifier.
+
 Comma Selection deliberately diverges after acceptance: Hyprland moves the chosen
 window from Parking into the current workspace, while macOS only restores and
 focuses the native window without changing its display, frame or tracked layout.

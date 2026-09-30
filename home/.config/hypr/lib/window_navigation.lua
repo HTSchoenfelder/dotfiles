@@ -18,6 +18,29 @@ local function matches_application(window, application)
     return not application or window.class:lower() == application.class:lower()
 end
 
+local function monitor_position(monitor)
+    local position = monitor.position or {}
+    return position.x or monitor.x or 0, position.y or monitor.y or 0
+end
+
+local function other_monitor()
+    local current = hl.get_active_monitor()
+    if not current then return end
+    local monitors = hl.get_monitors()
+    table.sort(monitors, function(first, second)
+        local first_x, first_y = monitor_position(first)
+        local second_x, second_y = monitor_position(second)
+        if first_x ~= second_x then return first_x < second_x end
+        return first_y < second_y
+    end)
+    if #monitors < 2 then return end
+    local current_index = 1
+    for index, monitor in ipairs(monitors) do
+        if monitor == current or monitor.name == current.name then current_index = index; break end
+    end
+    return monitors[current_index % #monitors + 1]
+end
+
 function window_navigation.list(application)
     local windows = {}
     for _, window in ipairs(hl.get_windows({ mapped = true })) do
@@ -186,6 +209,27 @@ function window_navigation.new(options, picker)
         local active_window = hl.get_active_window()
         local initial_index = compositor.next_index(windows, direction, active_window and active_window.address)
         select_window(nil, windows, request, key, initial_index)
+    end
+
+    local function place_focused(workspace, add_to_stack)
+        local window = hl.get_active_window()
+        if not window or not workspace then return end
+        latest_request = nil
+        picker.cancel()
+        window_navigation.show(window, {
+            workspace = workspace.addressable_name,
+            add_to_stack = add_to_stack == true,
+        }, parking_workspace)
+    end
+
+    function navigation.keep_focused_only()
+        place_focused(compositor.active_workspace(), false)
+    end
+
+    function navigation.move_focused_to_other_monitor(add_to_stack)
+        local monitor = other_monitor()
+        if not monitor then return end
+        place_focused(monitor.active_workspace, add_to_stack)
     end
 
     -- Other picker domains also supersede launches that have not produced a window yet.

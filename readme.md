@@ -44,6 +44,9 @@ keeps the current layout and adds the selected window to the right stack. Holdin
 | `mainMod + M` | Focus the next window in the active layout |
 | `mainMod + N` | Rotate positions while retaining focus on the visual slot |
 | `mainMod + H` | Focus the most recent window on the other display |
+| `mainMod + /` | Keep only the focused window in the current display layout |
+| `mainMod + G + /` | Move the focused window to the next display and replace its layout |
+| `mainMod + G + H` | Move the focused window to the next display and add it to its layout |
 | `mainMod + W` | Close the focused window |
 | `mainMod + R` | Toggle the native application launcher |
 | `mainMod + Shift + R` | Show the searchable shortcut catalog |
@@ -78,9 +81,12 @@ master stack. Hold `F` to choose an existing instance.
 | `mainMod + P` / `mainMod + Shift + P` | Select any window / select and add it to the stack |
 | `mainMod + ,` / `mainMod + Shift + ,` | Comma selection through windows forward/backward; release `mainMod` to accept |
 | `mainMod + F + ,` | Comma selection through instances of the focused app |
-| `mainMod + G` / `mainMod + Shift + G` | Comma selection through workspaces forward/backward |
+| `mainMod + B` / `mainMod + Shift + B` | Comma selection through workspaces forward/backward |
 | `mainMod + Y` / `mainMod + Shift + Y` | Comma selection through Play/Pause, Next and Previous |
 | `mainMod + H` | Switch between workspaces 1 and 2 |
+| `mainMod + /` | Keep only the focused window in the current workspace layout |
+| `mainMod + G + /` | Move the focused window to the next display and replace its active workspace layout |
+| `mainMod + G + H` | Move the focused window to the next display and add it to its active workspace layout |
 | `mainMod + M` | Focus the next layout window |
 | `mainMod + N` | Rotate window positions while retaining the focused slot |
 | `mainMod + W` | Close the focused window |
