@@ -119,6 +119,19 @@ local function slotIDs(layout)
   return table.concat(ids, ",")
 end
 
+local function assertLayoutInvariants()
+  local seen = {}
+  for _, currentLayout in pairs(orchestrator.layouts) do
+    assert(#currentLayout.slots > 0)
+    assert(currentLayout.focusedSlot >= 1 and currentLayout.focusedSlot <= #currentLayout.slots)
+    for _, slot in ipairs(currentLayout.slots) do
+      assert(not seen[slot.windowID], "window belongs to more than one layout")
+      assert(slot.frame and slot.frame.x and slot.frame.y and slot.frame.w and slot.frame.h)
+      seen[slot.windowID] = true
+    end
+  end
+end
+
 local generation = gate:next()
 orchestrator:activate({id = 1, window = first, screen = screen}, {
   generation = generation, mode = "single", screen = screen,
@@ -126,6 +139,7 @@ orchestrator:activate({id = 1, window = first, screen = screen}, {
 assert(orchestrator.layouts["screen-1"].slots[1].windowID == 1)
 assert(first:frame().x == 5 and first:frame().w == 990)
 assert(#scheduledDelays == 0 and layoutChanges == 1)
+assertLayoutInvariants()
 
 local firstFrameCount, firstFocusCount = #first.appliedFrames, first.focusCalls
 generation = gate:next()
@@ -133,6 +147,7 @@ orchestrator:activate({id = 1, window = first, screen = screen}, {
   generation = generation, mode = "single", screen = screen,
 })
 assert(#first.appliedFrames == firstFrameCount and first.focusCalls == firstFocusCount)
+assertLayoutInvariants()
 
 generation = gate:next()
 orchestrator:activate({id = 2, window = second, screen = screen}, {
@@ -140,6 +155,7 @@ orchestrator:activate({id = 2, window = second, screen = screen}, {
 })
 assert(slotIDs(orchestrator.layouts["screen-1"]) == "1,2")
 assert(first:frame().w == 492 and second:frame().x == 502 and not second.focusedBeforeFrame)
+assertLayoutInvariants()
 
 second.minimized = true
 local prepared = false
@@ -156,6 +172,7 @@ orchestrator:rotatePositions()
 local layout = orchestrator.layouts["screen-1"]
 assert(slotIDs(layout) == "2,3,1", slotIDs(layout))
 assert(focused == third)
+assertLayoutInvariants()
 
 orchestrator:focusNext()
 assert(focused == first)
@@ -167,6 +184,7 @@ orchestrator:activate({id = 1, window = first, screen = screen}, {
 })
 layout = orchestrator.layouts["screen-1"]
 assert(slotIDs(layout) == "4,1", slotIDs(layout))
+assertLayoutInvariants()
 
 orchestrator.layouts["screen-2"] = {
   screen = secondScreen,
@@ -181,6 +199,7 @@ orchestrator:activate({id = 1, window = first, screen = screen}, {
 local secondLayout = orchestrator.layouts["screen-2"]
 assert(slotIDs(secondLayout) == "5,1")
 assert(first:screen() == secondScreen and fifth:screen() == secondScreen)
+assertLayoutInvariants()
 
 generation = gate:next()
 orchestrator:activate({id = 2, window = second, screen = screen}, {
@@ -188,6 +207,7 @@ orchestrator:activate({id = 2, window = second, screen = screen}, {
 })
 assert(slotIDs(secondLayout) == "2")
 assert(second:screen() == secondScreen)
+assertLayoutInvariants()
 
 generation = gate:next()
 orchestrator:activate({id = 5, window = fifth, screen = secondScreen}, {
@@ -202,17 +222,20 @@ assert(secondLayout.slots[2].frame.x == retainedFrame.x
   and secondLayout.slots[2].frame.w == retainedFrame.w
   and secondLayout.slots[2].frame.h == retainedFrame.h)
 assert(sixth:frame().x == retainedFrame.x and focused == sixth)
+assertLayoutInvariants()
 
 generation = gate:next()
 orchestrator:adopt({id = 2, window = second, screen = secondScreen}, generation)
 assert(slotIDs(secondLayout) == "2,6" and secondLayout.focusedSlot == 1)
 assert(focused == second)
+assertLayoutInvariants()
 
 orchestrator:clearScreen(screen)
 generation = gate:next()
 orchestrator:adopt({id = 4, window = fourth, screen = screen}, generation)
 assert(slotIDs(orchestrator.layouts["screen-1"]) == "4")
 assert(fourth:frame().w == 990)
+assertLayoutInvariants()
 
 focused = seventh
 orchestrator:_validateFocus()
@@ -221,14 +244,14 @@ assert(orchestrator.layouts["screen-2"] == secondLayout)
 
 focused = sixth
 sixth.currentFrame.x = sixth.currentFrame.x + 30
-orchestrator:_scheduleMoveValidation(sixth)
+orchestrator:_validateMove(sixth)
 assert(orchestrator.layouts["screen-2"] == nil)
 
 orchestrator:start()
 assert(filter.callback and watcher.started)
 watcher.callback()
 orchestrator:stop()
-assert(filter.unsubscribed and watcher.stopped)
+assert(filter.unsubscribed and watcher.stopped and orchestrator.observer.filter == nil)
 
 local previousChanges = layoutChanges
 unsubscribe()

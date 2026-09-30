@@ -146,9 +146,11 @@ management.
 - `modules/window_repository.lua` exposes usable native windows and joins them with
   Hammerspoon MRU metadata.
 - `modules/layout_planner.lua` calculates full, split and master/stack frames.
-- `modules/layout_orchestrator.lua` owns the per-display slot records, applies
-  explicit Accessibility operations and invalidates layouts after external native
-  changes. It publishes read-only snapshots to visual consumers.
+- `modules/layout_orchestrator.lua` exclusively owns the per-display slot records,
+  applies explicit Accessibility operations and invalidates layouts after external
+  native changes. It publishes read-only snapshots to visual consumers.
+- `modules/layout_observer.lua` debounces native window and display events and
+  reports them to the orchestrator without owning or mutating layout state.
 - `modules/layout_borders.lua` renders event-driven Catppuccin slot frames without
   participating in layout decisions.
 - Application and window navigation share the compact chooser and request gate.

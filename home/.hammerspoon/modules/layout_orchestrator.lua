@@ -1,4 +1,5 @@
 local planner = require("modules.layout_planner")
+local LayoutObserver = require("modules.layout_observer")
 local WindowRepository = require("modules.window_repository")
 
 local LayoutOrchestrator = {}
@@ -19,37 +20,24 @@ end
 function LayoutOrchestrator.new(repository, gate, options, runtime)
   options = options or {}
   runtime = runtime or {}
-  return setmetatable({
+  local orchestrator = setmetatable({
     repository = repository,
     gate = gate,
     gap = options.gap or 0,
     restoreDelay = options.restoreDelaySeconds or 0.08,
-    validationDelay = options.validationDelaySeconds or 0.08,
     frameTolerance = options.frameTolerance or 2,
     layouts = {},
     listeners = {},
-    focusValidation = 0,
-    moveValidations = {},
     after = runtime.after or function(delay, callback) hs.timer.doAfter(delay, callback) end,
     mainScreen = runtime.mainScreen or function() return hs.screen.mainScreen() end,
-    filterNew = runtime.filterNew or function()
-      return hs.window.filter.new()
-        :rejectApp("Hammerspoon")
-        :rejectApp("Control Center")
-        :rejectApp("Notification Center")
-        :rejectApp("Spotlight")
-    end,
-    events = runtime.events or {
-      destroyed = hs.window.filter.windowDestroyed,
-      focused = hs.window.filter.windowFocused,
-      moved = hs.window.filter.windowMoved,
-      notInCurrentSpace = hs.window.filter.windowNotInCurrentSpace,
-      notVisible = hs.window.filter.windowNotVisible,
-    },
-    screenWatcherNew = runtime.screenWatcherNew or function(callback)
-      return hs.screen.watcher.new(callback)
-    end,
   }, LayoutOrchestrator)
+  orchestrator.observer = LayoutObserver.new({
+    onFocus = function() orchestrator:_validateFocus() end,
+    onMove = function(window) orchestrator:_validateMove(window) end,
+    onLifecycle = function(window) orchestrator:_validateLifecycle(window) end,
+    onScreensChanged = function() orchestrator:clearAll() end,
+  }, options, runtime)
+  return orchestrator
 end
 
 function LayoutOrchestrator:subscribe(listener)
@@ -90,12 +78,47 @@ function LayoutOrchestrator:_layout(screen, create)
   return layout, key
 end
 
+function LayoutOrchestrator:_slotIndex(layout, windowID)
+  for index, slot in ipairs(layout and layout.slots or {}) do
+    if slot.windowID == windowID then return index end
+  end
+end
+
 function LayoutOrchestrator:_slotForWindow(windowID)
   for screenKey, layout in pairs(self.layouts) do
-    for index, slot in ipairs(layout.slots) do
-      if slot.windowID == windowID then return layout, index, screenKey end
-    end
+    local index = self:_slotIndex(layout, windowID)
+    if index then return layout, index, screenKey end
   end
+end
+
+function LayoutOrchestrator:_setSingle(layout, windowID)
+  layout.slots = {{windowID = windowID}}
+  layout.focusedSlot = 1
+end
+
+function LayoutOrchestrator:_append(layout, windowID, anchorID)
+  if anchorID and anchorID ~= windowID and self:_window(anchorID)
+      and not self:_slotIndex(layout, anchorID) then
+    layout.slots = {{windowID = anchorID}}
+  end
+  local slots = {}
+  for _, slot in ipairs(layout.slots) do
+    if slot.windowID ~= windowID then slots[#slots + 1] = slot end
+  end
+  slots[#slots + 1] = {windowID = windowID}
+  layout.slots = slots
+  layout.focusedSlot = #slots
+end
+
+function LayoutOrchestrator:_replaceFocused(layout, windowID)
+  if #layout.slots == 0 then
+    self:_setSingle(layout, windowID)
+    return nil
+  end
+  local index = math.min(layout.focusedSlot or 1, #layout.slots)
+  layout.slots[index] = {windowID = windowID, frame = copyFrame(layout.slots[index].frame)}
+  layout.focusedSlot = index
+  return index
 end
 
 function LayoutOrchestrator:_prune(layout)
@@ -212,23 +235,9 @@ function LayoutOrchestrator:activate(target, request, callback)
     self:_removeFromOtherLayouts(target.id, layout)
     self:_prune(layout)
     if request.mode == "stack" then
-      if request.anchorID and request.anchorID ~= target.id and self:_window(request.anchorID) then
-        local containsAnchor = false
-        for _, slot in ipairs(layout.slots) do
-          if slot.windowID == request.anchorID then containsAnchor = true; break end
-        end
-        if not containsAnchor then layout.slots = {{windowID = request.anchorID}} end
-      end
-      local slots = {}
-      for _, slot in ipairs(layout.slots) do
-        if slot.windowID ~= target.id then slots[#slots + 1] = slot end
-      end
-      slots[#slots + 1] = {windowID = target.id}
-      layout.slots = slots
-      layout.focusedSlot = #slots
+      self:_append(layout, target.id, request.anchorID)
     else
-      layout.slots = {{windowID = target.id}}
-      layout.focusedSlot = 1
+      self:_setSingle(layout, target.id)
     end
     self:_reflow(layout)
     self:_focus(target.window)
@@ -258,18 +267,13 @@ function LayoutOrchestrator:adopt(target, generation, callback)
     local layout = self:_layout(screen, true)
     self:_removeFromOtherLayouts(target.id, layout)
     self:_prune(layout)
-    if #layout.slots == 0 then
-      layout.slots = {{windowID = target.id}}
-      layout.focusedSlot = 1
+    local index = self:_replaceFocused(layout, target.id)
+    if not index then
       self:_reflow(layout)
-      self:_focus(target.window)
     else
-      local index = math.min(layout.focusedSlot or 1, #layout.slots)
-      layout.slots[index] = {windowID = target.id, frame = copyFrame(layout.slots[index].frame)}
-      layout.focusedSlot = index
       self:_applySlot(layout.slots[index])
-      self:_focus(target.window)
     end
+    self:_focus(target.window)
     self:_notify()
     callback(true)
   end)
@@ -281,10 +285,7 @@ function LayoutOrchestrator:focusNext()
   if #slots < 2 then return end
   local focused = self.repository.focusedWindow()
   local focusedID = focused and focused:id()
-  local index = layout.focusedSlot or 0
-  for candidateIndex, slot in ipairs(slots) do
-    if slot.windowID == focusedID then index = candidateIndex; break end
-  end
+  local index = self:_slotIndex(layout, focusedID) or layout.focusedSlot or 0
   local targetIndex = index % #slots + 1
   local target = self:_window(slots[targetIndex].windowID)
   if target then
@@ -300,10 +301,7 @@ function LayoutOrchestrator:rotatePositions()
   if #slots < 2 then return end
   local focused = self.repository.focusedWindow()
   local focusedID = focused and focused:id()
-  local focusedIndex = layout.focusedSlot or 1
-  for index, slot in ipairs(slots) do
-    if slot.windowID == focusedID then focusedIndex = index; break end
-  end
+  local focusedIndex = self:_slotIndex(layout, focusedID) or layout.focusedSlot or 1
   local firstID = slots[1].windowID
   for index = 1, #slots - 1 do slots[index].windowID = slots[index + 1].windowID end
   slots[#slots].windowID = firstID
@@ -368,75 +366,41 @@ function LayoutOrchestrator:_validateFocus()
   self:clearScreen(record.screen)
 end
 
-function LayoutOrchestrator:_scheduleFocusValidation()
-  self.focusValidation = self.focusValidation + 1
-  local generation = self.focusValidation
-  self.after(self.validationDelay, function()
-    if generation == self.focusValidation then self:_validateFocus() end
-  end)
-end
-
-function LayoutOrchestrator:_scheduleMoveValidation(window)
+function LayoutOrchestrator:_validateMove(window)
   local windowID = tonumber(window and window:id())
   if not windowID then return end
-  self.moveValidations[windowID] = (self.moveValidations[windowID] or 0) + 1
-  local generation = self.moveValidations[windowID]
-  self.after(self.validationDelay, function()
-    if generation ~= self.moveValidations[windowID] then return end
-    self.moveValidations[windowID] = nil
-    local layout, index, screenKey = self:_slotForWindow(windowID)
-    if not layout then return end
-    local current = self.repository:borderRecord(window)
-    local slot = layout.slots[index]
-    if not current or not framesMatch(window:frame(), slot.frame, self.frameTolerance) then
-      local destinationKey = current and current.screenID
-      local changed = false
-      if self.layouts[screenKey] then self.layouts[screenKey] = nil; changed = true end
-      if destinationKey and destinationKey ~= screenKey and self.layouts[destinationKey] then
-        self.layouts[destinationKey] = nil
-        changed = true
-      end
-      if changed then self:_notify() end
+  local layout, index, screenKey = self:_slotForWindow(windowID)
+  if not layout then return end
+  local current = self.repository:borderRecord(window)
+  local slot = layout.slots[index]
+  if not current or not framesMatch(window:frame(), slot.frame, self.frameTolerance) then
+    local destinationKey = current and current.screenID
+    local changed = false
+    if self.layouts[screenKey] then self.layouts[screenKey] = nil; changed = true end
+    if destinationKey and destinationKey ~= screenKey and self.layouts[destinationKey] then
+      self.layouts[destinationKey] = nil
+      changed = true
     end
-  end)
+    if changed then self:_notify() end
+  end
 end
 
-function LayoutOrchestrator:_scheduleLifecycleValidation(window)
+function LayoutOrchestrator:_validateLifecycle(window)
   local windowID = tonumber(window and window:id())
   if not windowID then return end
-  self.after(self.validationDelay, function()
-    local _, _, screenKey = self:_slotForWindow(windowID)
-    if not screenKey then return end
-    local current = self.repository:borderRecord(window)
-    if not current or current.minimized or not window:isVisible() then self:clearScreen(screenKey) end
-  end)
+  local _, _, screenKey = self:_slotForWindow(windowID)
+  if not screenKey then return end
+  local current = self.repository:borderRecord(window)
+  if not current or current.minimized or not window:isVisible() then self:clearScreen(screenKey) end
 end
 
 function LayoutOrchestrator:start()
-  if self.filter then return self end
-  self.filter = self.filterNew()
-  self.filter:subscribe({
-    self.events.destroyed,
-    self.events.focused,
-    self.events.moved,
-    self.events.notInCurrentSpace,
-    self.events.notVisible,
-  }, function(window, _, event)
-    if event == self.events.focused then
-      self:_scheduleFocusValidation()
-    elseif event == self.events.moved then
-      self:_scheduleMoveValidation(window)
-    else
-      self:_scheduleLifecycleValidation(window)
-    end
-  end)
-  self.screenWatcher = self.screenWatcherNew(function() self:clearAll() end):start()
+  self.observer:start()
   return self
 end
 
 function LayoutOrchestrator:stop()
-  if self.filter then self.filter:unsubscribeAll(); self.filter = nil end
-  if self.screenWatcher then self.screenWatcher:stop(); self.screenWatcher = nil end
+  self.observer:stop()
 end
 
 function LayoutOrchestrator:resetFocused()
