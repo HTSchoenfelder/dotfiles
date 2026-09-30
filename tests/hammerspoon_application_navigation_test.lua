@@ -15,14 +15,16 @@ local gate = RequestGate.new()
 local activated
 local chooserShown
 local records = {{id = 9, bundleID = "example.app", appName = "Example", title = "Only"}}
+local focusedWindow = {}
 local repository = {
-  listAll = function(_, callback) callback(records) end,
-  matchingBundle = function(_, values, bundleID)
-    local result = {}
-    for _, value in ipairs(values) do if value.bundleID == bundleID then result[#result + 1] = value end end
-    return result
+  listForBundle = function(_, bundleID, callback)
+    assert(bundleID == "example.app")
+    callback(records)
   end,
-  focusedRecord = function() return {id = 1, screen = "screen"} end,
+  focusedWindow = function() return focusedWindow end,
+  record = function(_, window)
+    return window == focusedWindow and {id = 1, screen = "screen"} or nil
+  end,
 }
 local appNavigation = ApplicationNavigation.new({
   repository = repository,
@@ -49,6 +51,10 @@ appNavigation.chooserFactory = function()
 end
 appNavigation:_showOrChoose(records, {generation = generation}, true)
 assert(#chooserShown == 2 and activated.id == 10)
+
+activated = nil
+appNavigation:activate({bundleID = "example.app"}, "single", false)
+assert(activated.id == 9)
 
 activated = nil
 local staleGeneration = gate:next()

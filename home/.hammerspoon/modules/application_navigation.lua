@@ -32,8 +32,8 @@ function ApplicationNavigation.new(options)
   }, ApplicationNavigation)
 end
 
-function ApplicationNavigation:_request(application, mode, generation, records)
-  local focused = self.repository:focusedRecord(records)
+function ApplicationNavigation:_request(application, mode, generation)
+  local focused = self.repository:record(self.repository.focusedWindow())
   return {
     application = application,
     anchorID = focused and focused.id,
@@ -93,8 +93,7 @@ end
 function ApplicationNavigation:_waitForWindow(application, request, chooseInstance)
   local deadline = hs.timer.secondsSinceEpoch() + self.timeout
   local function poll()
-    self.repository:listAll(function(records)
-      local windows = self.repository:matchingBundle(records, application.bundleID)
+    self.repository:listForBundle(application.bundleID, function(windows)
       if #windows > 0 then
         if self.gate:isCurrent(request.generation) then
           self:_showOrChoose(windows, request, chooseInstance)
@@ -118,10 +117,9 @@ end
 
 function ApplicationNavigation:activate(application, mode, chooseInstance)
   local generation = self.gate:next()
-  self.repository:listAll(function(records)
+  local request = self:_request(application, mode, generation)
+  self.repository:listForBundle(application.bundleID, function(windows)
     if not self.gate:isCurrent(generation) then return end
-    local request = self:_request(application, mode, generation, records)
-    local windows = self.repository:matchingBundle(records, application.bundleID)
     if #windows > 0 then
       self:_showOrChoose(windows, request, chooseInstance)
       return

@@ -40,6 +40,8 @@ function WindowRepository.new(history, runtime)
   runtime = runtime or {}
   return setmetatable({
     history = history,
+    applicationsForBundleID = runtime.applicationsForBundleID
+      or function(bundleID) return hs.application.applicationsForBundleID(bundleID) end,
     orderedWindows = runtime.orderedWindows or function() return hs.window.orderedWindows() end,
     allWindows = runtime.allWindows or function() return hs.window.allWindows() end,
     getWindow = runtime.getWindow or function(id) return hs.window.get(id) end,
@@ -77,6 +79,20 @@ function WindowRepository:listAll(callback)
   append(self.orderedWindows())
   append(self.allWindows())
   callback(records, nil)
+end
+
+function WindowRepository:listForBundle(bundleID, callback)
+  local records, seen = {}, {}
+  for _, application in ipairs(self.applicationsForBundleID(bundleID) or {}) do
+    for _, window in ipairs(call(application, "allWindows", {}) or {}) do
+      local item = record(window)
+      if item and item.bundleID == bundleID and not seen[item.id] then
+        seen[item.id] = true
+        records[#records + 1] = item
+      end
+    end
+  end
+  callback(self:orderedByHistory(records), nil)
 end
 
 function WindowRepository:focusedRecord(records)

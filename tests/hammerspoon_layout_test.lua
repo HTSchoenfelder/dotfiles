@@ -32,17 +32,22 @@ local function newWindow(id, initialScreen)
   function window:id() return self.windowID end
   function window:isStandard() return true end
   function window:isFullScreen() return false end
-  function window:isMinimized() return false end
+  function window:isMinimized() return self.minimized == true end
+  function window:unminimize() self.minimized = false end
   function window:isVisible() return not self.closed end
   function window:application() return application end
   function window:screen() return self.currentScreen end
   function window:frame() return self.currentFrame end
   function window:setFrameWithWorkarounds(frame)
+    self.focusedBeforeFrame = focused == self
     self.currentFrame = {x = frame.x, y = frame.y, w = frame.w, h = frame.h}
     self.currentScreen = frame.x >= 1000 and secondScreen or screen
     self.appliedFrames[#self.appliedFrames + 1] = self.currentFrame
   end
-  function window:focus() focused = self end
+  function window:focus()
+    self.focusCalls = (self.focusCalls or 0) + 1
+    focused = self
+  end
   function window:close() self.closed = true; windows[self.windowID] = nil end
   windows[id] = window
   return window
@@ -84,12 +89,16 @@ function watcher:stop() self.stopped = true end
 hs = {printf = function() end}
 local LayoutOrchestrator = require("modules.layout_orchestrator")
 local gate = RequestGate.new()
+local scheduledDelays = {}
 local orchestrator = LayoutOrchestrator.new(repository, gate, {
   gap = 5,
   restoreDelaySeconds = 0,
   validationDelaySeconds = 0,
 }, {
-  after = function(_, callback) callback() end,
+  after = function(delay, callback)
+    scheduledDelays[#scheduledDelays + 1] = delay
+    callback()
+  end,
   events = {
     destroyed = "destroyed",
     focused = "focused",
@@ -116,14 +125,27 @@ orchestrator:activate({id = 1, window = first, screen = screen}, {
 })
 assert(orchestrator.layouts["screen-1"].slots[1].windowID == 1)
 assert(first:frame().x == 5 and first:frame().w == 990)
-assert(layoutChanges == 1)
+assert(#scheduledDelays == 0 and layoutChanges == 1)
+
+local firstFrameCount, firstFocusCount = #first.appliedFrames, first.focusCalls
+generation = gate:next()
+orchestrator:activate({id = 1, window = first, screen = screen}, {
+  generation = generation, mode = "single", screen = screen,
+})
+assert(#first.appliedFrames == firstFrameCount and first.focusCalls == firstFocusCount)
 
 generation = gate:next()
 orchestrator:activate({id = 2, window = second, screen = screen}, {
   anchorID = 1, generation = generation, mode = "stack", screen = screen,
 })
 assert(slotIDs(orchestrator.layouts["screen-1"]) == "1,2")
-assert(first:frame().w == 492 and second:frame().x == 502)
+assert(first:frame().w == 492 and second:frame().x == 502 and not second.focusedBeforeFrame)
+
+second.minimized = true
+local prepared = false
+orchestrator:_prepare(second, function() prepared = true end)
+assert(prepared and not second.minimized and focused == second)
+assert(scheduledDelays[#scheduledDelays] == 0)
 
 generation = gate:next()
 orchestrator:activate({id = 3, window = third, screen = screen}, {

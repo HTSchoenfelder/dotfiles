@@ -111,7 +111,19 @@ end
 
 function LayoutOrchestrator:_applySlot(slot)
   local window = self:_window(slot.windowID)
-  if window and slot.frame then window:setFrameWithWorkarounds(slot.frame, 0) end
+  if not window or not slot.frame then return false end
+  local ok, currentFrame = pcall(window.frame, window)
+  if ok and framesMatch(currentFrame, slot.frame, self.frameTolerance) then return false end
+  window:setFrameWithWorkarounds(slot.frame, 0)
+  return true
+end
+
+function LayoutOrchestrator:_focus(window)
+  if not window then return false end
+  local focused = self.repository.focusedWindow()
+  if focused and tonumber(focused:id()) == tonumber(window:id()) then return false end
+  window:focus()
+  return true
 end
 
 function LayoutOrchestrator:_reflow(layout)
@@ -146,9 +158,21 @@ end
 
 function LayoutOrchestrator:_prepare(window, callback)
   local application = window:application()
-  if application and application:isHidden() then application:unhide() end
-  if window:isMinimized() then window:unminimize() end
-  self.after(self.restoreDelay, callback)
+  local restored = false
+  if application and application:isHidden() then
+    application:unhide()
+    restored = true
+  end
+  if window:isMinimized() then
+    window:unminimize()
+    restored = true
+  end
+  if restored then
+    self:_focus(window)
+    self.after(self.restoreDelay, callback)
+  else
+    callback()
+  end
 end
 
 function LayoutOrchestrator:layoutSnapshot()
@@ -207,7 +231,7 @@ function LayoutOrchestrator:activate(target, request, callback)
       layout.focusedSlot = 1
     end
     self:_reflow(layout)
-    target.window:focus()
+    self:_focus(target.window)
     self:_notify()
     callback(true)
   end)
@@ -223,7 +247,7 @@ function LayoutOrchestrator:adopt(target, generation, callback)
     local existingLayout, existingIndex = self:_slotForWindow(target.id)
     if existingLayout then
       existingLayout.focusedSlot = existingIndex
-      target.window:focus()
+      self:_focus(target.window)
       self:_notify()
       callback(true)
       return
@@ -238,13 +262,14 @@ function LayoutOrchestrator:adopt(target, generation, callback)
       layout.slots = {{windowID = target.id}}
       layout.focusedSlot = 1
       self:_reflow(layout)
+      self:_focus(target.window)
     else
       local index = math.min(layout.focusedSlot or 1, #layout.slots)
       layout.slots[index] = {windowID = target.id, frame = copyFrame(layout.slots[index].frame)}
       layout.focusedSlot = index
       self:_applySlot(layout.slots[index])
+      self:_focus(target.window)
     end
-    target.window:focus()
     self:_notify()
     callback(true)
   end)
@@ -264,7 +289,7 @@ function LayoutOrchestrator:focusNext()
   local target = self:_window(slots[targetIndex].windowID)
   if target then
     layout.focusedSlot = targetIndex
-    target:focus()
+    self:_focus(target)
     self:_notify()
   end
 end
@@ -285,7 +310,7 @@ function LayoutOrchestrator:rotatePositions()
   for _, slot in ipairs(slots) do self:_applySlot(slot) end
   layout.focusedSlot = focusedIndex
   local target = self:_window(slots[focusedIndex].windowID)
-  if target then target:focus() end
+  if target then self:_focus(target) end
   self:_notify()
 end
 
@@ -309,7 +334,7 @@ function LayoutOrchestrator:closeFocused()
     self.after(self.restoreDelay, function()
       local slot = layout.slots[layout.focusedSlot]
       local target = slot and self:_window(slot.windowID)
-      if target then target:focus(); self:_notify() end
+      if target then self:_focus(target); self:_notify() end
     end)
   end
 end

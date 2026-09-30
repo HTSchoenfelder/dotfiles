@@ -116,7 +116,12 @@ ordered by Hammerspoon's focus history.
 Application launch uses asynchronous `/usr/bin/open -g` tasks so a pending launch
 does not intentionally steal focus. A request generation prevents a late result
 from applying an obsolete layout intention. Existing hidden or minimized target
-windows are restored before their Accessibility frame is changed.
+windows are focused immediately and receive a short restoration delay before
+their Accessibility frame is changed. Already visible windows use a synchronous
+focus path with no timer. Application shortcuts query only the target
+application's windows instead of inventorying every desktop window. Repeating an
+action skips native focus and frame calls when both already match the requested
+slot, avoiding redundant Accessibility redraws.
 
 Project overlays are ordinary Kitty windows. Toggling an overlay restores and
 centres that window on the active display; toggling it off minimizes only that

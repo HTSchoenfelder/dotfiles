@@ -36,7 +36,12 @@ function secondWindow:id() return 2 end
 local fullScreenWindow = setmetatable({}, {__index = window})
 function fullScreenWindow:id() return 3 end
 function fullScreenWindow:isFullScreen() return true end
+function application:allWindows() return {window, secondWindow, fullScreenWindow} end
 local repository = WindowRepository.new(history, {
+  applicationsForBundleID = function(bundleID)
+    assert(bundleID == "example.app")
+    return {application}
+  end,
   orderedWindows = function() return {window, secondWindow, fullScreenWindow} end,
   allWindows = function() return {secondWindow, window, fullScreenWindow} end,
   focusedWindow = function() return secondWindow end,
@@ -47,6 +52,9 @@ assert(#records == 2 and repository:focusedRecord(records).id == 2)
 local matches = repository:matchingBundle(records, "example.app")
 assert(#matches == 2)
 assert(repository:borderRecord(fullScreenWindow).id == 3)
+local scoped
+repository:listForBundle("example.app", function(values) scoped = values end)
+assert(#scoped == 2 and scoped[1].id == 2 and scoped[2].id == 42)
 
 local gate = RequestGate.new()
 local first = gate:next()
