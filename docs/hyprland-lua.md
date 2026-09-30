@@ -25,6 +25,10 @@ chooses an application instance or restricts Comma Selection to the focused
 application. Shift remains exclusively the backward direction during Comma
 Selection and media/workspace cycling.
 
+Comma Selection deliberately diverges after acceptance: Hyprland moves the chosen
+window from Parking into the current workspace, while macOS only restores and
+focuses the native window without changing its display, frame or tracked layout.
+
 | File | Responsibility |
 | --- | --- |
 | `config/application_shortcuts.lua` | Ctrl shortcuts and application-specific mappings |

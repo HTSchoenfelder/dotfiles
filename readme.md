@@ -38,8 +38,8 @@ keeps the current layout and adds the selected window to the right stack. Holdin
 | `mainMod + Shift + app key` | Add the selected application to the right stack |
 | `mainMod + F + app key` | Select an application window before placing it |
 | `mainMod + P` / `mainMod + Shift + P` | Select any window by recent focus; replace the layout / add it to the stack |
-| `mainMod + ,` / `mainMod + Shift + ,` | Cycle windows forward/backward; release `mainMod` to accept |
-| `mainMod + F + ,` | Cycle through windows of the focused application |
+| `mainMod + ,` / `mainMod + Shift + ,` | Focus windows forward/backward by MRU without changing their layout; release `mainMod` to accept |
+| `mainMod + F + ,` | Focus windows of the current application without changing their layout |
 | `mainMod + Y` / `mainMod + Shift + Y` | Cycle through Spotify Play/Pause, Next and Previous; release `mainMod` to accept |
 | `mainMod + M` | Focus the next window in the active layout |
 | `mainMod + N` | Rotate positions while retaining focus on the visual slot |

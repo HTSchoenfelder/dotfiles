@@ -10,6 +10,7 @@ end
 
 function WindowNavigation.new(options)
   options.allScreens = options.allScreens or function() return hs.screen.allScreens() end
+  options.after = options.after or function(delay, callback) hs.timer.doAfter(delay, callback) end
   return setmetatable(options, WindowNavigation)
 end
 
@@ -59,10 +60,24 @@ function WindowNavigation:commaItems(instancesOnly, callback)
   end)
 end
 
-function WindowNavigation:activateComma(record, request)
-  if self.gate:isCurrent(request.generation) then
-    self.orchestrator:activate(record, request)
+function WindowNavigation:focusComma(record, generation)
+  if not record or not record.window or not self.gate:isCurrent(generation)
+      or not self.repository:isUsable(record.window) then return end
+  local window = record.window
+  local restored = false
+  local application = window:application()
+  if application and application:isHidden() then
+    application:unhide()
+    restored = true
   end
+  if window:isMinimized() then
+    window:unminimize()
+    restored = true
+  end
+  local function focus()
+    if self.gate:isCurrent(generation) and self.repository:isUsable(window) then window:focus() end
+  end
+  if restored then self.after(0.08, focus) else focus() end
 end
 
 function WindowNavigation:focusNext()

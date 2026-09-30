@@ -78,7 +78,6 @@ function navigation.start()
   local function windowCycle(direction)
     local kind = heldKeys:isDown(settings.instanceKey) and "application_windows" or "windows"
     local currentSession = commaSelection.session
-    local context = {}
     local generation = currentSession and currentSession.kind == kind
       and currentSession.generation or gate:next()
     commaSelection:cycle(kind, direction, {
@@ -88,19 +87,12 @@ function navigation.start()
           local session = commaSelection.session
           if session and session.kind == kind then
             session.currentID = focused and focused.id
-            context.anchorID = focused and focused.id
-            context.screen = focused and focused.screen or orchestrator:activeScreen()
           end
           done(items)
         end)
       end,
       onSelect = function(item)
-        windowNavigation:activateComma(item.record, {
-          anchorID = context.anchorID,
-          generation = generation,
-          mode = "single",
-          screen = context.screen,
-        })
+        windowNavigation:focusComma(item.record, generation)
       end,
     })
     if commaSelection.session then commaSelection.session.generation = generation end
@@ -112,9 +104,9 @@ function navigation.start()
 
   catalog.add("Windows", "MainMod + P", "Choose window by last focus")
   catalog.add("Windows", "MainMod + Shift + P", "Choose window and add it to stack")
-  catalog.add("Windows", "MainMod + ,", "Cycle windows by last focus")
-  catalog.add("Windows", "MainMod + Shift + ,", "Cycle windows backwards")
-  catalog.add("Windows", "MainMod + F + ,", "Cycle application windows")
+  catalog.add("Windows", "MainMod + ,", "Focus windows by last focus")
+  catalog.add("Windows", "MainMod + Shift + ,", "Focus windows backwards")
+  catalog.add("Windows", "MainMod + F + ,", "Focus application windows")
   catalog.add("Navigation", "MainMod + M", "Focus next layout window")
   catalog.add("Windows", "MainMod + N", "Rotate window positions")
   catalog.add("Navigation", "MainMod + H", "Focus other display")

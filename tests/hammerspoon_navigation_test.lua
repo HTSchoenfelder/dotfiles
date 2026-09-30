@@ -69,6 +69,7 @@ local fakeRepository = {
     return {id = 10, bundleID = "a", appName = "A", title = "One"}
   end,
   orderedByHistory = function(_, values) return values end,
+  isUsable = function(_, candidate) return candidate ~= nil end,
 }
 local windowNavigation = WindowNavigation.new({
   repository = fakeRepository,
@@ -78,5 +79,28 @@ local windowNavigation = WindowNavigation.new({
 })
 windowNavigation:commaItems(true, function(items) filtered = items end)
 assert(#filtered == 2 and filtered[1].id == 10 and filtered[2].id == 11)
+
+local focusedByComma = false
+local frame = {x = 17, y = 23, w = 640, h = 480}
+local commaApplication = {hidden = true}
+function commaApplication:isHidden() return self.hidden end
+function commaApplication:unhide() self.hidden = false end
+local commaWindow = {minimized = true, frame = frame}
+function commaWindow:application() return commaApplication end
+function commaWindow:isMinimized() return self.minimized end
+function commaWindow:unminimize() self.minimized = false end
+function commaWindow:focus() focusedByComma = true end
+local commaGate = RequestGate.new()
+local commaGeneration = commaGate:next()
+local commaNavigation = WindowNavigation.new({
+  repository = fakeRepository,
+  gate = commaGate,
+  orchestrator = {activate = function() error("Comma Selection changed the layout") end},
+  after = function(_, callback) callback() end,
+  allScreens = function() return {} end,
+})
+commaNavigation:focusComma({window = commaWindow}, commaGeneration)
+assert(focusedByComma and not commaWindow.minimized and not commaApplication.hidden)
+assert(commaWindow.frame == frame)
 
 print("Hammerspoon navigation tests passed")

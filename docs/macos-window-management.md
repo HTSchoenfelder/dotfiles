@@ -75,8 +75,10 @@ Shift has two independent, unambiguous roles:
   direction.
 
 Comma Selection queries native windows once, cycles locally and accepts the
-highlighted window when the base MainMod keys are released. Window and application
-choices are ordered by Hammerspoon's focus history.
+highlighted window when the base MainMod keys are released. Acceptance only
+restores and focuses the chosen window, like an MRU application switcher; it never
+moves or resizes the window and never changes a tracked layout. Window and
+application choices are ordered by Hammerspoon's focus history.
 
 ## Application and overlay lifecycle
 

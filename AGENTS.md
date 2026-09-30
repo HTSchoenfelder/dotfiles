@@ -61,6 +61,8 @@ See `docs/hyprland-desktop.md` for the current service, portal and toolkit owner
 - `Shift + App` and `Shift + P` add a selected window to the current layout.
 - `F + App` chooses an instance and `F + comma` filters by the focused app.
 - During Comma Selection, Shift always means backward and never add-to-stack.
+- On macOS, Comma Selection only restores and focuses its target; it never changes
+  display assignment, frame geometry or the tracked layout.
 - **Dot Mode** is the submap entered with `mainMod + period`.
 - **Terminal Workspace** is workspace 1 (``) on the primary display.
 - **Display Workspace** is workspace 2 (`󰍹`) on the secondary display.
