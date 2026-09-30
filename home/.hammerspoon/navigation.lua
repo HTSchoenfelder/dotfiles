@@ -5,6 +5,7 @@ local Chooser = require("modules.chooser")
 local CommaSelection = require("modules.comma_selection")
 local HeldKeys = require("modules.held_keys")
 local LayoutOrchestrator = require("modules.layout_orchestrator")
+local LayoutBorders = require("modules.layout_borders")
 local RequestGate = require("modules.request_gate")
 local WindowHistory = require("modules.window_history")
 local WindowNavigation = require("modules.window_navigation")
@@ -28,6 +29,10 @@ function navigation.start()
   history:start()
   local repository = WindowRepository.new(history)
   local orchestrator = LayoutOrchestrator.new(repository, gate, settings)
+  local layoutBorders = LayoutBorders.new(
+    orchestrator,
+    config.appearance.layoutBorders
+  ):start()
   local applicationNavigation = ApplicationNavigation.new({
     repository = repository,
     orchestrator = orchestrator,
@@ -135,6 +140,7 @@ function navigation.start()
     commaSelection = commaSelection,
     gate = gate,
     history = history,
+    layoutBorders = layoutBorders,
     orchestrator = orchestrator,
     repository = repository,
     windows = windowNavigation,

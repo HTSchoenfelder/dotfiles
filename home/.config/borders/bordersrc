@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# JankyBorders is the optional global focus ring. Hammerspoon draws the muted
+# borders for tracked layout windows, so the global inactive border is transparent.
+options=(
+  style=round
+  width=5.0
+  hidpi=on
+  active_color=0xffcba6f7
+  inactive_color=0x00585b70
+  blacklist="Hammerspoon,Notification Center,Control Center,Spotlight"
+)
+
+borders "${options[@]}"

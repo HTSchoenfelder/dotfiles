@@ -66,6 +66,8 @@ local orchestrator = LayoutOrchestrator.new(repository, gate, {
   after = function(_, callback) callback() end,
   mainScreen = function() return screen end,
 })
+local layoutChanges = 0
+local unsubscribe = orchestrator:subscribe(function() layoutChanges = layoutChanges + 1 end)
 
 local generation = gate:next()
 orchestrator:activate({id = 1, window = first, screen = screen}, {
@@ -73,6 +75,7 @@ orchestrator:activate({id = 1, window = first, screen = screen}, {
 })
 assert(orchestrator.layouts["screen-1"].ids[1] == 1)
 assert(first.frame.x == 5 and first.frame.w == 990)
+assert(layoutChanges == 1 and orchestrator:layoutWindows()[1].id == 1)
 
 generation = gate:next()
 orchestrator:activate({id = 2, window = second, screen = screen}, {
@@ -121,5 +124,10 @@ orchestrator:activate({id = 2, window = second, screen = screen}, {
 })
 assert(#secondLayout.ids == 1 and secondLayout.ids[1] == 2)
 assert(second:screen() == secondScreen)
+
+local previousChanges = layoutChanges
+unsubscribe()
+orchestrator:_notify()
+assert(layoutChanges == previousChanges)
 
 print("Hammerspoon layout planning tests passed")

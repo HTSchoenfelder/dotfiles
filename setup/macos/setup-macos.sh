@@ -38,3 +38,4 @@ sudo nix run nix-darwin/master#darwin-rebuild -- switch \
 mkdir -p "$HOME/projects/dev"
 mkdir -p "$HOME/projects/temp"
 mkdir -p "$HOME/projects/work"
+mkdir -p "$HOME/screenshots"

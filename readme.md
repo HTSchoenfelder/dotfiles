@@ -14,11 +14,14 @@ Reliable platform-native behavior takes precedence when exact parity would be
 fragile. Intentional differences that affect muscle memory must stay explicit and
 documented.
 
-Hammerspoon is the only macOS workflow process. It owns shortcuts, modes, choosers,
-application intentions, MRU state, MIDI integration and passive master/stack
-geometry through native windows. It changes frames only for explicit actions and
-does not use AeroSpace, Stage Manager, Mission Control or Spaces. See the
-[macOS window-management architecture](docs/macos-window-management.md).
+Hammerspoon is the only macOS workflow and window-management process. It owns
+shortcuts, modes, choosers, application intentions, MRU state, MIDI integration,
+passive master/stack geometry and selective layout frames through native windows.
+It changes frames only for explicit actions and does not use AeroSpace, Stage
+Manager, Mission Control or Spaces. JankyBorders may run as a separate optional
+focus-ring service but never owns navigation or layout. See the
+[macOS window-management architecture](docs/macos-window-management.md) and
+[optional appearance layer](docs/macos-appearance.md).
 
 The interaction model is shared, while the requested split ratio intentionally
 differs: Hyprland currently uses a 70/30 master/stack split and the macOS target
@@ -53,9 +56,12 @@ keeps the current layout and adds the selected window to the right stack. Holdin
 | `mainMod + Backslash` | Toggle the RØDECaster mute state |
 
 Application, window and comma selection use the same compact `hs.chooser`
-presentation. The application launcher lists top-level bundles from the standard
-application directories with their native icons. macOS has no workflow workspaces
-or Parking state.
+presentation with Catppuccin text colors, application icons and subdued window
+titles. The application launcher lists top-level bundles from the standard
+application directories with their native icons. Tracked layout windows receive a
+muted Catppuccin frame and the focused member is highlighted. Both the titles and
+layout frames can be disabled in `home/.hammerspoon/config.lua`. macOS has no
+workflow workspaces or Parking state.
 
 Managed layouts use one full-size window, a 1:1 left/right split for two windows,
 and a left master with a vertical right stack for three or more windows.
@@ -115,6 +121,8 @@ instead of Rofi.
 
 On macOS, project identity is taken from path-based VS Code titles such as
 `~/dotfiles | Code`; non-path titles are deliberately rejected.
+
+Dot Mode screenshots from both macOS and Hyprland are stored in `~/screenshots`.
 
 Project overlays use the absolute project path from the active VS Code title and
 reuse one Kitty window per project and tool. Toggling an overlay off minimizes

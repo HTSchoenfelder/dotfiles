@@ -1,9 +1,23 @@
 local ApplicationNavigation = {}
 ApplicationNavigation.__index = ApplicationNavigation
 
+local function icon(record)
+  if type(record.bundleID) == "string" and record.bundleID ~= ""
+      and hs and hs.image and hs.image.imageFromAppBundle then
+    return hs.image.imageFromAppBundle(record.bundleID)
+  end
+end
+
 local function choice(record)
-  local title = record.title ~= "" and record.title or record.appName
-  return {text = record.appName .. " — " .. title, id = record.id, record = record}
+  local title = record.title ~= "" and record.title ~= record.appName and record.title or nil
+  return {
+    text = record.appName,
+    subText = title,
+    image = icon(record),
+    kind = "window",
+    id = record.id,
+    record = record,
+  }
 end
 
 function ApplicationNavigation.new(options)

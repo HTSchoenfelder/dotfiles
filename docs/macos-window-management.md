@@ -17,12 +17,19 @@ not emulate Hyprland workspaces or Parking.
 | Component | Responsibility |
 | --- | --- |
 | Hyprland | Reference interaction model and shortcut semantics |
-| Hammerspoon | Global shortcuts, held-key state, Comma Selection, Dot Mode, chooser UI, application launch/focus, MRU state, MIDI and explicit window geometry |
+| Hammerspoon | Global shortcuts, held-key state, Comma Selection, Dot Mode, chooser UI, application launch/focus, MRU state, MIDI, explicit window geometry and selective layout frames |
 | macOS Accessibility | Native window discovery, focus, close, minimize, restore, frame and display association |
+| JankyBorders | Optional global focused-window border; never layout or navigation |
 
 Hammerspoon changes frames only in direct response to a shortcut. It does not run
 a permanent reflow loop, create virtual workspaces, hide unrelated applications or
 maintain a competing model of every window on the desktop.
+
+The optional Catppuccin layout-frame module observes only the retained layout IDs
+and required native window events. Its canvases are visual and click-through; they
+never trigger geometry changes. See the
+[macOS appearance layer](macos-appearance.md) for switches, service ownership and
+restore commands.
 
 ```text
 keyboard
@@ -102,6 +109,9 @@ centres that window on the active display; toggling it off minimizes only that
 window. Only one project overlay is kept visible at a time. No hidden workspace is
 required.
 
+Dot Mode stores region, window and display captures in `~/screenshots`, matching
+Hyprland's `HYPRSHOT_DIR`.
+
 ## Launcher and hardware integration
 
 `hs.chooser` is the shared native selection surface for applications, windows,
@@ -118,7 +128,10 @@ management.
   Hammerspoon MRU metadata.
 - `modules/layout_planner.lua` calculates full, split and master/stack frames.
 - `modules/layout_orchestrator.lua` owns the small per-display layout ID lists and
-  applies explicit Accessibility operations.
+  applies explicit Accessibility operations. It publishes read-only layout changes
+  to visual consumers.
+- `modules/layout_borders.lua` renders event-driven Catppuccin frames for those
+  layout IDs without participating in layout decisions.
 - Application and window navigation share the compact chooser and request gate.
 - `modules/media_controls.lua` applies the same selection lifecycle to Spotify.
 - Dot Mode owns screenshots, text launchers and minimized project overlays.

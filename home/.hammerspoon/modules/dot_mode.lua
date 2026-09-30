@@ -4,9 +4,10 @@ local textData = require("modules.text_data")
 local DotMode = {}
 DotMode.__index = DotMode
 
-local function screenshotPath()
+local function screenshotPath(directory)
   local timestamp = os.date("%Y-%m-%d at %H.%M.%S")
-  return os.getenv("HOME") .. "/Desktop/Screen Shot " .. timestamp .. ".png"
+  hs.fs.mkdir(directory)
+  return directory .. "/Screen Shot " .. timestamp .. ".png"
 end
 
 function DotMode.new(options)
@@ -79,13 +80,15 @@ function DotMode:_action(callback)
 end
 
 function DotMode:_captureRegion()
-  self:_run("/usr/sbin/screencapture", {"-i", "-s", screenshotPath()})
+  self:_run("/usr/sbin/screencapture", {"-i", "-s", screenshotPath(self.screenshotDirectory)})
 end
 
 function DotMode:_captureWindow()
   local window = hs.window.focusedWindow()
   if window and window:id() then
-    self:_run("/usr/sbin/screencapture", {"-l", tostring(window:id()), screenshotPath()})
+    self:_run("/usr/sbin/screencapture", {
+      "-l", tostring(window:id()), screenshotPath(self.screenshotDirectory),
+    })
   end
 end
 
@@ -94,7 +97,9 @@ function DotMode:_captureScreen()
   local screen = window and window:screen() or hs.screen.mainScreen()
   local frame = screen:fullFrame()
   local rectangle = string.format("%d,%d,%d,%d", frame.x, frame.y, frame.w, frame.h)
-  self:_run("/usr/sbin/screencapture", {"-R", rectangle, screenshotPath()})
+  self:_run("/usr/sbin/screencapture", {
+    "-R", rectangle, screenshotPath(self.screenshotDirectory),
+  })
 end
 
 function DotMode:_commands()

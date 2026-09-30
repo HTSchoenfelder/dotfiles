@@ -43,7 +43,8 @@ function catalog.show()
   local choices = {}
   for _, entry in ipairs(catalog.items()) do
     choices[#choices + 1] = {
-      text = entry.shortcut .. " — " .. entry.description,
+      text = entry.shortcut,
+      subText = entry.description,
     }
   end
   catalog.chooser:show(choices, function() end)

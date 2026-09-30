@@ -18,9 +18,7 @@ in
     stateVersion = 6;
 
     defaults = {
-      NSGlobalDomain._HIHideMenuBar = false;
       dock.orientation = "bottom";
-      dock.autohide = false;
       controlcenter.NowPlaying = true;
     };
   };

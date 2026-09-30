@@ -13,9 +13,42 @@ function LayoutOrchestrator.new(repository, gate, options, runtime)
     gap = options.gap or 0,
     restoreDelay = options.restoreDelaySeconds or 0.08,
     layouts = {},
+    listeners = {},
     after = runtime.after or function(delay, callback) hs.timer.doAfter(delay, callback) end,
     mainScreen = runtime.mainScreen or function() return hs.screen.mainScreen() end,
   }, LayoutOrchestrator)
+end
+
+function LayoutOrchestrator:subscribe(listener)
+  self.listeners[#self.listeners + 1] = listener
+  return function()
+    for index, candidate in ipairs(self.listeners) do
+      if candidate == listener then table.remove(self.listeners, index); return end
+    end
+  end
+end
+
+function LayoutOrchestrator:_notify()
+  for _, listener in ipairs(self.listeners) do
+    local ok, message = pcall(listener)
+    if not ok and hs and hs.printf then hs.printf("Layout listener failed: %s", message) end
+  end
+end
+
+function LayoutOrchestrator:layoutWindows()
+  local result, seen = {}, {}
+  for _, layout in pairs(self.layouts) do
+    for _, windowID in ipairs(layout.ids) do
+      if not seen[windowID] then
+        local item = self.repository:recordForID(windowID)
+        if item then
+          seen[windowID] = true
+          result[#result + 1] = item
+        end
+      end
+    end
+  end
+  return result
 end
 
 function LayoutOrchestrator:_screenKey(screen)
@@ -118,6 +151,7 @@ function LayoutOrchestrator:activate(target, request, callback)
     self:_reflow(layout)
     target.window:focus()
     layout.lastFocusedID = target.id
+    self:_notify()
     callback(true)
   end)
 end
@@ -135,7 +169,11 @@ function LayoutOrchestrator:focusNext()
   end
   local targetID = ids[index % #ids + 1]
   local target = self:_window(targetID)
-  if target then target:focus(); layout.lastFocusedID = targetID end
+  if target then
+    target:focus()
+    layout.lastFocusedID = targetID
+    self:_notify()
+  end
 end
 
 function LayoutOrchestrator:rotatePositions()
@@ -155,6 +193,7 @@ function LayoutOrchestrator:rotatePositions()
   self:_reflow(layout)
   local target = self:_window(ids[focusedIndex])
   if target then target:focus(); layout.lastFocusedID = ids[focusedIndex] end
+  self:_notify()
 end
 
 function LayoutOrchestrator:closeFocused()
@@ -169,8 +208,10 @@ function LayoutOrchestrator:closeFocused()
     end
     layout.ids = kept
   end
+  self:_notify()
   self.after(self.restoreDelay, function()
     for _, layout in pairs(self.layouts) do self:_reflow(layout) end
+    self:_notify()
   end)
 end
 

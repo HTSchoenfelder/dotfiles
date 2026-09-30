@@ -9,7 +9,12 @@ end
 function Chooser.new(options)
   options = options or {}
   local self = setmetatable({
+    dark = options.dark,
+    foregroundColor = options.foregroundColor,
     rows = options.rows or 7,
+    searchSubText = options.searchSubText == true,
+    secondaryColor = options.secondaryColor,
+    showWindowTitles = options.showWindowTitles ~= false,
     width = options.width or 40,
     callback = nil,
     originalChoices = {},
@@ -23,8 +28,11 @@ function Chooser.new(options)
   end)
   self.instance:rows(self.rows)
   self.instance:width(self.width)
-  self.instance:searchSubText(false)
+  self.instance:searchSubText(self.searchSubText)
   self.instance:placeholderText("")
+  if self.dark ~= nil then self.instance:bgDark(self.dark) end
+  if self.foregroundColor then self.instance:fgColor(self.foregroundColor) end
+  if self.secondaryColor then self.instance:subTextColor(self.secondaryColor) end
   return self
 end
 
@@ -33,9 +41,11 @@ function Chooser:show(choices, callback, screen)
   self.originalChoices = choices
   local displayChoices = {}
   for index, choice in ipairs(choices) do
+    local subText = choice.subText
+    if choice.kind == "window" and not self.showWindowTitles then subText = nil end
     displayChoices[index] = {
       text = choice.text,
-      subText = choice.subText,
+      subText = subText,
       image = choice.image,
       valid = choice.valid,
       uuid = tostring(index),

@@ -1,5 +1,9 @@
 # Brewfile
 
+tap "FelixKratz/formulae"
+
+brew "borders"
+
 cask "yubico-authenticator"
 cask "hammerspoon"
 cask "keepassxc"

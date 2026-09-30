@@ -584,6 +584,7 @@
   "window.commandCenter": false,
   "window.menuBarVisibility": "toggle",
   "window.menuStyle": "inherit",
+  "window.titleBarStyle": "custom",
   "window.title": "${rootPath} | Code",
   "workbench.colorCustomizations": {
     "statusBar.background": "#11111B",

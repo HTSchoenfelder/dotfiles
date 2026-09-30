@@ -8,6 +8,9 @@ function instance:rows() return self end
 function instance:width() return self end
 function instance:searchSubText() return self end
 function instance:placeholderText() return self end
+function instance:bgDark(value) self.dark = value; return self end
+function instance:fgColor(value) self.foreground = value; return self end
+function instance:subTextColor(value) self.secondary = value; return self end
 function instance:choices(choices) nativeChoices = choices; return self end
 function instance:query() return self end
 function instance:show() return self end
@@ -24,15 +27,27 @@ hs = {
 }
 
 local Chooser = require("modules.chooser")
-local chooser = Chooser.new()
+local chooser = Chooser.new({
+  dark = true,
+  foregroundColor = {name = "foreground"},
+  secondaryColor = {name = "secondary"},
+  showWindowTitles = false,
+})
 local windowObject = {native = true}
-local original = {{text = "Code — dotfiles", record = {window = windowObject}}}
+local original = {{
+  text = "Code",
+  subText = "dotfiles",
+  kind = "window",
+  record = {window = windowObject},
+}}
 local selected
 chooser:show(original, function(choice) selected = choice end)
 
-assert(nativeChoices[1].text == "Code — dotfiles")
+assert(nativeChoices[1].text == "Code" and nativeChoices[1].subText == nil)
 assert(nativeChoices[1].record == nil)
 assert(nativeChoices[1].uuid == "1")
+assert(instance.dark and instance.foreground.name == "foreground")
+assert(instance.secondary.name == "secondary")
 nativeCallback(nativeChoices[1])
 assert(selected == original[1] and selected.record.window == windowObject)
 

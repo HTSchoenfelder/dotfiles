@@ -40,6 +40,7 @@ function shortcuts.start(services)
     overlays = overlays,
     textLauncher = textLauncher,
     resetLayout = function() services.orchestrator:resetFocused() end,
+    screenshotDirectory = config.paths.screenshots,
     emojiPath = config.paths.repository .. "/home/.config/hypr/launcher-data/emoji.txt",
     snippetPath = config.paths.repository .. "/home/.config/hypr/launcher-data/snippets.txt",
   })
