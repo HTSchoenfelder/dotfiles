@@ -2,17 +2,18 @@ local config = require("config")
 local DotMode = require("modules.dot_mode")
 local MediaControls = require("modules.media_controls")
 local ProjectOverlays = require("modules.project_overlays")
+local Rodecaster = require("modules.rodecaster")
 local TextLauncher = require("modules.text_launcher")
 local catalog = require("shortcut_catalog")
-local midi = require("midi")
 
 local shortcuts = {}
 
 function shortcuts.start(services)
-  midi:start()
-  shortcuts.midiBinding = hs.hotkey.bind(config.hyper, "\\", function()
-    midi:toggleMute()
+  local rodecaster = Rodecaster.new(config.rodecaster):start()
+  shortcuts.rodecasterBinding = hs.hotkey.bind(config.hyper, "\\", function()
+    rodecaster:toggleMute()
   end)
+  shortcuts.rodecaster = rodecaster
   catalog.add("Media", "MainMod + \\", "Toggle RØDECaster mute")
 
   local mediaControls = MediaControls.new({commaSelection = services.commaSelection})

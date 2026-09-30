@@ -42,4 +42,25 @@ config.appearance = {
   },
 }
 
+config.rodecaster = {
+  deviceName = "RODECaster Pro II",
+  channel = 0,
+  controllerNumber = 27,
+  pressValue = 1,
+  releaseValue = 0,
+  releaseDelaySeconds = 0.1,
+  incomingDebounceSeconds = 0.3,
+  echoSuppressionSeconds = 0.3,
+  settingsKey = "dotfiles.rodecaster.assumedMuted",
+  overlay = {
+    width = 200,
+    height = 50,
+    bottomMargin = 80,
+    radius = 10,
+    textSize = 22,
+    fillColor = {hex = "#f38ba8", alpha = 0.9},
+    textColor = {hex = "#1e1e2e"},
+  },
+}
+
 return config
