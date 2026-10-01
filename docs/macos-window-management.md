@@ -137,12 +137,13 @@ Hyprland's `HYPRSHOT_DIR`.
 instances, Spotify actions, emoji, snippets, commands and the shortcut catalog.
 Spotify actions run asynchronously through `osascript`.
 
-RØDECaster MIDI remains entirely in Hammerspoon. `MainMod + Backslash` sends the
-configured mute-button press and release. The persisted overlay tracks the last
-locally commanded or observed button press and follows the primary display. This
-is an assumed state because that MIDI control reports button events rather than an
-authoritative mute state. Outgoing event echoes and duplicate incoming presses are
-filtered independently, so rapid intentional shortcut presses are never debounced.
+RØDECaster MIDI remains entirely in Hammerspoon. `MainMod + Backslash` sends one
+absolute mute or unmute value; it does not emulate a momentary button press. The
+physical mute control reports a press and release instead, so Hammerspoon toggles
+its retained state only on the press and ignores the release. A narrowly scoped
+echo guard prevents an outgoing mute command from being counted as another
+physical press. The persisted overlay follows the primary display and remains an
+assumed state after a Hammerspoon or device restart until the next interaction.
 
 ## Implemented modules
 
@@ -159,7 +160,7 @@ filtered independently, so rapid intentional shortcut presses are never debounce
 - Application and window navigation share the compact chooser and request gate.
 - `modules/media_controls.lua` applies the same selection lifecycle to Spotify.
 - `modules/rodecaster.lua` owns MIDI discovery and reconnection, mute-button
-  commands, incoming-event filtering, persisted assumed state and its feedback
+  state commands, physical button events, persisted assumed state and its feedback
   overlay.
 - Dot Mode owns screenshots, text launchers and minimized project overlays.
 

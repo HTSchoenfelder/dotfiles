@@ -7,7 +7,6 @@ local SETTINGS_KEY = "dotfiles.rodecaster.assumedMuted"
 local now = 100
 local availableDevices = {DEVICE_NAME}
 local settings = {}
-local timers = {}
 local devices = {}
 local notices = {}
 local deviceChangeCallback
@@ -81,9 +80,6 @@ function screenWatcher:start()
 end
 
 local runtime = {
-  after = function(delay, callback)
-    timers[#timers + 1] = {delay = delay, callback = callback}
-  end,
   canvasLevel = "status",
   canvasNew = newCanvas,
   deviceCallback = function(callback)
@@ -128,27 +124,28 @@ assert(rodecaster.assumedMuted and settings[SETTINGS_KEY] == true)
 assert(rodecaster.overlay.visible)
 assert(#devices[1].commands == 1)
 assert(devices[1].commands[1].metadata.controllerValue == 1)
-assert(#timers == 1 and timers[1].delay == 0.1)
 
-now = 100.05
+now = 100.01
 devices[1].commandCallback(nil, nil, "controlChange", nil, {
   channel = 0,
   controllerNumber = 27,
   controllerValue = 1,
 })
-assert(rodecaster.assumedMuted, "outgoing MIDI echo must be ignored")
+assert(rodecaster.assumedMuted, "outgoing mute echo must not toggle the state")
 
-now = 100.1
+devices[1].commandCallback(nil, nil, "controlChange", nil, {
+  channel = 0,
+  controllerNumber = 27,
+  controllerValue = 0,
+})
+assert(rodecaster.assumedMuted, "button release must not change the state")
+
+now = 100.02
 assert(rodecaster:toggleMute())
-assert(not rodecaster.assumedMuted, "rapid intentional hotkeys must not be debounced")
+assert(not rodecaster.assumedMuted)
 assert(not rodecaster.overlay.visible)
 assert(#devices[1].commands == 2)
-
-timers[1].callback()
-timers[2].callback()
-assert(#devices[1].commands == 4)
-assert(devices[1].commands[3].metadata.controllerValue == 0)
-assert(devices[1].commands[4].metadata.controllerValue == 0)
+assert(devices[1].commands[2].metadata.controllerValue == 0)
 
 now = 101
 devices[1].commandCallback(nil, nil, "controlChange", nil, {
@@ -158,13 +155,42 @@ devices[1].commandCallback(nil, nil, "controlChange", nil, {
 })
 assert(rodecaster.assumedMuted)
 
-now = 101.1
 devices[1].commandCallback(nil, nil, "controlChange", nil, {
   channel = 0,
   controllerNumber = 27,
   controllerValue = 1,
 })
-assert(rodecaster.assumedMuted, "duplicate incoming events must be debounced")
+assert(rodecaster.assumedMuted, "duplicate button-down events must be ignored")
+
+devices[1].commandCallback(nil, nil, "controlChange", nil, {
+  channel = 0,
+  controllerNumber = 27,
+  controllerValue = 0,
+})
+assert(rodecaster.assumedMuted)
+
+now = 102
+devices[1].commandCallback(nil, nil, "controlChange", nil, {
+  channel = 0,
+  controllerNumber = 27,
+  controllerValue = 1,
+})
+assert(not rodecaster.assumedMuted, "the next physical press must toggle the state")
+
+devices[1].commandCallback(nil, nil, "controlChange", nil, {
+  channel = 0,
+  controllerNumber = 27,
+  controllerValue = 0,
+})
+assert(not rodecaster.assumedMuted)
+
+now = 103
+devices[1].commandCallback(nil, nil, "controlChange", nil, {
+  channel = 0,
+  controllerNumber = 27,
+  controllerValue = 1,
+})
+assert(rodecaster.assumedMuted)
 
 screenFrame.x = 1200
 screenWatcher.callback()

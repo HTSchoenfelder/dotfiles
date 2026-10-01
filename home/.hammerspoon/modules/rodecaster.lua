@@ -19,10 +19,8 @@ function Rodecaster.new(options, runtime)
     deviceName = options.deviceName or "RODECaster Pro II",
     channel = options.channel or 0,
     controllerNumber = options.controllerNumber or 27,
-    pressValue = options.pressValue or 1,
-    releaseValue = options.releaseValue or 0,
-    releaseDelay = options.releaseDelaySeconds or 0.1,
-    incomingDebounce = options.incomingDebounceSeconds or 0.3,
+    mutedValue = options.mutedValue or 1,
+    unmutedValue = options.unmutedValue or 0,
     echoSuppression = options.echoSuppressionSeconds or 0.3,
     settingsKey = options.settingsKey or "dotfiles.rodecaster.assumedMuted",
     overlayWidth = overlay.width or 200,
@@ -32,13 +30,10 @@ function Rodecaster.new(options, runtime)
     overlayTextSize = overlay.textSize or 22,
     overlayFillColor = overlay.fillColor or {hex = "#f38ba8", alpha = 0.9},
     overlayTextColor = overlay.textColor or {hex = "#1e1e2e"},
+    buttonDown = false,
     device = nil,
-    lastIncomingAt = -math.huge,
-    suppressIncomingUntil = -math.huge,
+    suppressMutedUntil = -math.huge,
     started = false,
-    after = runtime.after or function(delay, callback)
-      hs.timer.doAfter(delay, callback)
-    end,
     canvasLevel = runtime.canvasLevel or hs.canvas.windowLevels.status,
     canvasNew = runtime.canvasNew or function(frame)
       return hs.canvas.new(frame)
@@ -155,45 +150,55 @@ function Rodecaster:_syncOverlay()
 end
 
 function Rodecaster:_setAssumedMuted(muted)
-  self.assumedMuted = muted == true
+  muted = muted == true
+  if self.assumedMuted == muted then
+    return
+  end
+
+  self.assumedMuted = muted
   self.settingsSet(self.settingsKey, self.assumedMuted)
   self:_syncOverlay()
   self.log(string.format("RØDECaster assumed mute state: %s", tostring(self.assumedMuted)))
 end
 
-function Rodecaster:_toggleAssumedMute()
-  self:_setAssumedMuted(not self.assumedMuted)
-end
-
-function Rodecaster:_isMutePress(commandType, metadata)
+function Rodecaster:_isMuteControl(commandType, metadata)
   return commandType == "controlChange"
     and type(metadata) == "table"
     and metadata.channel == self.channel
     and metadata.controllerNumber == self.controllerNumber
-    and metadata.controllerValue == self.pressValue
 end
 
 function Rodecaster:_handleCommand(commandType, metadata)
-  if not self:_isMutePress(commandType, metadata) then
+  if not self:_isMuteControl(commandType, metadata) then
     return
   end
 
-  local now = self.now()
-  if now <= self.suppressIncomingUntil then
+  if metadata.controllerValue == self.unmutedValue then
+    self.buttonDown = false
     return
   end
-  if now - self.lastIncomingAt <= self.incomingDebounce then
+  if metadata.controllerValue ~= self.mutedValue then
     return
   end
 
-  self.lastIncomingAt = now
-  self:_toggleAssumedMute()
+  if self.now() <= self.suppressMutedUntil then
+    self.suppressMutedUntil = -math.huge
+    return
+  end
+  if self.buttonDown then
+    return
+  end
+
+  self.buttonDown = true
+  self:_setAssumedMuted(not self.assumedMuted)
 end
 
 function Rodecaster:_connect(devices)
   if not contains(devices or self.devices(), self.deviceName) then
     local wasConnected = self.device ~= nil
+    self.buttonDown = false
     self.device = nil
+    self.suppressMutedUntil = -math.huge
     self:_syncOverlay()
     if wasConnected then
       self.log("RØDECaster MIDI device disconnected")
@@ -211,6 +216,8 @@ function Rodecaster:_connect(devices)
     return false
   end
 
+  self.buttonDown = false
+  self.suppressMutedUntil = -math.huge
   self.device:callback(function(_, _, commandType, _, metadata)
     self:_handleCommand(commandType, metadata)
   end)
@@ -260,20 +267,20 @@ function Rodecaster:toggleMute()
     return false
   end
 
-  self.suppressIncomingUntil = self.now() + self.echoSuppression
-  if not self:_send(device, self.pressValue) then
+  local muted = not self.assumedMuted
+  local value = muted and self.mutedValue or self.unmutedValue
+  if value == self.mutedValue then
+    self.suppressMutedUntil = self.now() + self.echoSuppression
+  end
+  if not self:_send(device, value) then
+    self.suppressMutedUntil = -math.huge
     self.device = nil
     self:_syncOverlay()
     self.notify("Mute command failed")
     return false
   end
 
-  self.after(self.releaseDelay, function()
-    if self:_isOnline(device) then
-      self:_send(device, self.releaseValue)
-    end
-  end)
-  self:_toggleAssumedMute()
+  self:_setAssumedMuted(muted)
   return true
 end
 
