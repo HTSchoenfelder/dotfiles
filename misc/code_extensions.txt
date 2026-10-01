@@ -24,7 +24,6 @@ dbaeumer.vscode-eslint
 donjayamanne.githistory
 dotjoshjohnson.xml
 dtsvet.vscode-wasm
-eamodio.gitlens
 ecmel.vscode-html-css
 editorconfig.editorconfig
 esbenp.prettier-vscode
@@ -98,7 +97,6 @@ ritwickdey.liveserver
 rust-lang.rust-analyzer
 saramorillon.terraform-graph
 skellock.just
-sonarsource.sonarlint-vscode
 sumneko.lua
 syler.sass-indented
 tamasfe.even-better-toml

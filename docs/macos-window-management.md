@@ -49,6 +49,10 @@ Hammerspoon retains a compact layout record per display:
 display ID -> { screen, focused slot, slots [{ window ID, frame }] }
 ```
 
+The per-display focused slot is the retained replacement cursor for that layout;
+it is not a claim that every display has a focused window. Border highlighting is
+derived separately from macOS's single globally focused native window.
+
 The slot frames are the stable visual layout. Window IDs identify the current
 occupants:
 

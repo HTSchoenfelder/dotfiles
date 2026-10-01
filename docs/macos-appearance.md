@@ -8,9 +8,11 @@ use Stage Manager, Mission Control, Spaces or another window manager.
 
 Hammerspoon draws rounded Catppuccin frames for active layout slots only. Green
 marks the slot occupied by the focused window and Pink marks the other slots.
-Untracked windows have no frame. `config.appearance.layoutBorders` controls the
-feature, colors, width, radius and offset; set `enabled = false` to remove it
-completely. The configured width is 4.5 points.
+The Green frame follows macOS's global window focus, so inactive displays contain
+only Pink frames. Untracked windows have no frame.
+`config.appearance.layoutBorders` controls the feature, colors, width, radius and
+offset; set `enabled = false` to remove it completely. The configured width is 4.5
+points.
 
 Frames belong to slot geometry rather than window objects. A focus change updates
 only the colors. When Comma Selection replaces a slot occupant, an unchanged slot

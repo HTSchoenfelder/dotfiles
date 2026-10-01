@@ -191,6 +191,12 @@ orchestrator.layouts["screen-2"] = {
   focusedSlot = 1,
   slots = {{windowID = 5, frame = fifth:frame()}},
 }
+local focusChanges = layoutChanges
+focused = fifth
+orchestrator:_validateFocus()
+assert(orchestrator:focusedWindowID() == 5)
+assert(layoutChanges == focusChanges + 1,
+  "focus validation must notify even when the display-local slot index is unchanged")
 focused = first
 generation = gate:next()
 orchestrator:activate({id = 1, window = first, screen = screen}, {

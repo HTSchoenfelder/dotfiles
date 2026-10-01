@@ -218,6 +218,11 @@ function LayoutOrchestrator:layoutSnapshot()
   return result
 end
 
+function LayoutOrchestrator:focusedWindowID()
+  local focused = self.repository.focusedWindow()
+  return focused and tonumber(focused:id()) or nil
+end
+
 function LayoutOrchestrator:activeScreen()
   local focused = self.repository.focusedWindow()
   return focused and focused:screen() or self.mainScreen()
@@ -357,10 +362,8 @@ function LayoutOrchestrator:_validateFocus()
   if not record then return end
   local layout, index = self:_slotForWindow(record.id)
   if layout then
-    if layout.focusedSlot ~= index then
-      layout.focusedSlot = index
-      self:_notify()
-    end
+    layout.focusedSlot = index
+    self:_notify()
     return
   end
   self:clearScreen(record.screen)

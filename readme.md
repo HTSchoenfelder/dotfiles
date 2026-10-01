@@ -59,10 +59,10 @@ Application, window and comma selection use the same compact `hs.chooser`
 presentation with Catppuccin text colors, application icons and subdued window
 titles. The application launcher lists top-level bundles from the standard
 application directories with their native icons. Active layout slots receive a
-Catppuccin frame: Green for the focused occupant and Pink for other slots;
-untracked windows have no frame. Both the titles and slot frames can be disabled
-in `home/.hammerspoon/config.lua`. macOS has no workflow workspaces or Parking
-state.
+Catppuccin frame: the single globally focused occupant is Green and every other
+slot is Pink; untracked windows have no frame. Both the titles and slot frames can
+be disabled in `home/.hammerspoon/config.lua`. macOS has no workflow workspaces or
+Parking state.
 
 Managed layouts use one full-size window, a 1:1 left/right split for two windows,
 and a left master with a vertical right stack for three or more windows.
