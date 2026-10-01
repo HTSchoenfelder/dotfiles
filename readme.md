@@ -14,6 +14,12 @@ Reliable platform-native behavior takes precedence when exact parity would be
 fragile. Intentional differences that affect muscle memory must stay explicit and
 documented.
 
+Keyboard parity extends beyond window management: Linux-shaped `Ctrl` editing,
+text navigation and application shortcuts should retain their physical keys even
+where macOS expects `Command` or `Option`. The current implementation and remaining
+VS Code and application-specific gaps are tracked in the
+[macOS keyboard parity](docs/macos-keyboard-parity.md) document.
+
 Hammerspoon is the only macOS workflow and window-management process. It owns
 shortcuts, modes, choosers, application intentions, MRU state, MIDI integration,
 passive master/stack geometry and layout-slot frames through native windows.
@@ -135,8 +141,12 @@ that window; opening another overlay minimizes the previous one.
 
 ## Application shortcut forwarding
 
-`Ctrl + P/H/J/K/L` reaches the focused application unchanged. In Chrome it maps
-to `Ctrl+Shift+A`, `Alt+Left`, `Ctrl+Shift+Tab`, `Ctrl+Tab` and `Alt+Right`.
+On Hyprland, `Ctrl + P/H/J/K/L` reaches the focused application unchanged. Chrome
+maps it to tab search, Back, previous tab, next tab and Forward. The macOS layer
+implements the same actions and translates the common Linux-shaped Chrome and
+system text shortcuts to their native macOS events. VS Code remains
+context-owned; its status is documented in
+[macOS keyboard parity](docs/macos-keyboard-parity.md).
 
 Media, volume, microphone and brightness hardware keys use their native actions.
 The read-only shortcut catalogs use `Shortcut — Description` rows and include

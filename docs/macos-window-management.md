@@ -12,6 +12,10 @@ Hyprland remains the behavioral reference. Shortcut shape, selection lifecycle a
 master/stack intent stay aligned where macOS has a reliable equivalent. macOS does
 not emulate Hyprland workspaces or Parking.
 
+Application shortcut and text-navigation parity is a separate input concern. Its
+current ownership, incomplete coverage and target contract are documented in
+[macOS keyboard parity](macos-keyboard-parity.md).
+
 ## Responsibility boundaries
 
 | Component | Responsibility |
@@ -20,6 +24,10 @@ not emulate Hyprland workspaces or Parking.
 | Hammerspoon | Global shortcuts, held-key state, Comma Selection, Dot Mode, chooser UI, application launch/focus, MRU state, MIDI, explicit window geometry and layout-slot frames |
 | macOS Accessibility | Native window discovery, focus, close, minimize, restore, frame and display association |
 | JankyBorders | Optional two-state alternative for global window borders; never layout or navigation |
+
+Hammerspoon also hosts the current GUI key-remapping event tap, but VS Code keeps
+context-sensitive shortcut ownership in its native keybinding system. This input
+boundary is intentionally documented separately from window geometry.
 
 Hammerspoon changes frames only in direct response to a shortcut. It does not run
 a permanent reflow loop, create virtual workspaces, hide unrelated applications or
@@ -166,6 +174,11 @@ assumed state after a Hammerspoon or device restart until the next interaction.
 - `modules/rodecaster.lua` owns MIDI discovery and reconnection, mute-button
   state commands, physical button events, persisted assumed state and its feedback
   overlay.
+- `remapping.lua` owns the key-remapper lifecycle, while
+  `modules/key_remapper.lua` contains the declarative, testable application
+  shortcut and text-navigation translation layer. Its ownership and remaining
+  application-specific work are described in
+  [macOS keyboard parity](macos-keyboard-parity.md).
 - Dot Mode owns screenshots, text launchers and minimized project overlays.
 
 ## Platform differences

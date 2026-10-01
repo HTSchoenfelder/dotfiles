@@ -31,6 +31,16 @@ config.chooser = {
   width = 40,
 }
 
+config.keyboard = {
+  chromeBundleID = "com.google.Chrome",
+  vsCodeBundleID = "com.microsoft.VSCode",
+  terminalBundleIDs = {
+    "net.kovidgoyal.kitty",
+    "com.apple.Terminal",
+    "com.googlecode.iterm2",
+  },
+}
+
 config.appearance = {
   layoutBorders = {
     enabled = true,

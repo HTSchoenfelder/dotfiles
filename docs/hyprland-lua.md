@@ -18,7 +18,9 @@ does not reproduce Hyprland workspaces or Parking.
 Platform-specific implementation details are acceptable when the keys, sequence
 and visible outcome remain aligned. Any deliberate behavioral difference that
 affects muscle memory should be recorded in the relevant quick reference or in the
-[macOS window-management architecture](macos-window-management.md).
+[macOS window-management architecture](macos-window-management.md). Application
+shortcut and text-input differences are tracked separately in
+[macOS keyboard parity](macos-keyboard-parity.md).
 
 Shift adds an application shortcut or `P` selection to the current layout. `F`
 chooses an application instance or restricts Comma Selection to the focused

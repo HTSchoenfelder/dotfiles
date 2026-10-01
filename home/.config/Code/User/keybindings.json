@@ -82,6 +82,26 @@
         "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
     },
     {
+        "key": "ctrl+c",
+        "command": "execCopy",
+        "when": "!terminalFocus"
+    },
+    {
+        "key": "ctrl+c",
+        "command": "editor.action.clipboardCopyAction",
+        "when": "!terminalFocus"
+    },
+    {
+        "key": "ctrl+v",
+        "command": "execPaste",
+        "when": "!terminalFocus"
+    },
+    {
+        "key": "ctrl+v",
+        "command": "editor.action.clipboardPasteAction",
+        "when": "!terminalFocus"
+    },
+    {
         "command": "workbench.action.quickOpen",
         "key": "ctrl+p"
     },
