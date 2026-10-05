@@ -69,6 +69,17 @@ local function modifiers(base, shifted)
   return result
 end
 
+local function attributeValue(element, name)
+  if not element then
+    return nil
+  end
+
+  local ok, value = pcall(function()
+    return element:attributeValue(name)
+  end)
+  return ok and value or nil
+end
+
 function KeyRemapper.new(options, runtime)
   options = options or {}
   runtime = runtime or {}
@@ -82,6 +93,10 @@ function KeyRemapper.new(options, runtime)
     end,
     frontmostApplication = runtime.frontmostApplication or function()
       return hs.application.frontmostApplication()
+    end,
+    focusedUIElement = runtime.focusedUIElement or function()
+      local systemElement = hs.axuielement.systemWideElement()
+      return systemElement and systemElement:attributeValue("AXFocusedUIElement")
     end,
     keyDownType = runtime.keyDownType or hs.eventtap.event.types.keyDown,
     keyName = runtime.keyName or function(keyCode)
@@ -164,7 +179,34 @@ function KeyRemapper:_editingTranslation(key, flags)
   return nil
 end
 
-function KeyRemapper:translate(bundleID, key, flags)
+function KeyRemapper:_isVSCodeTextInput(element)
+  element = element or self.focusedUIElement()
+  local role = attributeValue(element, "AXRole")
+  if role ~= "AXTextArea" and role ~= "AXTextField" then
+    return false
+  end
+
+  local description = string.lower(attributeValue(element, "AXDescription") or "")
+  if string.find(description, "terminal accessibility help", 1, true)
+      or string.find(description, "editor is not accessible", 1, true) then
+    return false
+  end
+
+  local current = element
+  for _ = 1, 12 do
+    if attributeValue(current, "AXSubrole") == "AXCodeStyleGroup" then
+      return false
+    end
+    current = attributeValue(current, "AXParent")
+    if not current then
+      break
+    end
+  end
+
+  return true
+end
+
+function KeyRemapper:translate(bundleID, key, flags, context)
   if not bundleID or not key then
     return nil
   end
@@ -175,6 +217,9 @@ function KeyRemapper:translate(bundleID, key, flags)
     return self:_terminalTranslation(key, flags)
   end
   if bundleID == self.vsCodeBundleID then
+    if context and context.vsCodeTextInput then
+      return self:_textTranslation(key, flags)
+    end
     return nil
   end
   if bundleID == self.chromeBundleID then
@@ -193,11 +238,15 @@ function KeyRemapper:_handle(event)
     return false
   end
 
-  local target = self:translate(
-    application:bundleID(),
-    self.keyName(event:getKeyCode()),
-    event:getFlags()
-  )
+  local bundleID = application:bundleID()
+  local key = self.keyName(event:getKeyCode())
+  local flags = event:getFlags()
+  local context
+  if bundleID == self.vsCodeBundleID and self:_textTranslation(key, flags) then
+    context = {vsCodeTextInput = self:_isVSCodeTextInput()}
+  end
+
+  local target = self:translate(bundleID, key, flags, context)
   if not target then
     return false
   end

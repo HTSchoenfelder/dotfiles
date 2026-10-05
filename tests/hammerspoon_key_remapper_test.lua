@@ -6,6 +6,18 @@ local KeyRemapper = require("modules.key_remapper")
 local sent = {}
 local createdTaps = {}
 local frontmostBundleID = "com.google.Chrome"
+local focusedElement
+
+local function axElement(attributes, parent)
+  return {
+    attributeValue = function(_, name)
+      if name == "AXParent" then
+        return parent
+      end
+      return attributes[name]
+    end,
+  }
+end
 
 local function newTap(_, callback)
   local tap = {callback = callback}
@@ -29,6 +41,7 @@ local remapper = KeyRemapper.new({
   frontmostApplication = function()
     return {bundleID = function() return frontmostBundleID end}
   end,
+  focusedUIElement = function() return focusedElement end,
   keyDownType = "keyDown",
   keyName = function(keyCode) return keyCode end,
   send = function(mods, key)
@@ -43,8 +56,8 @@ local function assertModifiers(actual, expected)
   end
 end
 
-local function assertTarget(bundleID, key, flags, expectedMods, expectedKey)
-  local target = remapper:translate(bundleID, key, flags)
+local function assertTarget(bundleID, key, flags, expectedMods, expectedKey, context)
+  local target = remapper:translate(bundleID, key, flags, context)
   assert(target, "expected a target for " .. bundleID .. " " .. key)
   assert(target.key == expectedKey, "unexpected target key for " .. key)
   assertModifiers(target.mods, expectedMods)
@@ -77,6 +90,28 @@ assertTarget(terminal, "c", {ctrl = true, shift = true}, {"cmd"}, "c")
 assertTarget(terminal, "v", {ctrl = true, shift = true}, {"cmd"}, "v")
 assertTarget(terminal, "z", {ctrl = true, shift = true}, {"cmd", "shift"}, "z")
 assertIgnored(vscode, "c", {ctrl = true})
+
+local codexInput = axElement({
+  AXRole = "AXTextArea",
+  AXDescription = "Ask for follow-up changes",
+})
+local searchInput = axElement({
+  AXRole = "AXTextField",
+  AXDescription = "Search",
+})
+local codeGroup = axElement({AXRole = "AXGroup", AXSubrole = "AXCodeStyleGroup"})
+local editorInput = axElement({AXRole = "AXTextArea"}, codeGroup)
+local terminalInput = axElement({
+  AXRole = "AXTextField",
+  AXDescription = "Terminal 1, zsh Use Option+F1 for terminal accessibility help",
+})
+
+assert(remapper:_isVSCodeTextInput(codexInput))
+assert(remapper:_isVSCodeTextInput(searchInput))
+assert(not remapper:_isVSCodeTextInput(editorInput))
+assert(not remapper:_isVSCodeTextInput(terminalInput))
+assertTarget(vscode, "left", {ctrl = true}, {"alt"}, "left", {vsCodeTextInput = true})
+assertIgnored(vscode, "left", {ctrl = true})
 
 assertTarget(chrome, "p", {ctrl = true}, {"cmd", "shift"}, "a")
 assertTarget(chrome, "h", {ctrl = true}, {"cmd"}, "left")
@@ -111,6 +146,24 @@ assert(createdTaps[1].callback(event))
 assert(#sent == 1)
 assert(sent[1].key == "a")
 assertModifiers(sent[1].mods, {"cmd", "shift"})
+
+frontmostBundleID = vscode
+focusedElement = codexInput
+local wordLeftEvent = {
+  getFlags = function() return {ctrl = true} end,
+  getKeyCode = function() return "left" end,
+}
+assert(createdTaps[1].callback(wordLeftEvent))
+assert(#sent == 2 and sent[2].key == "left")
+assertModifiers(sent[2].mods, {"alt"})
+
+focusedElement = editorInput
+assert(not createdTaps[1].callback(wordLeftEvent))
+assert(#sent == 2, "Monaco editor navigation must remain application-owned")
+
+focusedElement = terminalInput
+assert(not createdTaps[1].callback(wordLeftEvent))
+assert(#sent == 2, "terminal navigation must remain shell-owned")
 
 remapper:stop()
 assert(not createdTaps[1].started and remapper.tap == nil)

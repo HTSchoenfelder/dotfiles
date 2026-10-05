@@ -102,6 +102,76 @@
         "when": "!terminalFocus"
     },
     {
+        "key": "ctrl+left",
+        "command": "cursorWordStartLeft",
+        "when": "editorTextFocus && !terminalFocus && (!vim.active || vim.mode == 'Insert')"
+    },
+    {
+        "key": "ctrl+right",
+        "command": "cursorWordEndRight",
+        "when": "editorTextFocus && !terminalFocus && (!vim.active || vim.mode == 'Insert')"
+    },
+    {
+        "key": "ctrl+shift+left",
+        "command": "cursorWordStartLeftSelect",
+        "when": "editorTextFocus && !terminalFocus && (!vim.active || vim.mode == 'Insert')"
+    },
+    {
+        "key": "ctrl+shift+right",
+        "command": "cursorWordEndRightSelect",
+        "when": "editorTextFocus && !terminalFocus && (!vim.active || vim.mode == 'Insert')"
+    },
+    {
+        "key": "ctrl+backspace",
+        "command": "deleteWordLeft",
+        "when": "editorTextFocus && !terminalFocus && (!vim.active || vim.mode == 'Insert')"
+    },
+    {
+        "key": "ctrl+delete",
+        "command": "deleteWordRight",
+        "when": "editorTextFocus && !terminalFocus && (!vim.active || vim.mode == 'Insert')"
+    },
+    {
+        "key": "home",
+        "command": "cursorHome",
+        "when": "editorTextFocus && !terminalFocus && (!vim.active || vim.mode == 'Insert')"
+    },
+    {
+        "key": "end",
+        "command": "cursorEnd",
+        "when": "editorTextFocus && !terminalFocus && (!vim.active || vim.mode == 'Insert')"
+    },
+    {
+        "key": "shift+home",
+        "command": "cursorHomeSelect",
+        "when": "editorTextFocus && !terminalFocus && (!vim.active || vim.mode == 'Insert')"
+    },
+    {
+        "key": "shift+end",
+        "command": "cursorEndSelect",
+        "when": "editorTextFocus && !terminalFocus && (!vim.active || vim.mode == 'Insert')"
+    },
+    {
+        "key": "ctrl+home",
+        "command": "cursorTop",
+        "when": "editorTextFocus && !terminalFocus && (!vim.active || vim.mode == 'Insert')"
+    },
+    {
+        "key": "ctrl+end",
+        "command": "cursorBottom",
+        "when": "editorTextFocus && !terminalFocus && (!vim.active || vim.mode == 'Insert')"
+    },
+    {
+        "key": "ctrl+shift+home",
+        "command": "cursorTopSelect",
+        "when": "editorTextFocus && !terminalFocus && (!vim.active || vim.mode == 'Insert')"
+    },
+    {
+        "key": "ctrl+shift+end",
+        "command": "cursorBottomSelect",
+        "when": "editorTextFocus && !terminalFocus && (!vim.active || vim.mode == 'Insert')"
+    },
+    {
         "command": "workbench.action.quickOpen",
         "key": "ctrl+p"
     },
@@ -111,17 +181,13 @@
     },
     {
         "command": "editor.action.selectAll",
-        "key": "ctrl+a"
+        "key": "ctrl+a",
+        "when": "!terminalFocus"
     },
     {
         "command": "list.selectAll",
         "key": "ctrl+a",
         "when": "listFocus && listSupportsMultiselect && !inputFocus && !treestickyScrollFocused"
-    },
-    {
-        "command": "workbench.action.terminal.selectAll",
-        "key": "ctrl+a",
-        "when": "terminalFocusInAny && terminalHasBeenCreated || terminalFocusInAny && terminalProcessSupported"
     },
     {
         "command": "notebook.cell.output.selectAll",
@@ -151,7 +217,7 @@
     {
         "command": "keybindings.editor.searchKeybindings",
         "key": "ctrl+f",
-        "when": "inKeybindings"
+        "when": "!terminalFocus && inKeybindings"
     },
     {
         "command": "workbench.action.closeAllEditors",
@@ -160,52 +226,47 @@
     {
         "command": "actions.find",
         "key": "ctrl+f",
-        "when": "editorFocus || editorIsOpen"
+        "when": "!terminalFocus && (editorFocus || editorIsOpen)"
     },
     {
         "command": "notebook.find",
         "key": "ctrl+f",
-        "when": "notebookEditorFocused && !editorFocus && activeEditor == 'workbench.editor.interactive' || notebookEditorFocused && !editorFocus && activeEditor == 'workbench.editor.notebook'"
+        "when": "!terminalFocus && (notebookEditorFocused && !editorFocus && activeEditor == 'workbench.editor.interactive' || notebookEditorFocused && !editorFocus && activeEditor == 'workbench.editor.notebook')"
     },
     {
         "command": "settings.action.search",
         "key": "ctrl+f",
-        "when": "inSettingsEditor"
-    },
-    {
-        "command": "workbench.action.terminal.focusFind",
-        "key": "ctrl+f",
-        "when": "terminalFindFocused && terminalHasBeenCreated || terminalFindFocused && terminalProcessSupported || terminalFocusInAny && terminalHasBeenCreated || terminalFocusInAny && terminalProcessSupported"
+        "when": "!terminalFocus && inSettingsEditor"
     },
     {
         "command": "commentsFocusFilter",
         "key": "ctrl+f",
-        "when": "focusedView == 'workbench.panel.comments'"
+        "when": "!terminalFocus && focusedView == 'workbench.panel.comments'"
     },
     {
         "command": "editor.action.extensioneditor.showfind",
         "key": "ctrl+f",
-        "when": "!editorFocus && activeEditor == 'workbench.editor.extension'"
+        "when": "!terminalFocus && !editorFocus && activeEditor == 'workbench.editor.extension'"
     },
     {
         "command": "editor.action.webvieweditor.showFind",
         "key": "ctrl+f",
-        "when": "webviewFindWidgetEnabled && !editorFocus && activeEditor == 'WebviewEditor'"
+        "when": "!terminalFocus && webviewFindWidgetEnabled && !editorFocus && activeEditor == 'WebviewEditor'"
     },
     {
         "command": "keybindings.editor.searchKeybindings",
         "key": "ctrl+f",
-        "when": "inKeybindings"
+        "when": "!terminalFocus && inKeybindings"
     },
     {
         "command": "problems.action.focusFilter",
         "key": "ctrl+f",
-        "when": "focusedView == 'workbench.panel.markers.view'"
+        "when": "!terminalFocus && focusedView == 'workbench.panel.markers.view'"
     },
     {
         "command": "repl.action.filter",
         "key": "ctrl+f",
-        "when": "inDebugRepl && textInputFocus"
+        "when": "!terminalFocus && inDebugRepl && textInputFocus"
     },
     {
         "command": "chat.inlineResourceAnchor.copyResource",

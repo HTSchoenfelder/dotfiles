@@ -144,8 +144,9 @@ that window; opening another overlay minimizes the previous one.
 On Hyprland, `Ctrl + P/H/J/K/L` reaches the focused application unchanged. Chrome
 maps it to tab search, Back, previous tab, next tab and Forward. The macOS layer
 implements the same actions and translates the common Linux-shaped Chrome and
-system text shortcuts to their native macOS events. VS Code remains
-context-owned; its status is documented in
+system text shortcuts to their native macOS events. VS Code remains context-owned
+for commands, Monaco, Vim and its terminal, while native and webview text inputs
+receive the same navigation translation. Its status is documented in
 [macOS keyboard parity](docs/macos-keyboard-parity.md).
 
 Media, volume, microphone and brightness hardware keys use their native actions.

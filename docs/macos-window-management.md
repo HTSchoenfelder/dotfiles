@@ -25,9 +25,11 @@ current ownership, incomplete coverage and target contract are documented in
 | macOS Accessibility | Native window discovery, focus, close, minimize, restore, frame and display association |
 | JankyBorders | Optional two-state alternative for global window borders; never layout or navigation |
 
-Hammerspoon also hosts the current GUI key-remapping event tap, but VS Code keeps
-context-sensitive shortcut ownership in its native keybinding system. This input
-boundary is intentionally documented separately from window geometry.
+Hammerspoon also hosts the current GUI key-remapping event tap. VS Code keeps
+context-sensitive command, Monaco, Vim and terminal ownership in its native
+keybinding system; Hammerspoon only adds Accessibility-gated navigation for
+native and webview text inputs. This input boundary is intentionally documented
+separately from window geometry.
 
 Hammerspoon changes frames only in direct response to a shortcut. It does not run
 a permanent reflow loop, create virtual workspaces, hide unrelated applications or
