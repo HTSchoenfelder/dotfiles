@@ -25,6 +25,7 @@ local picker = rofi_picker.new({
 local windows = window_navigation.new({
     parking_workspace = workspaces.parking,
     launch_timeout_ms = settings.launch_timeout_ms,
+    state_file = settings.slot_state_file,
 }, picker)
 local spaces = workspace_navigation.new(picker)
 local overlays = project_overlays.new(require("config.project_overlays"))
@@ -45,33 +46,15 @@ bind("SHIFT + R", function()
     shortcut_catalog.open(picker)
 end, "Show shortcut catalog", "Launchers")
 bind("W", hl.dsp.window.close(), "Close window", "Windows")
-hl.bind(settings.modifier .. " + " .. settings.monitor_key, hl.dsp.no_op(), {
-    description = "Target other display",
-})
-hl.bind(settings.modifier .. " + H", function()
-    if hl.is_key_down(settings.monitor_key:lower()) then
-        windows.move_focused_to_other_monitor(true)
-    else
-        spaces.switch_between(workspaces.primary)
-    end
-end, { description = "Switch workspace or move window to other display" })
-hl.bind(settings.modifier .. " + slash", function()
-    if hl.is_key_down(settings.monitor_key:lower()) then
-        windows.move_focused_to_other_monitor(false)
-    else
-        windows.keep_focused_only()
-    end
-end, { description = "Keep focused window as the only layout window" })
-shortcut_catalog.add("Navigation", shortcut_catalog.main("H"), "Switch between workspaces 1 and 2")
-shortcut_catalog.add("Windows", shortcut_catalog.main("slash"), "Keep only focused window in layout")
-shortcut_catalog.add("Windows", shortcut_catalog.main("G + slash"), "Move window to other display and replace layout")
-shortcut_catalog.add("Windows", shortcut_catalog.main("G + H"), "Move window to other display and add to layout")
-bind("M", hl.dsp.layout("cyclenext"), "Focus next window", "Navigation")
-bind("N", window_navigation.rotate_positions, "Rotate window positions", "Windows")
+bind("H", windows.focus_other_monitor, "Focus other display", "Navigation")
+bind("slash", windows.keep_focused_only, "Keep focused slot only", "Windows")
+bind("SHIFT + slash", windows.enable_two_slots, "Use two slots on focused display", "Windows")
+bind("M", windows.focus_next_slot, "Focus other slot", "Navigation")
+bind("N", windows.rotate_positions, "Swap slot contents and retain focused side", "Windows")
 
 bind(settings.instance_key, hl.dsp.no_op(), "Select application instance", "Applications")
 shortcut_catalog.add("Applications", shortcut_catalog.main("F + App"), "Select application instance")
-shortcut_catalog.add("Applications", shortcut_catalog.main("SHIFT + App"), "Add application to stack")
+shortcut_catalog.add("Applications", shortcut_catalog.main("SHIFT + App"), "Fill other slot with application")
 local terminal
 local function focused_application()
     local active = hl.get_active_window()
@@ -86,29 +69,29 @@ for _, application in ipairs(settings.applications) do
     if application.class == "kitty" then terminal = application end
     bind(application.key, function()
         windows.activate(application, {}, hl.is_key_down(settings.instance_key:lower()))
-    end, "Navigate to " .. application.name, "Applications")
+    end, "Fill focused slot with " .. application.name, "Applications")
     hl.bind(settings.modifier .. " + SHIFT + " .. application.key, function()
-        windows.activate(application, { add_to_stack = true }, hl.is_key_down(settings.instance_key:lower()))
-    end, { description = "Add " .. application.name .. " to stack" })
+        windows.activate(application, { other_slot = true }, hl.is_key_down(settings.instance_key:lower()))
+    end, { description = "Fill other slot with " .. application.name })
 end
 assert(terminal, "Kitty must be configured as a navigation application")
 local reset_workspaces = workspace_reset.new({
     workspaces = workspaces,
-    activate_terminal = function() windows.activate(terminal, {}, false) end,
+    activate_terminal = function() windows.activate(terminal, { replace_layout = true }, false) end,
 })
 
-bind("P", function() windows.activate(nil, {}, true) end, "Select window by last focus", "Windows")
+bind("P", function() windows.activate(nil, {}, true) end, "Select window for focused slot", "Windows")
 hl.bind(settings.modifier .. " + SHIFT + P", function()
-    windows.activate(nil, { add_to_stack = true }, true)
-end, { description = "Select window and add it to stack" })
+    windows.activate(nil, { other_slot = true }, true)
+end, { description = "Select window for other slot" })
 picker.bind_cycle("comma", function(direction)
     local application = hl.is_key_down(settings.instance_key:lower()) and focused_application() or nil
     windows.cycle(direction, "comma", {}, application)
 end, "Cycle windows by last focus")
-shortcut_catalog.add("Windows", shortcut_catalog.main("comma"), "Cycle windows by last focus")
+shortcut_catalog.add("Windows", shortcut_catalog.main("comma"), "Choose focused slot content by last focus")
 shortcut_catalog.add("Windows", shortcut_catalog.main("SHIFT + comma"), "Cycle windows backwards")
 shortcut_catalog.add("Windows", shortcut_catalog.main("F + comma"), "Cycle application windows")
-shortcut_catalog.add("Windows", shortcut_catalog.main("SHIFT + P"), "Choose window and add it to stack")
+shortcut_catalog.add("Windows", shortcut_catalog.main("SHIFT + P"), "Select window for other slot")
 picker.bind_cycle("B", function(direction)
     if picker.is_open() then return end
     windows.invalidate_pending_focus()
@@ -134,6 +117,7 @@ dot_mode.bind({
         picker.cancel()
     end,
     actions = {
+        { key = "M", description = "Toggle display split between 70:30 and 50:50", run = windows.toggle_ratio },
         { key = "Q", description = "Capture region", run = screenshots.capture_region },
         { key = "A", description = "Capture active window", run = screenshots.capture_active_window },
         { key = "Z", description = "Capture active screen", run = screenshots.capture_active_output },

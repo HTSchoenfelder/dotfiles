@@ -78,9 +78,10 @@ inner spacing; zero restores edge-to-edge geometry.
 
 Normal application activation replaces the tracked layout with the selected
 full-size window. Other macOS windows remain unchanged behind it. This is the
-deliberate replacement for Hyprland Parking: no unrelated window is minimized,
-hidden or moved. `Shift + App` and `Shift + P` preserve the current layout and
-append the selected window to its stack. After external focus has reset a layout,
+macOS placement policy (Hyprland now replaces individual slots): no unrelated
+window is minimized, hidden or moved. `Shift + App` and `Shift + P` preserve the
+current layout and append the selected window to its stack. After external focus
+has reset a layout,
 the next Shift action uses that focused window as the new master.
 
 `MainMod + /` explicitly reduces the current display's tracked layout to the
@@ -187,12 +188,19 @@ assumed state after a Hammerspoon or device restart until the next interaction.
 
 - Hyprland has Terminal, Display and Parking workspaces; macOS has no workflow
   workspaces. Hyprland cycles them with `MainMod + B`.
-- Hyprland uses a 70/30 master ratio; macOS uses a 1:1 left/right ratio.
+- Hyprland toggles 70:30/50:50 with Dot Mode `M`; macOS uses a 1:1 ratio.
 - Hyprland Dot Mode can toggle physical displays. macOS Accessibility cannot, so
   Dot Mode has no `B` action.
 - macOS has no extra Dot Mode window movement or fullscreen actions.
-- Hyprland Comma Selection brings a chosen window into the current workspace;
-  macOS adopts it into a slot on the window's existing display.
+- Hyprland caps each normal display layout at two slots. App keys, `P` and Comma
+  Selection replace the focused slot; Shift app/`P` targets the other slot while
+  retaining focus. macOS still replaces the layout on app/`P` activation and adds
+  to a potentially larger stack with Shift.
+- Hyprland swaps contents when selecting another visible slot, including across
+  displays, and refills closed slots from Parking. macOS comma adoption stays on
+  the selected window's existing display and has no Parking refill.
+- Hyprland has no held `G` display modifier. macOS retains `G + /` and `G + H`.
+- Hyprland uses `Shift + /` to request two slots; macOS has no equivalent binding.
 
 VS Code project overlays require a path-bearing title such as
 `~/dotfiles | Code`. Non-path titles are rejected rather than guessed.

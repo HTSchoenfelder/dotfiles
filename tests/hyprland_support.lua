@@ -1,7 +1,7 @@
 local support = {}
 
 function support.session()
-    local session = { windows = {}, spaces = {}, monitors = {}, monitor_rules = {}, workspace_moves = {}, bindings = {}, events = {}, timers = {}, commands = {}, shortcuts = {}, notices = {}, held = {}, submap = "reset" }
+    local session = { orders = {}, windows = {}, spaces = {}, monitors = {}, monitor_rules = {}, workspace_moves = {}, bindings = {}, events = {}, timers = {}, commands = {}, shortcuts = {}, notices = {}, held = {}, submap = "reset" }
     local defining_submap = "reset"
     local process = require("lib.process")
     local original_spawn = process.spawn
@@ -51,18 +51,61 @@ function support.session()
             mapped = true, fullscreen = 0, fullscreen_client = 0, floating = false, pinned = false,
         }
         session.windows[#session.windows + 1] = window
+        local key = window.workspace.addressable_name
+        session.orders[key] = session.orders[key] or {}
+        table.insert(session.orders[key], window)
+        setmetatable(window, { __index = function(_, name)
+            if name == "layout" and not window.floating then
+                local order = session.orders[window.workspace.addressable_name] or {}
+                return { is_master = order[1] == window, perc_master = window.workspace.ratio or 0.7 }
+            elseif name == "at" then
+                local order = session.orders[window.workspace.addressable_name] or {}
+                return { x = order[1] == window and 0 or 1000, y = 0 }
+            end
+        end })
+        return window
+    end
+    function session.remove_from_order(window)
+        local order = session.orders[window.workspace.addressable_name] or {}
+        for index, entry in ipairs(order) do
+            if entry == window then table.remove(order, index); return end
+        end
+    end
+    function session.close_window(window)
+        local focused = session.focused == window
+        session.emit("window.close", window)
+        session.remove_from_order(window)
+        window.mapped = false
+        if focused then session.focus((session.orders[window.workspace.addressable_name] or {})[1], 8192) end
+    end
+    function session.open_window(class, workspace, rank)
+        local window = session.add(class, workspace, rank)
+        session.emit("window.open_early", window)
+        session.focus(window)
+        session.emit("window.open", window)
         return window
     end
     function session.retile_on_next_center(window)
         session.retile_before_center = window
     end
-    function session.focus(window)
+    function session.focus_monitor(monitor)
+        for _, candidate in ipairs(session.monitors) do candidate.focused = candidate == monitor end
+        session.current = monitor.active_workspace
+        session.focused = nil
+        session.emit("monitor.focused", monitor)
+    end
+    function session.focus(window, reason)
         session.focused = window
         if window then
             session.current = window.workspace
-            if window.workspace.monitor then window.workspace.monitor.active_workspace = window.workspace end
+            if window.workspace.monitor then
+                window.workspace.monitor.active_workspace = window.workspace
+                for _, monitor in ipairs(session.monitors) do
+                    monitor.focused = monitor == window.workspace.monitor
+                end
+            end
         end
-        session.emit("window.active", window)
+        session.emit("window.active", window, reason or 2)
     end
     function session.press(key)
         local binding_key = session.submap == "reset" and key or session.submap .. ":" .. key
@@ -96,6 +139,7 @@ function support.session()
     end
     function session.close()
         session.emit("config.unload")
+        for _, path in ipairs(session.cleanup_paths or {}) do os.remove(path) end
         process.spawn = original_spawn
     end
 
@@ -183,7 +227,7 @@ function support.session()
         dsp = {
             send_shortcut = dispatcher("shortcut"), no_op = dispatcher("noop"), layout = dispatcher("layout"), focus = dispatcher("focus"), submap = dispatcher("submap"),
             window = {
-                close = dispatcher("close"), move = dispatcher("move"), float = dispatcher("float"),
+                swap = dispatcher("swap"), close = dispatcher("close"), move = dispatcher("move"), float = dispatcher("float"),
                 resize = dispatcher("resize"), center = dispatcher("center"), deny_from_group = dispatcher("deny_group"),
                 fullscreen_state = dispatcher("fullscreen"), pin = dispatcher("pin"),
             },
@@ -200,14 +244,30 @@ function support.session()
                 if window.fail_move then return { ok = false, error = "Move failed" } end
                 if arguments.workspace then
                     assert(arguments.follow == false)
+                    session.remove_from_order(window)
                     window.workspace = session.space(arguments.workspace)
+                    local key = window.workspace.addressable_name
+                    session.orders[key] = session.orders[key] or {}
+                    table.insert(session.orders[key], window)
                     if window.retile_on_move then window.floating = false end
                 else
                     assert(arguments.relative == false)
                     window.position = { arguments.x, arguments.y }
                 end
+            elseif action.kind == "swap" then
+                local target = arguments.target
+                if window.fail_move or target.fail_move then return { ok = false, error = "Swap failed" } end
+                local first, second = window.workspace, target.workspace
+                local order_a, order_b = session.orders[first.addressable_name], session.orders[second.addressable_name]
+                local ai, bi
+                for i, w in ipairs(order_a) do if w == window then ai = i end end
+                for i, w in ipairs(order_b) do if w == target then bi = i end end
+                order_a[ai], order_b[bi] = target, window
+                window.workspace, target.workspace = second, first
+            elseif action.kind == "close" then session.close_window(window or session.focused)
             elseif action.kind == "focus" then
                 if window then session.focus(window)
+                elseif arguments.monitor then session.focus_monitor(hl.get_monitor(arguments.monitor))
                 else
                     session.current = session.space(arguments.workspace)
                     if session.current.monitor then
@@ -237,7 +297,9 @@ function support.session()
                 window.workspace.fullscreen_window = nil
             elseif action.kind == "layout" then
                 local order = session.layout_order or {}
-                if arguments == "orientationleft" then
+                if arguments:match("^mfact exact ") then
+                    session.current.ratio = tonumber(arguments:match("mfact exact (.+)"))
+                elseif arguments == "orientationleft" then
                     session.current.master_orientation = "left"
                 elseif arguments == "orientationright" then
                     session.current.master_orientation = "right"
@@ -260,7 +322,11 @@ function support.session()
     require("lib.monitor_configuration").set_workspace_roles({
         primary = "HDMI-A-1", secondary = "HDMI-A-2",
     })
+    local settings = require("config.navigation")
+    local state_file = settings.slot_state_file
+    settings.slot_state_file = nil
     require("config.keybindings")
+    settings.slot_state_file = state_file
     require("config.hardware_keys")
     return session
 end

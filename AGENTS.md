@@ -58,19 +58,32 @@ See `docs/hyprland-desktop.md` for the current service, portal and toolkit owner
   symlink.
 - `mainMod` is `SUPER + CTRL + ALT`.
 - **Comma Selection** cycles in Rofi and accepts on `mainMod` release.
-- `Shift + App` and `Shift + P` add a selected window to the current layout.
+- Hyprland has one or two normal slots per display. App keys, instance selection,
+  `P` and Comma Selection replace the focused slot's content.
+- `Shift + App` and `Shift + P` fill the other slot (creating it when needed),
+  retaining focus. One window cannot occupy both slots.
+- Selection from another visible slot swaps contents, including across displays;
+  selection from Parking or a hidden workspace parks the displaced occupant.
+- Closing a slot window refills its side from Parking MRU, skipping visible slots,
+  floating utility windows/dialogs, hidden group members and project overlays.
+  If no replacement exists, remember the vacancy and temporarily use native
+  single-window geometry. `/` explicitly reduces to one slot without refilling;
+  `Shift + /` requests two slots and refills the other side when possible.
+- `M` focuses the other occupied slot; `N` swaps contents and retains the focused
+  side. `H` only focuses the other display and does nothing with one monitor.
+- There is no held `G` display modifier. Dot Mode `M` toggles 70:30/50:50 per display.
+  Existing Dot Mode project-tool keys remain separate from navigation.
 - `F + App` chooses an instance and `F + comma` filters by the focused app.
-- `/` keeps only the focused window in the current layout. Held `G` targets the
-  next display: `G + /` replaces its layout and `G + H` adds to it.
-- During Comma Selection, Shift always means backward and never add-to-stack.
+- During Comma Selection, Shift always means backward, never the other slot.
+- macOS retains its documented replacement/stack, comma adoption and `G` actions;
+  the Hyprland slot redesign does not implicitly migrate Hammerspoon.
 - On macOS, Comma Selection only restores and focuses its target; it never changes
   display assignment, frame geometry or the tracked layout.
 - **Dot Mode** is the submap entered with `mainMod + period`.
 - **Terminal Workspace** is workspace 1 (``) on the primary display.
 - **Display Workspace** is workspace 2 (`󰍹`) on the secondary display.
 - **Parking Workspace** is workspace 10 (`󰮍`).
-- Hyprland workspace Comma Selection uses `mainMod + B`; `G` is reserved as the
-  held display-target modifier.
+- Hyprland workspace Comma Selection uses `mainMod + B`.
 - Hyprpaper and Hypridle remain compositor-session processes. Do not resume the
   currently paused Hypridle process unless Henrik requests it.
 

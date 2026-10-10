@@ -59,19 +59,6 @@ function workspace_navigation.new(picker)
         })
     end
 
-    function navigation.switch_between(workspaces)
-        if #workspaces == 0 then return end
-        local current = compositor.active_workspace()
-        local target = workspaces[1]
-        for index, workspace in ipairs(workspaces) do
-            if current and current.addressable_name == tostring(workspace) then
-                target = workspaces[index % #workspaces + 1]
-                break
-            end
-        end
-        compositor.dispatch(hl.dsp.focus({ workspace = tostring(target) }))
-    end
-
     return navigation
 end
 

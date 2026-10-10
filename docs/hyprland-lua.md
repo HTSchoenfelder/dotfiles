@@ -22,19 +22,61 @@ affects muscle memory should be recorded in the relevant quick reference or in t
 shortcut and text-input differences are tracked separately in
 [macOS keyboard parity](macos-keyboard-parity.md).
 
-Shift adds an application shortcut or `P` selection to the current layout. `F`
-chooses an application instance or restricts Comma Selection to the focused
-application. Shift remains exclusively the backward direction during Comma
-Selection and media/workspace cycling.
+Hyprland uses at most two normal tiled windows per displayed workspace. App keys,
+instance selection, `P` and Comma Selection replace the focused slot. Shift app
+and `P` selection target the other slot and retain the focused side; they expand
+one slot into two only when a distinct selected window becomes available. Shift
+in Comma Selection remains backward cycling. `F` selects an instance or filters
+Comma Selection by application.
 
-`/` reduces the current workspace layout to the focused window. Held `G` targets
-the next monitor's active workspace: `G + /` replaces that layout, while `G + H`
-adds the focused window to it. Workspace Comma Selection uses `B` so `G` remains
-an unambiguous display-target modifier.
+Selection from Parking or a hidden workspace parks the displaced occupant.
+Selection from another visible slot exchanges both occupants through the native
+window-swap dispatcher. `M` switches occupied slots, `N` swaps their contents
+without changing the focused side, and `H` focuses the other display's visible
+workspace. `H` is a no-op with one enabled monitor. There is no held `G` modifier;
+Dot Mode project-tool bindings retain their independent meanings.
 
-Comma Selection deliberately diverges after acceptance: Hyprland moves the chosen
-window from Parking into the current workspace, while macOS adopts it into the
-focused slot on its existing display, or creates a single-window layout there.
+`/` explicitly reduces the layout to the focused window. `Shift + /` requests
+two slots and refills the other side from Parking MRU; without a candidate, the
+vacancy remains remembered for the next normal window. Dot Mode `M` toggles
+70:30 and 50:50, with the master always on the left and the ratio remembered per
+display. The existing workspace reset explicitly places the terminal as the only
+slot in workspace 1.
+
+### Slot lifecycle
+
+`lib/slot_layout.lua` owns slot identity, desired slot count, focused side and
+per-display split preferences. Hyprland owns native window lifetime and master
+geometry. Window events trigger discrete placement/refill operations; there is no
+polling or permanent geometry/reflow loop. No third-party window manager, service
+or placeholder window is introduced.
+
+`window.open_early` snapshots the intended slot before native focus changes.
+Placement waits until after `window.open`. Explicit launch requests take priority;
+requests invalidated by newer selection, slot revision or focus changes park late
+results instead of replacing current work. Unsolicited normal windows fill a
+remembered vacancy or replace their original focused slot. Floating utility
+windows/dialogs, hidden group members, special workspaces and project overlays
+are excluded from slot selection and refill.
+
+`window.close` records the vacated side and focus before native teardown. A
+one-shot callback refills from Parking MRU after teardown, preserving the peer
+and background keyboard focus. If no candidate exists, desired slots and their
+identities remain recorded while native master tiling temporarily enlarges the
+remaining window. Explicit `/` sets the desired count to one, so its parked
+occupant is not immediately restored. Vacancies can be filled after later opens
+or explicit selection places new candidates in Parking.
+
+Session state is saved as data-only TSV under `XDG_RUNTIME_DIR`, keyed by the
+compositor instance, on config unload and consumed on the next load. Only slot
+addresses/counts/focused side and monitor ratios are stored, never window titles
+or executable Lua. A new compositor session adopts its live windows. Existing
+layouts with more than two normal windows are normalized once, preserving the
+master and focused window when possible and parking excess occupants.
+
+macOS currently retains application/`P` layout replacement and Shift-to-stack,
+plus its existing comma slot adoption. It does not yet implement the two-slot cap,
+Parking refill or Dot Mode ratio toggle. See the documented platform differences.
 
 | File | Responsibility |
 | --- | --- |
@@ -45,7 +87,8 @@ focused slot on its existing display, or creates a single-window layout there.
 | `config/keybindings.lua` | Bindings and composition of navigation/launcher actions |
 | `config/hardware_keys.lua` | Volume, microphone, brightness and playback keys |
 | `config/window_rules.lua` | Maximize suppression and XWayland drag focus correction |
-| `lib/window_navigation.lua` | Window MRU order, Parking/stack navigation and asynchronous application startup |
+| `lib/window_navigation.lua` | MRU selection, captured slot intentions and asynchronous application startup |
+| `lib/slot_layout.lua` | Two-slot placement, cross-display swaps, close/refill lifecycle and session state |
 | `lib/workspace_navigation.lua` | Workspace MRU history and workspace selection |
 | `lib/rofi_picker.lua` | One active selection, native cycling/release bindings, cancellation and cleanup |
 | `lib/rofi_mode.lua` | Standalone Rofi script provider and numeric selection replies |
@@ -62,10 +105,10 @@ focused slot on its existing display, or creates a single-window layout there.
 | `lib/process.lua` | Quoted argument vectors and asynchronous process startup |
 | `lib/compositor.lua` | Checked dispatch, current workspace and shared selection indexing |
 
-The active master layout uses `mfact = 0.70`: the master occupies 70% and the
-right stack 30%. The macOS Accessibility layout deliberately uses a 1:1 split.
-Hyprland moves replaced windows to Parking; macOS leaves them unchanged behind the
-new full-size window. Workspace cycling remains Hyprland-only.
+The master layout starts at 70:30 and supports a per-display 50:50 toggle.
+macOS retains its 1:1 split. Hyprland parks replaced slot occupants; macOS leaves
+unrelated windows unchanged behind its managed layout. Workspace cycling remains
+Hyprland-only.
 
 Focus and window transitions are intentionally restrained. Focus opacity and border
 changes complete in 100 ms, window movement in 150 ms and window open/close motion
@@ -92,8 +135,9 @@ launcher data are reused. Snippets retain the `text|alias` format and support
 
 `mainMod + period` enters dot mode and holds a native Hyprland notification until
 the mode ends. `Q`, `A` and `Z` capture a region, the active window and the active
-monitor. `B` selects and toggles connected displays. `G`, `Shift+G` and `J` toggle
-project LazyVim, Lazygit and terminal overlays. `E`, `R` and `T` select emojis,
+monitor. `M` toggles the active display split. `B` selects and toggles connected
+displays. `G`, `Shift+G` and `J` toggle project LazyVim, Lazygit and terminal
+overlays. `E`, `R` and `T` select emojis,
 configured commands and snippets. The submap resets before the selected tool opens.
 `mainMod + R` still opens the application launcher. `mainMod + Shift + R` opens
 the read-only shortcut catalog through the same Rofi picker infrastructure.
@@ -122,7 +166,9 @@ default configuration audit.
 ## Validation
 
 Run `lua tests/hyprland_test.lua` from the repository root for behavioral checks.
-The scenarios cover MRU order, workspace changes, launch races, Parking/stack,
+The scenarios cover slot replacement and cross-display swaps, Shift targeting,
+close/refill focus and ordering, exhausted Parking, session-state restoration,
+monitor MRU and empty/single displays, workspace changes and launch races,
 cycling, cancellation, reload, the shortcut catalog, player actions, shortcut
 forwarding, command selection, monitor toggling, project overlays and text
 insertion.

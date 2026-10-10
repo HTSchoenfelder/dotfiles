@@ -29,9 +29,12 @@ alternative but must not run alongside Hammerspoon's window frames. See the
 [macOS window-management architecture](docs/macos-window-management.md) and
 [optional appearance layer](docs/macos-appearance.md).
 
-The interaction model is shared, while the requested split ratio intentionally
-differs: Hyprland currently uses a 70/30 master/stack split and the macOS target
-uses 1:1.
+Hyprland uses one or two occupied slots per display. Application and window
+selection replaces a slot's content; Shift targets the other slot. Closing a
+window refills its slot from Parking by focus history. The split toggles between
+70:30 and 50:50. macOS retains its existing replacement/stack model; the
+[platform differences](docs/macos-window-management.md#platform-differences)
+remain explicit until Hammerspoon is migrated.
 
 ## macOS / Hammerspoon quick reference
 
@@ -79,36 +82,86 @@ display; it never moves a window across displays.
 
 ## Hyprland quick reference
 
-`mainMod` = `Super + Ctrl + Alt`. Application navigation reuses the most recently
-focused matching window or starts the app. Other windows on the active workspace
-move to Parking (`󰮍`). Hold `Shift` to keep them and place the target in the
-master stack. Hold `F` to choose an existing instance.
+`mainMod` = `Super + Ctrl + Alt`. Each display has one or two occupied slots.
+The native master layout owns geometry; navigation changes slot contents.
+The left slot is the master. The right slot is the only stack window.
+
+### Application selection
 
 | Shortcut | Action |
 | --- | --- |
-| `mainMod + J` | Kitty with Zellij |
-| `mainMod + K` | VS Code |
-| `mainMod + L` | Chrome |
-| `mainMod + I` | Google Chat |
-| `mainMod + ;` | Obsidian |
-| `mainMod + O` | KeePassXC |
-| `mainMod + U` | Spotify |
-| `mainMod + Shift + app key` | Keep the current layout and add the selected app to its stack |
-| `mainMod + F + app key` | Select an application instance |
-| `mainMod + P` / `mainMod + Shift + P` | Select any window / select and add it to the stack |
-| `mainMod + ,` / `mainMod + Shift + ,` | Comma selection through windows forward/backward; release `mainMod` to accept |
-| `mainMod + F + ,` | Comma selection through instances of the focused app |
-| `mainMod + B` / `mainMod + Shift + B` | Comma selection through workspaces forward/backward |
-| `mainMod + Y` / `mainMod + Shift + Y` | Comma selection through Play/Pause, Next and Previous |
-| `mainMod + H` | Switch between workspaces 1 and 2 |
-| `mainMod + /` | Keep only the focused window in the current workspace layout |
-| `mainMod + G + /` | Move the focused window to the next display and replace its active workspace layout |
-| `mainMod + G + H` | Move the focused window to the next display and add it to its active workspace layout |
-| `mainMod + M` | Focus the next layout window |
-| `mainMod + N` | Rotate window positions while retaining the focused slot |
-| `mainMod + W` | Close the focused window |
+| `mainMod + J/K/L/I/;/O/U` | Fill the focused slot with Kitty / VS Code / Chrome / Google Chat / Obsidian / KeePassXC / Spotify; start the app if needed |
+| `mainMod + Shift + app key` | Fill the other slot, creating it if needed; retain focus on the original side |
+| `mainMod + F + app key` | Choose an instance for the focused slot |
+| `mainMod + Shift + F + app key` | Choose another instance for the other slot; retain focus |
 | `mainMod + R` | Toggle the Rofi application launcher |
-| `mainMod + Shift + R` | Show the searchable shortcut catalog |
+
+Normal selection never adds a slot. A Parking or hidden-workspace selection
+replaces the target and parks its previous occupant. Selecting a window in another
+visible slot swaps the two occupants, including across displays. Selecting the
+current occupant does nothing. A window cannot occupy both slots: Shift excludes
+the focused instance, chooses another existing instance if available, and otherwise
+does nothing when that app already has only the focused instance. If the app is
+not running, its window is placed only after it appears; failed or stale launches
+do not displace existing slot contents.
+
+### Slot focus and contents
+
+| Shortcut | Action |
+| --- | --- |
+| `mainMod + P` / `mainMod + Shift + P` | Search for a window for the focused / other slot |
+| `mainMod + ,` / `mainMod + Shift + ,` | Select by focus history forward/backward; replace the focused slot on modifier release |
+| `mainMod + F + ,` | Select instances of the focused app for the focused slot |
+| `mainMod + M` | Focus the other occupied slot on the same display |
+| `mainMod + N` | Swap both slot contents; keep focus on the same visual side |
+| `mainMod + H` | Focus the most recent slot window on the other display, or the empty display itself |
+| `mainMod + W` | Close the focused window and refill its slot from Parking |
+
+`H` preserves the other display's visible workspace and does nothing with one
+enabled display. There is no held `G` display modifier or `G + H` / `G + /` action.
+The existing Dot Mode project-tool keys are separate from display navigation.
+Shift in Comma Selection always means backward, never the other slot.
+
+When any slot window closes, its side is filled by the most recently focused
+eligible window in Parking. Other visible windows are never taken for refill.
+A focused slot's replacement receives focus; background replacement preserves
+keyboard focus. Floating utility windows, native floating dialogs, hidden group
+members, special-workspace windows and project overlays are excluded from slot
+selection and refill.
+
+If Parking has no replacement, the remaining window temporarily fills the screen.
+The missing slot and its side remain remembered; the next available normal window
+restores the split. This also works after both slots become vacant. There are no
+placeholder windows. Slot vacancies and per-display ratios survive config reloads
+within the current compositor session via a private runtime-directory checkpoint.
+
+New normal windows opened outside app shortcuts (including launcher and in-app
+new-window actions) fill a remembered vacancy or replace the previously focused
+slot. They do not create a third tile. On initial adoption of an older layout,
+excess normal windows go to Parking while retaining the master and the focused
+window when possible.
+
+### Layout
+
+| Shortcut | Action |
+| --- | --- |
+| `mainMod + /` | Keep the focused window as the only slot; park the other content without refilling that slot |
+| `mainMod + Shift + /` | Use two slots; refill the other side from Parking or remember it until a window appears |
+| `mainMod + .`, then `M` | Toggle the focused display between 70:30 and 50:50 |
+
+70:30 always means left 70%, right 30%, regardless of focus. The ratio is remembered
+per display even with a single window. `Shift + /` and Shift selection expand a
+one-slot layout using that ratio. With a temporarily vacant slot, focus can only
+visit occupied slots because native master tiling has no independently focusable
+empty slot.
+
+For example, Code left and Chrome right remain a two-slot layout when `J` replaces
+Code with Kitty. `Shift + K` then replaces Chrome with Code while focus stays on
+Kitty. `N` swaps Kitty and Code while focus stays on the same screen side.
+
+Workspace selection remains `mainMod + B` / `Shift + B`; media selection remains
+`mainMod + Y` / `Shift + Y`. `mainMod + Shift + R` opens the shortcut catalog.
+The existing workspace reset explicitly restores a single terminal slot.
 
 ## Dot mode
 
@@ -122,6 +175,7 @@ instead of Rofi.
 | `A` | Capture the focused window |
 | `Z` | Capture the focused monitor |
 | `B` | Toggle a connected display (Hyprland only) |
+| `M` | Toggle the active display split between 70:30 and 50:50 (Hyprland only) |
 | `G` | Toggle a project Neovim overlay |
 | `Shift + G` | Toggle a project Lazygit overlay |
 | `J` | Toggle a project Kitty overlay |
