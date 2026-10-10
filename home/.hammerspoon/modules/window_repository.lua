@@ -30,6 +30,7 @@ local function record(window, allowFullScreen)
     bundleID = call(application, "bundleID", "") or "",
     appName = call(application, "name", "Window") or "Window",
     minimized = call(window, "isMinimized", false) == true,
+    visible = call(window, "isVisible", true) == true,
     screen = screen,
     screenID = screenIdentifier(screen),
     window = window,
@@ -117,5 +118,9 @@ end
 WindowRepository.screenIdentifier = screenIdentifier
 WindowRepository.isUsableWindow = isUsable
 WindowRepository.windowRecord = record
+WindowRepository.isSlotCandidate = function(item)
+  return item and not (type(item.title) == "string"
+    and item.title:match("^project%-overlay%-"))
+end
 
 return WindowRepository

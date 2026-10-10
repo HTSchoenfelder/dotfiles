@@ -13,7 +13,7 @@ reproduce wherever macOS exposes a reliable equivalent.
 
 Parity is measured by what a shortcut means and how the interaction feels, rather
 than by matching compositor internals. On macOS, Hammerspoon reproduces the input,
-selection and master/stack model directly through Accessibility. It deliberately
+selection and two-slot model directly through Accessibility. It deliberately
 does not reproduce Hyprland workspaces or Parking.
 Platform-specific implementation details are acceptable when the keys, sequence
 and visible outcome remain aligned. Any deliberate behavioral difference that
@@ -74,9 +74,9 @@ or executable Lua. A new compositor session adopts its live windows. Existing
 layouts with more than two normal windows are normalized once, preserving the
 master and focused window when possible and parking excess occupants.
 
-macOS currently retains application/`P` layout replacement and Shift-to-stack,
-plus its existing comma slot adoption. It does not yet implement the two-slot cap,
-Parking refill or Dot Mode ratio toggle. See the documented platform differences.
+macOS uses the same two-slot shortcut semantics, cross-display swaps and ratio
+toggle. Its native non-slot windows replace Parking as refill candidates; an
+empty display is selected through Hammerspoon's retained active-frame state.
 
 | File | Responsibility |
 | --- | --- |
@@ -106,8 +106,8 @@ Parking refill or Dot Mode ratio toggle. See the documented platform differences
 | `lib/compositor.lua` | Checked dispatch, current workspace and shared selection indexing |
 
 The master layout starts at 70:30 and supports a per-display 50:50 toggle.
-macOS retains its 1:1 split. Hyprland parks replaced slot occupants; macOS leaves
-unrelated windows unchanged behind its managed layout. Workspace cycling remains
+macOS uses the same 70:30/50:50 ratios. Hyprland parks replaced slot occupants;
+macOS leaves them as native non-slot windows. Workspace cycling remains
 Hyprland-only.
 
 Focus and window transitions are intentionally restrained. Focus opacity and border

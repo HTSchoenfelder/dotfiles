@@ -16,6 +16,8 @@ local launcher = Launcher.new({
   chooserFactory = function() return Chooser.new(config.chooser) end,
   modifiers = config.hyper,
   gate = services.gate,
+  orchestrator = services.orchestrator,
+  repository = services.repository,
 })
 launcher:start()
 shortcuts.start(services)

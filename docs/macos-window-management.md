@@ -4,17 +4,19 @@
 
 Hammerspoon is the only macOS workflow and window-management process. It owns
 global input, application intentions, MRU history, chooser state and passive
-master/stack geometry. It uses the supported macOS Accessibility window API
+two-slot geometry. It uses the supported macOS Accessibility window API
 exposed by `hs.window`; AeroSpace, Stage Manager, Mission Control and native Spaces
 are not workflow backends.
 
 Hyprland remains the behavioral reference. Shortcut shape, selection lifecycle and
-master/stack intent stay aligned where macOS has a reliable equivalent. macOS does
-not emulate Hyprland workspaces or Parking.
+two-slot behavior stay aligned. macOS does not emulate Hyprland workspaces or
+Parking; non-slot native windows form the logical refill pool.
 
 Application shortcut and text-navigation parity is a separate input concern. Its
 current ownership, incomplete coverage and target contract are documented in
 [macOS keyboard parity](macos-keyboard-parity.md).
+The [macOS tests](macos-tests.md) cover automated and live validation of this
+workflow.
 
 ## Responsibility boundaries
 
@@ -31,9 +33,10 @@ keybinding system; Hammerspoon only adds Accessibility-gated navigation for
 native and webview text inputs. This input boundary is intentionally documented
 separately from window geometry.
 
-Hammerspoon changes frames only in direct response to a shortcut. It does not run
-a permanent reflow loop, create virtual workspaces, hide unrelated applications or
-maintain a competing model of every window on the desktop.
+Hammerspoon changes frames for explicit selection, close/refill and new-window
+actions. It keeps only two slot identities per display in memory, not a model of
+every native window. It does not run a permanent reflow loop, create virtual
+workspaces or hide unrelated applications.
 
 The optional Catppuccin frame module draws only the retained layout slots. Its
 canvases are visual and click-through; replacing the window in a slot does not
@@ -53,87 +56,58 @@ macOS Accessibility window focus/frame operation
 
 ## Layout model
 
-Hammerspoon retains a compact layout record per display:
+Hammerspoon retains per-display state in Lua memory:
 
 ```text
-display ID -> { screen, focused slot, slots [{ window ID, frame }] }
+display ID -> { screen, desired slot count, focused side, ratio, slots [window ID?] }
+active display ID -> display with the Green active-slot frame
 ```
 
-The per-display focused slot is the retained replacement cursor for that layout;
-it is not a claim that every display has a focused window. Border highlighting is
-derived separately from macOS's single globally focused native window.
+Each display has at most two sides. The left side is the master. One occupied slot
+fills the usable display; two use 70:30 or 50:50, with `config.navigation.gap`
+controlling inner and outer spacing. If a desired side is vacant, its identity is
+remembered while the remaining window fills the display. On an entirely empty
+display, the active slot frame is still drawn. `H` changes the active display even
+when macOS cannot move native keyboard focus there; the next app or window action
+uses that retained display and side.
 
-The slot frames are the stable visual layout. Window IDs identify the current
-occupants:
+App keys, `P` and Comma Selection replace the focused side. Shift app and `P`
+selection fill the other side, expanding one to two, without leaving focus there.
+A selected window in another visible slot swaps identities; Hammerspoon places
+both windows into their new display frames. An untracked selection leaves the
+replaced window native and unchanged. Non-slot windows are neither hidden nor
+minimized to emulate Parking.
 
-```text
-master window | stack window 1
-              | stack window 2
-```
+`/` keeps one slot; `Shift + /` requests two and immediately refills the second
+side from the non-slot MRU pool. Dot Mode `M` toggles the ratio per display. `M`
+focuses the other occupied side; `N` swaps contents while focus remains on the
+same visual side. Closing a slot window refills its side from the most recently
+focused usable non-slot window. If there is no candidate, a later normal window
+can fill the vacancy. Window-created and close notifications trigger discrete
+updates; there is no continuous tiler.
 
-One selected window fills the usable display frame. Two windows use a balanced
-left/right split. Three or more retain the left master and divide the right half
-equally between stack windows. `config.navigation.gap` controls both outer and
-inner spacing; zero restores edge-to-edge geometry.
-
-Normal application activation replaces the tracked layout with the selected
-full-size window. Other macOS windows remain unchanged behind it. This is the
-macOS placement policy (Hyprland now replaces individual slots): no unrelated
-window is minimized, hidden or moved. `Shift + App` and `Shift + P` preserve the
-current layout and append the selected window to its stack. After external focus
-has reset a layout,
-the next Shift action uses that focused window as the new master.
-
-`MainMod + /` explicitly reduces the current display's tracked layout to the
-focused window. `MainMod + G + /` moves that window to the next display and
-replaces its tracked layout; `MainMod + G + H` moves it there and appends it to the
-existing tracked layout. Windows removed from a layout retain their native frame
-and remain behind the new layout rather than being minimized or hidden.
-
-Native actions outside this model invalidate the affected display's layout. This
-includes focusing an untracked window, manually moving a tracked window, closing,
-minimizing or hiding it, and changing the display configuration. The slot frames
-then disappear instead of trying to infer or repair an externally changed layout.
-
-`M` focuses the next tracked layout window. `N` rotates window identities through
-the existing visual slots and focuses the window that arrives at the previously
-focused slot. `H` adopts the most recently used visible window on the next display
-into that display's focused slot, or creates a single-window layout there.
-Workspace cycling has no macOS binding.
+Manual movement of a tracked window removes it from its slot. Display topology
+changes clear the in-memory slot records so the next action adopts current native
+windows. `clearScreen` and Dot Mode reset remain explicit layout reset actions.
 
 ## Selection and modifiers
 
-`F` is the application filter:
-
-- `MainMod + F + App` always opens the instance chooser.
-- `MainMod + F + ,` limits Comma Selection to the focused application.
-
-`G` is a held destination modifier for window placement. It changes the target
-from the current display to the next spatially ordered display. Comma Selection
-never moves a window between displays.
-
-Shift has two independent, unambiguous roles:
-
-- with an application key or `P`, it adds the selected window to the layout;
-- with Comma Selection or media selection, it retains the existing backward
-  direction.
-
-Comma Selection queries native windows once, cycles locally and accepts the
-highlighted window when the base MainMod keys are released. A window already in a
-layout is focused in its existing slot. An untracked window replaces the focused
-slot on its own display while preserving that slot's frame; without an existing
-layout on that display it creates a single-window layout. This is a controlled
-layout action, but never a cross-display move. Window and application choices are
-ordered by Hammerspoon's focus history.
+`F` selects an application instance or filters Comma Selection by application.
+Shift with Comma Selection and media selection means backward cycling, never
+other-slot placement. Comma Selection queries native windows once, cycles locally
+and accepts on base `MainMod` release. Its accepted window uses the captured
+focused side, including across displays, and can swap with another slot occupant.
+Window and application choices use Hammerspoon's focus history. Held `G` display
+placement is removed; `H` selects the other display without moving its existing
+windows.
 
 ## Application and overlay lifecycle
 
 Application launch uses asynchronous `/usr/bin/open -g` tasks so a pending launch
 does not intentionally steal focus. A request generation prevents a late result
 from applying an obsolete layout intention. Existing hidden or minimized target
-windows are focused immediately and receive a short restoration delay before
-their Accessibility frame is changed. Already visible windows use a synchronous
-focus path with no timer. Application shortcuts query only the target
+windows are restored before their Accessibility frame is changed. Already visible
+windows use a synchronous focus path with no timer. Application shortcuts query only the target
 application's windows instead of inventorying every desktop window. Repeating an
 action skips native focus and frame calls when both already match the requested
 slot, avoiding redundant Accessibility redraws.
@@ -150,6 +124,8 @@ Hyprland's `HYPRSHOT_DIR`.
 
 `hs.chooser` is the shared native selection surface for applications, windows,
 instances, Spotify actions, emoji, snippets, commands and the shortcut catalog.
+The launcher places an existing application window in the captured focused slot;
+new native windows are assigned from window-created events.
 Spotify actions run asynchronously through `osascript`.
 
 RØDECaster MIDI remains entirely in Hammerspoon. `MainMod + Backslash` sends one
@@ -164,10 +140,10 @@ assumed state after a Hammerspoon or device restart until the next interaction.
 
 - `modules/window_repository.lua` exposes usable native windows and joins them with
   Hammerspoon MRU metadata.
-- `modules/layout_planner.lua` calculates full, split and master/stack frames.
+- `modules/layout_planner.lua` calculates full and ratio-based split frames.
 - `modules/layout_orchestrator.lua` exclusively owns the per-display slot records,
-  applies explicit Accessibility operations and invalidates layouts after external
-  native changes. It publishes read-only snapshots to visual consumers.
+  applies explicit Accessibility operations and retains vacancies across close
+  events. It publishes read-only snapshots to visual consumers.
 - `modules/layout_observer.lua` debounces native window and display events and
   reports them to the orchestrator without owning or mutating layout state.
 - `modules/layout_borders.lua` renders event-driven Catppuccin slot frames without
@@ -187,20 +163,14 @@ assumed state after a Hammerspoon or device restart until the next interaction.
 ## Platform differences
 
 - Hyprland has Terminal, Display and Parking workspaces; macOS has no workflow
-  workspaces. Hyprland cycles them with `MainMod + B`.
-- Hyprland toggles 70:30/50:50 with Dot Mode `M`; macOS uses a 1:1 ratio.
+  workspaces. Native non-slot windows supply refill candidates instead of Parking.
+- Hyprland can focus an empty output; macOS cannot. Hammerspoon keeps a logical
+  active display and paints its active slot frame so subsequent actions target it.
 - Hyprland Dot Mode can toggle physical displays. macOS Accessibility cannot, so
   Dot Mode has no `B` action.
 - macOS has no extra Dot Mode window movement or fullscreen actions.
-- Hyprland caps each normal display layout at two slots. App keys, `P` and Comma
-  Selection replace the focused slot; Shift app/`P` targets the other slot while
-  retaining focus. macOS still replaces the layout on app/`P` activation and adds
-  to a potentially larger stack with Shift.
-- Hyprland swaps contents when selecting another visible slot, including across
-  displays, and refills closed slots from Parking. macOS comma adoption stays on
-  the selected window's existing display and has no Parking refill.
-- Hyprland has no held `G` display modifier. macOS retains `G + /` and `G + H`.
-- Hyprland uses `Shift + /` to request two slots; macOS has no equivalent binding.
+- Hammerspoon state lives in Lua memory and is rebuilt after reload; Hyprland
+  preserves its slot vacancies across config reloads within one compositor session.
 
 VS Code project overlays require a path-bearing title such as
 `~/dotfiles | Code`. Non-path titles are rejected rather than guessed.

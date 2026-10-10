@@ -1,3 +1,4 @@
+local WindowRepository = require("modules.window_repository")
 local ApplicationNavigation = {}
 ApplicationNavigation.__index = ApplicationNavigation
 
@@ -33,29 +34,45 @@ function ApplicationNavigation.new(options)
 end
 
 function ApplicationNavigation:_request(application, mode, generation)
-  local focused = self.repository:record(self.repository.focusedWindow())
-  return {
-    application = application,
-    anchorID = focused and focused.id,
-    generation = generation,
-    mode = mode,
-    screen = focused and focused.screen or self.orchestrator:activeScreen(),
-  }
+  local request = self.orchestrator:capture(mode, generation)
+  if request then request.application = application end
+  return request
 end
 
 function ApplicationNavigation:_showOrChoose(windows, request, chooseInstance)
-  if not self.gate:isCurrent(request.generation) then return end
+  if not request or not self.gate:isCurrent(request.generation) then
+    if request and request.application then
+      self.orchestrator:expectBundle(request.application.bundleID, false)
+    end
+    return
+  end
+  local excluded = self.orchestrator:excluded(request)
+  local candidates = {}
+  for _, window in ipairs(windows) do
+    if window.id ~= excluded and WindowRepository.isSlotCandidate(window) then
+      candidates[#candidates + 1] = window
+    end
+  end
+  windows = candidates
+  if #windows == 0 then
+    if request.application then self.orchestrator:expectBundle(request.application.bundleID, false) end
+    return
+  end
   if chooseInstance then
     local choices = {}
     for _, window in ipairs(windows) do choices[#choices + 1] = choice(window) end
     local chooser = self.chooserFactory()
     chooser:show(choices, function(selected)
+      if request.application then
+        self.orchestrator:expectBundle(request.application.bundleID, false)
+      end
       if selected and self.gate:isCurrent(request.generation) then
         self.orchestrator:activate(selected.record, request)
       end
     end, request.screen)
     return
   end
+  if request.application then self.orchestrator:expectBundle(request.application.bundleID, false) end
   self.orchestrator:activate(windows[1], request)
 end
 
@@ -97,10 +114,13 @@ function ApplicationNavigation:_waitForWindow(application, request, chooseInstan
       if #windows > 0 then
         if self.gate:isCurrent(request.generation) then
           self:_showOrChoose(windows, request, chooseInstance)
+        else
+          self.orchestrator:expectBundle(application.bundleID, false)
         end
         return
       end
       if hs.timer.secondsSinceEpoch() >= deadline then
+        self.orchestrator:expectBundle(application.bundleID, false)
         if self.gate:isCurrent(request.generation) then
           hs.notify.new({
             title = "Hammerspoon",
@@ -118,6 +138,7 @@ end
 function ApplicationNavigation:activate(application, mode, chooseInstance)
   local generation = self.gate:next()
   local request = self:_request(application, mode, generation)
+  if not request then return end
   self.repository:listForBundle(application.bundleID, function(windows)
     if not self.gate:isCurrent(generation) then return end
     if #windows > 0 then
@@ -126,8 +147,10 @@ function ApplicationNavigation:activate(application, mode, chooseInstance)
     end
 
     local running = hs.application.get(application.bundleID)
+    self.orchestrator:expectBundle(application.bundleID, true)
     self:_launch(application, running, generation, function(launched)
       if not launched then
+        self.orchestrator:expectBundle(application.bundleID, false)
         if self.gate:isCurrent(generation) then
           hs.notify.new({
             title = "Hammerspoon",

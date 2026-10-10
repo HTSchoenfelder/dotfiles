@@ -6,20 +6,20 @@ use Stage Manager, Mission Control, Spaces or another window manager.
 
 ## Window borders
 
-Hammerspoon draws rounded Catppuccin frames for active layout slots only. Green
-marks the slot occupied by the focused window and Pink marks the other slots.
-The Green frame follows macOS's global window focus, so inactive displays contain
-only Pink frames. Untracked windows have no frame.
+Hammerspoon draws rounded Catppuccin frames for retained slots. Green marks the
+active display's selected slot, even if that display has no native window; Pink
+marks other retained slots. This lets `H` select an empty display while macOS
+keeps native keyboard focus elsewhere. Untracked windows have no frame.
 `config.appearance.layoutBorders` controls the feature, colors, width, radius and
 offset; set `enabled = false` to remove it completely. The configured width is 4.5
 points.
 
 Frames belong to slot geometry rather than window objects. A focus change updates
 only the colors. When Comma Selection replaces a slot occupant, an unchanged slot
-needs no canvas geometry update at all. Frames are rebuilt only when the explicit
-layout geometry changes. Focusing an untracked window, manually moving a tracked
-window, changing its native lifecycle state or changing the display configuration
-invalidates the affected layout and removes its frames.
+needs no canvas geometry update at all. Frames change with slot geometry. Closing
+a slot window retains its side and refills it from non-slot MRU when available.
+Manual movement detaches a tracked window; display topology changes clear slot
+state.
 
 JankyBorders remains an optional simpler two-state alternative. Homebrew installs
 `borders`, but the main setup does not start its service. Its Catppuccin

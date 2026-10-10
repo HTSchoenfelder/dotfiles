@@ -30,6 +30,8 @@ function window:screen() return screen end
 local normalized = WindowRepository.windowRecord(window)
 assert(normalized.id == 42 and normalized.bundleID == "example.app")
 assert(normalized.screenID == "display" and normalized.window == window)
+assert(WindowRepository.isSlotCandidate(normalized))
+assert(not WindowRepository.isSlotCandidate({title = "project-overlay-terminal-123"}))
 
 local secondWindow = setmetatable({}, {__index = window})
 function secondWindow:id() return 2 end
@@ -93,21 +95,21 @@ windowNavigation:commaItems(true, function(items) filtered = items end)
 assert(#filtered == 2 and filtered[1].id == 10 and filtered[2].id == 11)
 
 local commaRecord = {id = 40, window = {}}
-local adoptedRecord, adoptedGeneration
+local adoptedRecord, adoptedRequest
 local commaGate = RequestGate.new()
-local commaGeneration = commaGate:next()
+local commaRequest = {generation = commaGate:next(), screenKey = "first", index = 1}
 local commaNavigation = WindowNavigation.new({
   repository = fakeRepository,
   gate = commaGate,
   orchestrator = {
-    adopt = function(_, record, generation)
-      adoptedRecord, adoptedGeneration = record, generation
+    adopt = function(_, record, request)
+      adoptedRecord, adoptedRequest = record, request
     end,
   },
   allScreens = function() return {} end,
 })
-commaNavigation:acceptComma(commaRecord, commaGeneration)
-assert(adoptedRecord == commaRecord and adoptedGeneration == commaGeneration)
+commaNavigation:acceptComma(commaRecord, commaRequest)
+assert(adoptedRecord == commaRecord and adoptedRequest == commaRequest)
 
 local firstDisplay = {}
 function firstDisplay:getUUID() return "first" end
@@ -115,44 +117,28 @@ function firstDisplay:frame() return {x = 0, y = 0, w = 1000, h = 800} end
 local secondDisplay = {}
 function secondDisplay:getUUID() return "second" end
 function secondDisplay:frame() return {x = 1000, y = 0, w = 1000, h = 800} end
-local nativeWindow = {}
-function nativeWindow:screen() return firstDisplay end
-local focusedRecord = {id = 20, window = nativeWindow, screen = firstDisplay}
-local placementRequest
+local activeDisplay = firstDisplay
+local actions = {}
 local placementGate = RequestGate.new()
 local placementNavigation = WindowNavigation.new({
-  repository = {
-    focusedWindow = function() return nativeWindow end,
-    record = function() return focusedRecord end,
-  },
+  repository = {},
   gate = placementGate,
   orchestrator = {
-    activeScreen = function() return firstDisplay end,
-    activate = function(_, record, request) placementRequest = {record = record, request = request} end,
+    activeScreen = function() return activeDisplay end,
+    switchScreen = function(_, display) activeDisplay = display; actions[#actions + 1] = "switch" end,
+    keepOnly = function() actions[#actions + 1] = "one" end,
+    enableTwo = function() actions[#actions + 1] = "two" end,
+    toggleRatio = function() actions[#actions + 1] = "ratio" end,
   },
   allScreens = function() return {secondDisplay, firstDisplay} end,
 })
 placementNavigation:makeFocusedSingle()
-assert(placementRequest.record == focusedRecord)
-assert(placementRequest.request.mode == "single" and placementRequest.request.screen == firstDisplay)
-placementNavigation:moveFocusedToOtherDisplay("stack")
-assert(placementRequest.request.mode == "stack" and placementRequest.request.screen == secondDisplay)
-
-local otherDisplayRecord = {id = 21, window = {}, screenID = "second", minimized = false}
-local adoptedOtherDisplay
-local displayNavigation = WindowNavigation.new({
-  repository = {
-    listAll = function(_, callback) callback({focusedRecord, otherDisplayRecord}) end,
-    orderedByHistory = function(_, values) return values end,
-  },
-  gate = RequestGate.new(),
-  orchestrator = {
-    activeScreen = function() return firstDisplay end,
-    adopt = function(_, record) adoptedOtherDisplay = record end,
-  },
-  allScreens = function() return {secondDisplay, firstDisplay} end,
-})
-displayNavigation:focusOtherDisplay()
-assert(adoptedOtherDisplay == otherDisplayRecord)
+placementNavigation:enableTwo()
+placementNavigation:toggleRatio()
+placementNavigation:focusOtherDisplay()
+assert(table.concat(actions, ",") == "one,two,ratio,switch")
+assert(activeDisplay == secondDisplay)
+placementNavigation:focusOtherDisplay()
+assert(activeDisplay == firstDisplay)
 
 print("Hammerspoon navigation tests passed")

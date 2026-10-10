@@ -51,20 +51,19 @@ function navigation.start()
   local heldKeys = HeldKeys.new(config.hyper)
 
   heldKeys:track(settings.instanceKey)
-  heldKeys:track(settings.monitorKey)
 
   for _, application in ipairs(applications) do
     hs.hotkey.bind(config.hyper, application.key, function()
       applicationNavigation:activate(
         application,
-        "single",
+        "focused",
         heldKeys:isDown(settings.instanceKey)
       )
     end)
     hs.hotkey.bind(shifted(config.hyper), application.key, function()
       applicationNavigation:activate(
         application,
-        "stack",
+        "other",
         heldKeys:isDown(settings.instanceKey)
       )
     end)
@@ -72,33 +71,28 @@ function navigation.start()
   end
 
   catalog.add("Applications", "MainMod + F + App", "Select application window")
-  catalog.add("Applications", "MainMod + Shift + App", "Add application to stack")
+  catalog.add("Applications", "MainMod + Shift + App", "Fill other slot")
 
   hs.hotkey.bind(config.hyper, "m", function() windowNavigation:focusNext() end)
   hs.hotkey.bind(config.hyper, "n", function() windowNavigation:rotatePositions() end)
   hs.hotkey.bind(config.hyper, "h", function()
-    if heldKeys:isDown(settings.monitorKey) then
-      windowNavigation:moveFocusedToOtherDisplay("stack")
-    else
-      windowNavigation:focusOtherDisplay()
-    end
+    windowNavigation:focusOtherDisplay()
   end)
   hs.hotkey.bind(config.hyper, "/", function()
-    if heldKeys:isDown(settings.monitorKey) then
-      windowNavigation:moveFocusedToOtherDisplay("single")
-    else
-      windowNavigation:makeFocusedSingle()
-    end
+    windowNavigation:makeFocusedSingle()
   end)
+  hs.hotkey.bind(shifted(config.hyper), "/", function() windowNavigation:enableTwo() end)
   hs.hotkey.bind(config.hyper, "w", function() windowNavigation:closeFocused() end)
-  hs.hotkey.bind(config.hyper, "p", function() windowNavigation:chooseAny("single") end)
-  hs.hotkey.bind(shifted(config.hyper), "p", function() windowNavigation:chooseAny("stack") end)
+  hs.hotkey.bind(config.hyper, "p", function() windowNavigation:chooseAny("focused") end)
+  hs.hotkey.bind(shifted(config.hyper), "p", function() windowNavigation:chooseAny("other") end)
 
   local function windowCycle(direction)
     local kind = heldKeys:isDown(settings.instanceKey) and "application_windows" or "windows"
     local currentSession = commaSelection.session
     local generation = currentSession and currentSession.kind == kind
       and currentSession.generation or gate:next()
+    local request = currentSession and currentSession.kind == kind
+      and currentSession.request or orchestrator:capture("focused", generation)
     commaSelection:cycle(kind, direction, {
       generation = generation,
       load = function(done)
@@ -111,10 +105,13 @@ function navigation.start()
         end)
       end,
       onSelect = function(item)
-        windowNavigation:acceptComma(item.record, generation)
+        windowNavigation:acceptComma(item.record, request)
       end,
     })
-    if commaSelection.session then commaSelection.session.generation = generation end
+    if commaSelection.session then
+      commaSelection.session.generation = generation
+      commaSelection.session.request = request
+    end
   end
 
   hs.hotkey.bind(config.hyper, ",", function() windowCycle(1) end, nil, function() windowCycle(1) end)
@@ -122,16 +119,15 @@ function navigation.start()
     function() windowCycle(-1) end)
 
   catalog.add("Windows", "MainMod + P", "Choose window by last focus")
-  catalog.add("Windows", "MainMod + Shift + P", "Choose window and add it to stack")
+  catalog.add("Windows", "MainMod + Shift + P", "Choose window for other slot")
   catalog.add("Windows", "MainMod + ,", "Adopt windows by last focus")
   catalog.add("Windows", "MainMod + Shift + ,", "Adopt windows backwards")
   catalog.add("Windows", "MainMod + F + ,", "Adopt application windows")
-  catalog.add("Navigation", "MainMod + M", "Focus next layout window")
-  catalog.add("Windows", "MainMod + N", "Rotate window positions")
+  catalog.add("Navigation", "MainMod + M", "Focus other slot")
+  catalog.add("Windows", "MainMod + N", "Swap slot contents")
   catalog.add("Navigation", "MainMod + H", "Focus other display")
   catalog.add("Windows", "MainMod + /", "Keep only focused window in layout")
-  catalog.add("Windows", "MainMod + G + /", "Move window to other display and replace layout")
-  catalog.add("Windows", "MainMod + G + H", "Move window to other display and add to layout")
+  catalog.add("Windows", "MainMod + Shift + /", "Use two slots")
   catalog.add("Windows", "MainMod + W", "Close focused window")
 
   navigation.services = {

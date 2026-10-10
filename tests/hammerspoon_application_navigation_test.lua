@@ -14,6 +14,7 @@ local RequestGate = require("modules.request_gate")
 local gate = RequestGate.new()
 local activated
 local chooserShown
+local excludedID
 local records = {{id = 9, bundleID = "example.app", appName = "Example", title = "Only"}}
 local focusedWindow = {}
 local repository = {
@@ -31,6 +32,11 @@ local appNavigation = ApplicationNavigation.new({
   orchestrator = {
     activate = function(_, record) activated = record end,
     activeScreen = function() return "screen" end,
+    capture = function(_, mode, generation)
+      return {screen = "screen", mode = mode, generation = generation}
+    end,
+    excluded = function() return excludedID end,
+    expectBundle = function() end,
   },
   chooserFactory = function()
     return {show = function(_, choices, callback) chooserShown = choices; callback(choices[1]) end}
@@ -52,8 +58,14 @@ end
 appNavigation:_showOrChoose(records, {generation = generation}, true)
 assert(#chooserShown == 2 and activated.id == 10)
 
+excludedID = 9
 activated = nil
-appNavigation:activate({bundleID = "example.app"}, "single", false)
+appNavigation:_showOrChoose(records, {generation = generation, mode = "other"}, false)
+assert(activated.id == 10)
+excludedID = nil
+
+activated = nil
+appNavigation:activate({bundleID = "example.app"}, "focused", false)
 assert(activated.id == 9)
 
 activated = nil

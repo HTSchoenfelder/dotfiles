@@ -80,19 +80,20 @@ end
 function LayoutBorders:refresh()
   if not self.enabled then return end
   local present = {}
-  local focusedWindowID = self.orchestrator:focusedWindowID()
   for screenKey, layout in pairs(self.orchestrator:layoutSnapshot()) do
-    for index, slot in ipairs(layout.slots) do
-      local key = screenKey .. ":" .. tostring(index)
-      local focusedSlot = focusedWindowID ~= nil
-        and tonumber(slot.windowID) == focusedWindowID
-      present[key] = true
-      self:_draw(
-        key,
-        slot.frame,
-        focusedSlot and self.focusColor or self.layoutColor,
-        focusedSlot and "focus" or "layout"
-      )
+    for index = 1, layout.wanted or #layout.slots do
+      local slot = layout.slots[index]
+      if slot then
+        local key = screenKey .. ":" .. tostring(index)
+        local focusedSlot = layout.active and layout.focusedSlot == index
+        present[key] = true
+        self:_draw(
+          key,
+          slot.frame,
+          focusedSlot and self.focusColor or self.layoutColor,
+          focusedSlot and "focus" or "layout"
+        )
+      end
     end
   end
   local stale = {}

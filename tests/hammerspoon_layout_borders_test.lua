@@ -7,6 +7,7 @@ local focusedWindowID = 1
 local snapshots = {
   ["screen-1"] = {
     focusedSlot = 1,
+    active = true,
     slots = {
       {windowID = 1, frame = {x = 10, y = 20, w = 600, h = 700}},
       {windowID = 2, frame = {x = 620, y = 20, w = 600, h = 700}},
@@ -75,11 +76,13 @@ assert(canvases[2].frameChanges == 0)
 
 snapshots["screen-2"] = {
   focusedSlot = 1,
+  active = true,
   slots = {
     {windowID = 4, frame = {x = 1240, y = 20, w = 600, h = 700}},
   },
 }
 focusedWindowID = 4
+snapshots["screen-1"].active = false
 listener()
 assert(#canvases == 3)
 assert(canvases[1].element.strokeColor.name == "layout")
@@ -97,6 +100,12 @@ assert(focusedCanvases == 1, "only the globally focused slot may be Green")
 snapshots["screen-1"].slots[2] = nil
 listener()
 assert(canvases[2].deleted)
+
+snapshots["screen-2"].slots[1].windowID = nil
+focusedWindowID = 3
+listener()
+assert(canvases[3].element.strokeColor.name == "focus",
+  "an empty active display keeps its Green slot frame")
 
 borders:stop()
 assert(listener == nil and canvases[1].deleted and canvases[3].deleted)

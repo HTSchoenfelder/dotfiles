@@ -3,265 +3,191 @@ package.path = "home/.hammerspoon/?.lua;home/.hammerspoon/?/init.lua;" .. packag
 
 local planner = require("modules.layout_planner")
 local RequestGate = require("modules.request_gate")
-
-local frames = planner.frames({x = 0, y = 0, w = 1000, h = 800}, 3, 5)
-assert(frames[1].x == 5 and frames[1].w == 492 and frames[1].h == 790)
-assert(frames[2].x == 502 and frames[2].y == 5 and frames[2].h == 392)
-assert(frames[3].x == 502 and frames[3].y == 402 and frames[3].h == 393)
-
-local screen = {}
-function screen:getUUID() return "screen-1" end
-function screen:frame() return {x = 0, y = 0, w = 1000, h = 800} end
-local secondScreen = {}
-function secondScreen:getUUID() return "screen-2" end
-function secondScreen:frame() return {x = 1000, y = 0, w = 1000, h = 800} end
-
-local application = {}
-function application:isHidden() return false end
-function application:unhide() self.hidden = false end
-
-local windows = {}
-local focused
-local function newWindow(id, initialScreen)
-  local window = {
-    windowID = id,
-    appliedFrames = {},
-    currentFrame = {x = 20, y = 20, w = 400, h = 300},
-    currentScreen = initialScreen or screen,
-  }
-  function window:id() return self.windowID end
-  function window:isStandard() return true end
-  function window:isFullScreen() return false end
-  function window:isMinimized() return self.minimized == true end
-  function window:unminimize() self.minimized = false end
-  function window:isVisible() return not self.closed end
-  function window:application() return application end
-  function window:screen() return self.currentScreen end
-  function window:frame() return self.currentFrame end
-  function window:setFrameWithWorkarounds(frame)
-    self.focusedBeforeFrame = focused == self
-    self.currentFrame = {x = frame.x, y = frame.y, w = frame.w, h = frame.h}
-    self.currentScreen = frame.x >= 1000 and secondScreen or screen
-    self.appliedFrames[#self.appliedFrames + 1] = self.currentFrame
-  end
-  function window:focus()
-    self.focusCalls = (self.focusCalls or 0) + 1
-    focused = self
-  end
-  function window:close() self.closed = true; windows[self.windowID] = nil end
-  windows[id] = window
-  return window
-end
-
-local first = newWindow(1)
-local second = newWindow(2)
-local third = newWindow(3)
-local fourth = newWindow(4)
-local fifth = newWindow(5, secondScreen)
-local sixth = newWindow(6, secondScreen)
-local seventh = newWindow(7)
-focused = first
-
-local repository = {
-  focusedWindow = function() return focused end,
-  recordForID = function(_, id)
-    local window = windows[id]
-    return window and {id = id, window = window, screen = window:screen()}
-  end,
-  record = function(_, window)
-    return window and {id = window:id(), window = window, screen = window:screen()}
-  end,
-  borderRecord = function(_, window)
-    return window and not window.closed
-      and {id = window:id(), window = window, screen = window:screen(), minimized = false}
-      or nil
-  end,
-  isUsable = function(_, window) return window and not window.closed end,
-}
-
-local filter = {}
-function filter:subscribe(events, callback) self.events = events; self.callback = callback end
-function filter:unsubscribeAll() self.unsubscribed = true end
-local watcher = {}
-function watcher:start() self.started = true; return self end
-function watcher:stop() self.stopped = true end
-
-hs = {printf = function() end}
 local LayoutOrchestrator = require("modules.layout_orchestrator")
-local gate = RequestGate.new()
-local scheduledDelays = {}
-local orchestrator = LayoutOrchestrator.new(repository, gate, {
-  gap = 5,
-  restoreDelaySeconds = 0,
-  validationDelaySeconds = 0,
-}, {
-  after = function(delay, callback)
-    scheduledDelays[#scheduledDelays + 1] = delay
-    callback()
-  end,
-  events = {
-    destroyed = "destroyed",
-    focused = "focused",
-    moved = "moved",
-    notInCurrentSpace = "notInCurrentSpace",
-    notVisible = "notVisible",
-  },
-  filterNew = function() return filter end,
-  mainScreen = function() return screen end,
-  screenWatcherNew = function(callback) watcher.callback = callback; return watcher end,
-})
-local layoutChanges = 0
-local unsubscribe = orchestrator:subscribe(function() layoutChanges = layoutChanges + 1 end)
 
-local function slotIDs(layout)
-  local ids = {}
-  for _, slot in ipairs(layout.slots) do ids[#ids + 1] = slot.windowID end
-  return table.concat(ids, ",")
-end
+local half = planner.frames({x = 0, y = 0, w = 1000, h = 800}, 2, 5, 0.5)
+local wide = planner.frames({x = 0, y = 0, w = 1000, h = 800}, 2, 5, 0.7)
+assert(half[1].w == 492 and half[2].x == 502)
+assert(wide[1].w == 689 and wide[2].x == 699)
 
-local function assertLayoutInvariants()
-  local seen = {}
-  for _, currentLayout in pairs(orchestrator.layouts) do
-    assert(#currentLayout.slots > 0)
-    assert(currentLayout.focusedSlot >= 1 and currentLayout.focusedSlot <= #currentLayout.slots)
-    for _, slot in ipairs(currentLayout.slots) do
-      assert(not seen[slot.windowID], "window belongs to more than one layout")
-      assert(slot.frame and slot.frame.x and slot.frame.y and slot.frame.w and slot.frame.h)
-      seen[slot.windowID] = true
-    end
+local function fixture()
+  local firstScreen = {uuid = "first", x = 0}
+  local secondScreen = {uuid = "second", x = 1000}
+  for _, screen in ipairs({firstScreen, secondScreen}) do
+    function screen:getUUID() return self.uuid end
+    function screen:frame() return {x = self.x, y = 0, w = 1000, h = 800} end
   end
+  local windows, focused, rank = {}, nil, {}
+  local application = {isHidden = function() return false end,
+    bundleID = function() return "example.app" end}
+  local function add(id, screen)
+    local window = {number = id, display = screen, currentFrame = {x = screen.x + 30, y = 30, w = 400, h = 300}}
+    function window:id() return self.number end
+    function window:screen() return self.display end
+    function window:frame() return self.currentFrame end
+    function window:application() return application end
+    function window:isMinimized() return false end
+    function window:focus() focused = self end
+    function window:close() self.closed = true; windows[id] = nil; if focused == self then focused = nil end end
+    function window:setFrameWithWorkarounds(frame)
+      self.currentFrame = frame
+      self.display = frame.x >= 1000 and secondScreen or firstScreen
+    end
+    windows[id] = window
+    rank[id] = id
+    return window
+  end
+  local repository = {
+    focusedWindow = function() return focused end,
+    isUsable = function(_, window) return window and not window.closed end,
+    recordForID = function(_, id)
+      local window = windows[id]
+      return window and {id = id, window = window, screen = window:screen(),
+        screenID = window:screen():getUUID()}
+    end,
+    listAll = function(_, callback)
+      local records = {}
+      for id, window in pairs(windows) do
+        records[#records + 1] = {id = id, window = window,
+          screen = window:screen(), screenID = window:screen():getUUID()}
+      end
+      callback(records)
+    end,
+    orderedByHistory = function(_, records)
+      table.sort(records, function(a, b) return rank[a.id] < rank[b.id] end)
+      return records
+    end,
+  }
+  local filter = {subscribe = function() end, unsubscribeAll = function() end}
+  local watcher = {start = function(self) return self end, stop = function() end}
+  hs = {printf = function() end}
+  local gate = RequestGate.new()
+  local orchestrator = LayoutOrchestrator.new(repository, gate, {gap = 5, restoreDelaySeconds = 0}, {
+    after = function(_, callback) callback() end,
+    mainScreen = function() return firstScreen end,
+    filterNew = function() return filter end,
+    screenWatcherNew = function() return watcher end,
+    events = {created = "created", destroyed = "destroyed", focused = "focused",
+      moved = "moved", notInCurrentSpace = "notInCurrentSpace", notVisible = "notVisible"},
+  })
+  local function select(window, mode)
+    orchestrator:activate({id = window:id(), window = window}, orchestrator:capture(mode, gate:next()))
+  end
+  return {first = firstScreen, second = secondScreen, add = add, select = select,
+    focus = function(window) focused = window end, focused = function() return focused end,
+    rank = rank, gate = gate, orchestrator = orchestrator}
 end
 
-local generation = gate:next()
-orchestrator:activate({id = 1, window = first, screen = screen}, {
-  generation = generation, mode = "single", screen = screen,
-})
-assert(orchestrator.layouts["screen-1"].slots[1].windowID == 1)
-assert(first:frame().x == 5 and first:frame().w == 990)
-assert(#scheduledDelays == 0 and layoutChanges == 1)
-assertLayoutInvariants()
+local session = fixture()
+local left = session.add(1, session.first)
+local parked = session.add(2, session.first)
+local older = session.add(3, session.first)
+session.focus(left)
+session.select(parked, "focused")
+local layout = session.orchestrator.layouts.first
+assert(layout.wanted == 1 and layout.slots[1].windowID == 2)
+assert(left:screen() == session.first and session.focused() == parked)
+-- The unselected window stays native and remains a refill candidate.
+session.select(older, "other")
+assert(layout.wanted == 2 and layout.slots[1].windowID == 2 and layout.slots[2].windowID == 3)
+assert(session.focused() == parked and parked:frame().w == 689)
+session.orchestrator:focusNext()
+assert(session.focused() == older)
+session.orchestrator:rotatePositions()
+assert(layout.slots[1].windowID == 3 and layout.slots[2].windowID == 2)
+assert(session.focused() == parked)
+session.orchestrator:toggleRatio()
+assert(layout.ratio == 0.5 and older:frame().w == 492)
+session.orchestrator:keepOnly()
+assert(layout.wanted == 1 and layout.slots[1].windowID == 2)
+session.orchestrator:enableTwo()
+assert(layout.wanted == 2 and layout.slots[2].windowID == 1)
+assert(session.focused() == parked)
 
-local firstFrameCount, firstFocusCount = #first.appliedFrames, first.focusCalls
-generation = gate:next()
-orchestrator:activate({id = 1, window = first, screen = screen}, {
-  generation = generation, mode = "single", screen = screen,
-})
-assert(#first.appliedFrames == firstFrameCount and first.focusCalls == firstFocusCount)
-assertLayoutInvariants()
+local remote = session.add(4, session.second)
+session.select(remote, "focused")
+assert(layout.slots[1].windowID == 4 and remote:screen() == session.first)
+assert(session.orchestrator.layouts.first.slots[2].windowID == 1)
+assert(session.orchestrator.layouts.second == nil)
+session.orchestrator:switchScreen(session.second)
+local empty = session.orchestrator:layoutSnapshot().second
+assert(empty.active and empty.focusedSlot == 1 and empty.slots[1].windowID == nil)
+assert(session.orchestrator:activeScreen() == session.second)
+session.select(left, "focused")
+assert(session.orchestrator.layouts.second.slots[1].windowID == 1)
+assert(left:screen() == session.second)
 
-generation = gate:next()
-orchestrator:activate({id = 2, window = second, screen = screen}, {
-  anchorID = 1, generation = generation, mode = "stack", screen = screen,
-})
-assert(slotIDs(orchestrator.layouts["screen-1"]) == "1,2")
-assert(first:frame().w == 492 and second:frame().x == 502 and not second.focusedBeforeFrame)
-assertLayoutInvariants()
+local closing = fixture()
+local master = closing.add(11, closing.first)
+local peer = closing.add(12, closing.first)
+local replacement = closing.add(13, closing.first)
+closing.rank[13] = 0
+closing.focus(master)
+closing.select(peer, "other")
+closing.orchestrator:closeFocused()
+assert(closing.orchestrator.layouts.first.slots[1].windowID == 13)
+assert(closing.orchestrator.layouts.first.slots[2].windowID == 12)
+assert(closing.focused() == replacement)
 
-second.minimized = true
-local prepared = false
-orchestrator:_prepare(second, function() prepared = true end)
-assert(prepared and not second.minimized and focused == second)
-assert(scheduledDelays[#scheduledDelays] == 0)
+local vacant = fixture()
+local current = vacant.add(21, vacant.first)
+vacant.focus(current)
+vacant.orchestrator:capture("focused", vacant.gate:next())
+vacant.orchestrator:enableTwo()
+local state = vacant.orchestrator.layouts.first
+assert(state.wanted == 2 and state.slots[2].windowID == nil)
+assert(current:frame().w == 990)
+vacant.orchestrator:closeFocused()
+assert(state.wanted == 2 and state.slots[1].windowID == nil
+  and state.slots[2].windowID == nil)
+assert(vacant.orchestrator:layoutSnapshot().first.active)
 
-generation = gate:next()
-orchestrator:activate({id = 3, window = third, screen = screen}, {
-  anchorID = 2, generation = generation, mode = "stack", screen = screen,
-})
-focused = second
-orchestrator:rotatePositions()
-local layout = orchestrator.layouts["screen-1"]
-assert(slotIDs(layout) == "2,3,1", slotIDs(layout))
-assert(focused == third)
-assertLayoutInvariants()
+local exchange = fixture()
+local localWindow = exchange.add(31, exchange.first)
+local remoteWindow = exchange.add(32, exchange.second)
+exchange.focus(localWindow)
+exchange.orchestrator:capture("focused", exchange.gate:next())
+exchange.orchestrator:switchScreen(exchange.second)
+assert(exchange.orchestrator.layouts.second.slots[1].windowID == 32)
+exchange.select(remoteWindow, "focused")
+exchange.orchestrator:switchScreen(exchange.first)
+exchange.select(remoteWindow, "focused")
+assert(exchange.orchestrator.layouts.first.slots[1].windowID == 32)
+assert(exchange.orchestrator.layouts.second.slots[1].windowID == 31)
+assert(remoteWindow:screen() == exchange.first and localWindow:screen() == exchange.second)
 
-orchestrator:focusNext()
-assert(focused == first)
+local newlyOpened = fixture()
+local initial = newlyOpened.add(41, newlyOpened.first)
+newlyOpened.focus(initial)
+newlyOpened.orchestrator:capture("focused", newlyOpened.gate:next())
+newlyOpened.orchestrator:enableTwo()
+local incoming = newlyOpened.add(42, newlyOpened.first)
+newlyOpened.orchestrator:_created(incoming)
+assert(newlyOpened.orchestrator.layouts.first.slots[2].windowID == 42)
+assert(newlyOpened.orchestrator.layouts.first.slots[1].windowID == 41)
+assert(newlyOpened.focused() == initial)
 
-focused = fourth
-generation = gate:next()
-orchestrator:activate({id = 1, window = first, screen = screen}, {
-  anchorID = 4, generation = generation, mode = "stack", screen = screen,
-})
-layout = orchestrator.layouts["screen-1"]
-assert(slotIDs(layout) == "4,1", slotIDs(layout))
-assertLayoutInvariants()
+local emptyScreen = fixture()
+local original = emptyScreen.add(51, emptyScreen.first)
+emptyScreen.focus(original)
+emptyScreen.orchestrator:capture("focused", emptyScreen.gate:next())
+emptyScreen.orchestrator:switchScreen(emptyScreen.second)
+local destination = emptyScreen.orchestrator:layoutSnapshot().second
+assert(destination.active and destination.slots[1].frame.w == 990)
+assert(emptyScreen.focused() == original)
+local selected = emptyScreen.add(52, emptyScreen.first)
+emptyScreen.select(selected, "focused")
+assert(selected:screen() == emptyScreen.second)
+assert(emptyScreen.orchestrator.layouts.second.slots[1].windowID == 52)
 
-orchestrator.layouts["screen-2"] = {
-  screen = secondScreen,
-  focusedSlot = 1,
-  slots = {{windowID = 5, frame = fifth:frame()}},
-}
-local focusChanges = layoutChanges
-focused = fifth
-orchestrator:_validateFocus()
-assert(orchestrator:focusedWindowID() == 5)
-assert(layoutChanges == focusChanges + 1,
-  "focus validation must notify even when the display-local slot index is unchanged")
-focused = first
-generation = gate:next()
-orchestrator:activate({id = 1, window = first, screen = screen}, {
-  generation = generation, mode = "stack", screen = secondScreen,
-})
-local secondLayout = orchestrator.layouts["screen-2"]
-assert(slotIDs(secondLayout) == "5,1")
-assert(first:screen() == secondScreen and fifth:screen() == secondScreen)
-assertLayoutInvariants()
+local externalClose = fixture()
+local prior = externalClose.add(61, externalClose.first)
+local nextWindow = externalClose.add(62, externalClose.first)
+externalClose.focus(prior)
+externalClose.orchestrator:capture("focused", externalClose.gate:next())
+prior:close()
+externalClose.orchestrator:_validateLifecycle(prior)
+assert(externalClose.orchestrator.layouts.first.slots[1].windowID == 62)
+assert(externalClose.focused() == nextWindow)
 
-generation = gate:next()
-orchestrator:activate({id = 2, window = second, screen = screen}, {
-  generation = generation, mode = "single", screen = secondScreen,
-})
-assert(slotIDs(secondLayout) == "2")
-assert(second:screen() == secondScreen)
-assertLayoutInvariants()
-
-generation = gate:next()
-orchestrator:activate({id = 5, window = fifth, screen = secondScreen}, {
-  anchorID = 2, generation = generation, mode = "stack", screen = secondScreen,
-})
-local retainedFrame = secondLayout.slots[2].frame
-generation = gate:next()
-orchestrator:adopt({id = 6, window = sixth, screen = secondScreen}, generation)
-assert(slotIDs(secondLayout) == "2,6")
-assert(secondLayout.slots[2].frame.x == retainedFrame.x
-  and secondLayout.slots[2].frame.y == retainedFrame.y
-  and secondLayout.slots[2].frame.w == retainedFrame.w
-  and secondLayout.slots[2].frame.h == retainedFrame.h)
-assert(sixth:frame().x == retainedFrame.x and focused == sixth)
-assertLayoutInvariants()
-
-generation = gate:next()
-orchestrator:adopt({id = 2, window = second, screen = secondScreen}, generation)
-assert(slotIDs(secondLayout) == "2,6" and secondLayout.focusedSlot == 1)
-assert(focused == second)
-assertLayoutInvariants()
-
-orchestrator:clearScreen(screen)
-generation = gate:next()
-orchestrator:adopt({id = 4, window = fourth, screen = screen}, generation)
-assert(slotIDs(orchestrator.layouts["screen-1"]) == "4")
-assert(fourth:frame().w == 990)
-assertLayoutInvariants()
-
-focused = seventh
-orchestrator:_validateFocus()
-assert(orchestrator.layouts["screen-1"] == nil)
-assert(orchestrator.layouts["screen-2"] == secondLayout)
-
-focused = sixth
-sixth.currentFrame.x = sixth.currentFrame.x + 30
-orchestrator:_validateMove(sixth)
-assert(orchestrator.layouts["screen-2"] == nil)
-
-orchestrator:start()
-assert(filter.callback and watcher.started)
-watcher.callback()
-orchestrator:stop()
-assert(filter.unsubscribed and watcher.stopped and orchestrator.observer.filter == nil)
-
-local previousChanges = layoutChanges
-unsubscribe()
-orchestrator:_notify()
-assert(layoutChanges == previousChanges)
-
-print("Hammerspoon layout planning tests passed")
+print("Hammerspoon slot layout tests passed")

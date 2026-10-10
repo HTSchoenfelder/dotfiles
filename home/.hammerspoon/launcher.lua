@@ -1,4 +1,5 @@
 local catalog = require("shortcut_catalog")
+local WindowRepository = require("modules.window_repository")
 
 local Launcher = {}
 Launcher.__index = Launcher
@@ -33,6 +34,8 @@ function Launcher.new(options)
     chooserFactory = options.chooserFactory,
     modifiers = options.modifiers,
     gate = options.gate,
+    orchestrator = options.orchestrator,
+    repository = options.repository,
     task = nil,
     chooser = nil,
     generation = 0,
@@ -73,6 +76,8 @@ function Launcher:toggle()
     self.chooser:hide()
     return
   end
+  local request = self.orchestrator and self.orchestrator:capture(
+    "focused", self.gate:current())
   self.generation = self.generation + 1
   local generation = self.generation
   if self.task and self.task:isRunning() then self.task:terminate() end
@@ -86,7 +91,21 @@ function Launcher:toggle()
     local choices = self:_choices(stdout)
     self.chooser = self.chooserFactory()
     self.chooser:show(choices, function(selected)
-      if selected then hs.application.launchOrFocus(selected.path) end
+      if not selected then return end
+      if request and selected.bundleID and self.repository then
+        self.repository:listForBundle(selected.bundleID, function(records)
+          if not self.gate:isCurrent(request.generation) then return end
+          for _, record in ipairs(records) do
+            if WindowRepository.isSlotCandidate(record) then
+              self.orchestrator:activate(record, request)
+              return
+            end
+          end
+          hs.application.launchOrFocus(selected.path)
+        end)
+      else
+        hs.application.launchOrFocus(selected.path)
+      end
     end)
   end, {spotlightQuery})
   self.task:start()

@@ -18,6 +18,7 @@ function LayoutObserver.new(callbacks, options, runtime)
         :rejectApp("Spotlight")
     end,
     events = runtime.events or {
+      created = hs.window.filter.windowCreated,
       destroyed = hs.window.filter.windowDestroyed,
       focused = hs.window.filter.windowFocused,
       moved = hs.window.filter.windowMoved,
@@ -59,13 +60,16 @@ function LayoutObserver:start()
   if self.filter then return self end
   self.filter = self.filterNew()
   self.filter:subscribe({
+    self.events.created,
     self.events.destroyed,
     self.events.focused,
     self.events.moved,
     self.events.notInCurrentSpace,
     self.events.notVisible,
   }, function(window, _, event)
-    if event == self.events.focused then
+    if event == self.events.created then
+      if self.callbacks.onCreated then self.callbacks.onCreated(window) end
+    elseif event == self.events.focused then
       self:_scheduleFocus()
     elseif event == self.events.moved then
       self:_scheduleMove(window)

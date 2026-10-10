@@ -2,7 +2,7 @@
 package.path = "home/.hammerspoon/?.lua;home/.hammerspoon/?/init.lua;" .. package.path
 
 local timers = {}
-local calls = {focus = 0, lifecycle = 0, move = 0, screens = 0}
+local calls = {created = 0, focus = 0, lifecycle = 0, move = 0, screens = 0}
 
 local filter = {}
 function filter:subscribe(events, callback) self.events = events; self.callback = callback end
@@ -17,6 +17,10 @@ function window:id() return 42 end
 
 local LayoutObserver = require("modules.layout_observer")
 local observer = LayoutObserver.new({
+  onCreated = function(candidate)
+    assert(candidate == window)
+    calls.created = calls.created + 1
+  end,
   onFocus = function() calls.focus = calls.focus + 1 end,
   onLifecycle = function(candidate)
     assert(candidate == window)
@@ -33,6 +37,7 @@ local observer = LayoutObserver.new({
     timers[#timers + 1] = callback
   end,
   events = {
+    created = "created",
     destroyed = "destroyed",
     focused = "focused",
     moved = "moved",
@@ -43,7 +48,10 @@ local observer = LayoutObserver.new({
   screenWatcherNew = function(callback) watcher.callback = callback; return watcher end,
 }):start()
 
-assert(filter.callback and watcher.started and #filter.events == 5)
+assert(filter.callback and watcher.started and #filter.events == 6)
+
+filter.callback(window, nil, "created")
+assert(calls.created == 1)
 
 filter.callback(window, nil, "focused")
 filter.callback(window, nil, "focused")

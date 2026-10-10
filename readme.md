@@ -22,63 +22,60 @@ VS Code and application-specific gaps are tracked in the
 
 Hammerspoon is the only macOS workflow and window-management process. It owns
 shortcuts, modes, choosers, application intentions, MRU state, MIDI integration,
-passive master/stack geometry and layout-slot frames through native windows.
+passive two-slot geometry and layout-slot frames through native windows.
 It changes frames only for explicit actions and does not use AeroSpace, Stage
 Manager, Mission Control or Spaces. JankyBorders remains an optional two-state
 alternative but must not run alongside Hammerspoon's window frames. See the
 [macOS window-management architecture](docs/macos-window-management.md) and
 [optional appearance layer](docs/macos-appearance.md).
 
-Hyprland uses one or two occupied slots per display. Application and window
-selection replaces a slot's content; Shift targets the other slot. Closing a
-window refills its slot from Parking by focus history. The split toggles between
-70:30 and 50:50. macOS retains its existing replacement/stack model; the
-[platform differences](docs/macos-window-management.md#platform-differences)
-remain explicit until Hammerspoon is migrated.
+Both platforms use one or two occupied slots per display. App and window selection
+replaces a slot; Shift targets the other side. Closing a slot window refills it by
+focus history. Dot Mode `M` toggles 70:30/50:50. On macOS, non-slot windows remain
+native windows and form a logical replacement pool; there is no Parking workspace.
 
 ## macOS / Hammerspoon quick reference
 
-`mainMod` = `Option + Control + Command`. Application shortcuts use bundle IDs and
-the Hammerspoon MRU history. Normal activation fills the active display with the
-selected window and leaves unrelated windows unchanged behind it. Holding `Shift`
-keeps the current layout and adds the selected window to the right stack. Holding
-`F` opens the instance chooser, including for a single instance.
+`mainMod` = `Option + Control + Command`. Hammerspoon retains one or two slot sides
+per display in memory. Application shortcuts use bundle IDs and the MRU history.
+Normal selection replaces the focused side; Shift fills the other side while
+retaining focus. `F` opens the instance chooser, including for one instance.
 
 | Shortcut | Action |
 | --- | --- |
-| `mainMod + J/K/L/I/;/O/U` | Activate Kitty / VS Code / Chrome / Google Chat / Obsidian / KeePassXC / Spotify as the full-size layout |
-| `mainMod + Shift + app key` | Add the selected application to the right stack |
-| `mainMod + F + app key` | Select an application window before placing it |
-| `mainMod + P` / `mainMod + Shift + P` | Select any window by recent focus; replace the layout / add it to the stack |
-| `mainMod + ,` / `mainMod + Shift + ,` | Adopt windows forward/backward by MRU into a slot on their current display; release `mainMod` to accept |
-| `mainMod + F + ,` | Adopt windows of the current application on their current display |
+| `mainMod + J/K/L/I/;/O/U` | Fill the focused slot with Kitty / VS Code / Chrome / Google Chat / Obsidian / KeePassXC / Spotify |
+| `mainMod + Shift + app key` | Fill the other slot with a distinct instance; retain focus |
+| `mainMod + F + app key` | Choose an application instance for the focused slot |
+| `mainMod + P` / `mainMod + Shift + P` | Choose a window for the focused / other slot |
+| `mainMod + ,` / `mainMod + Shift + ,` | Choose focused-slot content by MRU forward/backward; release `mainMod` to accept |
+| `mainMod + F + ,` | Choose focused-app instances for the focused slot |
 | `mainMod + Y` / `mainMod + Shift + Y` | Cycle through Spotify Play/Pause, Next and Previous; release `mainMod` to accept |
-| `mainMod + M` | Focus the next window in the active layout |
-| `mainMod + N` | Rotate positions while retaining focus on the visual slot |
-| `mainMod + H` | Focus the most recent window on the other display |
-| `mainMod + /` | Keep only the focused window in the current display layout |
-| `mainMod + G + /` | Move the focused window to the next display and replace its layout |
-| `mainMod + G + H` | Move the focused window to the next display and add it to its layout |
-| `mainMod + W` | Close the focused window |
+| `mainMod + M` | Focus the other occupied slot |
+| `mainMod + N` | Swap slot contents while retaining the focused side |
+| `mainMod + H` | Focus the other display's slot; show its active frame even when empty |
+| `mainMod + /` / `mainMod + Shift + /` | Use one / two slots on the active display |
+| `mainMod + .`, then `M` | Toggle the active display between 70:30 and 50:50 |
+| `mainMod + W` | Close the focused slot window and refill it from the non-slot MRU pool |
 | `mainMod + R` | Toggle the native application launcher |
 | `mainMod + Shift + R` | Show the searchable shortcut catalog |
 | `mainMod + Backslash` | Toggle the RØDECaster mute state |
 
 Application, window and comma selection use the same compact `hs.chooser`
 presentation with Catppuccin text colors, application icons and subdued window
-titles. The application launcher lists top-level bundles from the standard
-application directories with their native icons. Active layout slots receive a
-Catppuccin frame: the single globally focused occupant is Green and every other
-slot is Pink; untracked windows have no frame. Both the titles and slot frames can
-be disabled in `home/.hammerspoon/config.lua`. macOS has no workflow workspaces or
-Parking state.
+titles. The application launcher lists top-level bundles from standard application
+directories. Green marks the active slot, including an empty display selected by
+`H`; other retained slots are Pink. Untracked windows have no frame. Both titles
+and frames can be disabled in `home/.hammerspoon/config.lua`.
 
-Managed layouts use one full-size window, a 1:1 left/right split for two windows,
-and a left master with a vertical right stack for three or more windows.
-Focusing an untracked window or manually changing a tracked window resets the
-affected display's retained layout. Comma Selection is controlled: it focuses an
-existing member or replaces the focused slot with a window already on that
-display; it never moves a window across displays.
+The application launcher also places an existing app window into the captured
+focused slot. A newly launched normal window follows the same active-display
+state when its native window appears.
+
+Non-slot windows are neither minimized nor moved to a Parking area. A close refills
+the vacated side from their MRU order; if none exists, the side remains remembered.
+Selecting an occupant on another display swaps the two slot contents. Native
+macOS focus cannot move to an empty display, so the active frame and subsequent app
+selection follow Hammerspoon's retained display state instead.
 
 ## Hyprland quick reference
 
@@ -175,7 +172,7 @@ instead of Rofi.
 | `A` | Capture the focused window |
 | `Z` | Capture the focused monitor |
 | `B` | Toggle a connected display (Hyprland only) |
-| `M` | Toggle the active display split between 70:30 and 50:50 (Hyprland only) |
+| `M` | Toggle the active display split between 70:30 and 50:50 |
 | `G` | Toggle a project Neovim overlay |
 | `Shift + G` | Toggle a project Lazygit overlay |
 | `J` | Toggle a project Kitty overlay |

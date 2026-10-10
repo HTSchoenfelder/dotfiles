@@ -9,14 +9,14 @@ local function inset(frame, gap)
   }
 end
 
-function planner.frames(screenFrame, count, gap)
+function planner.frames(screenFrame, count, gap, ratio)
   if count <= 0 then return {} end
   gap = gap or 0
   local area = inset(screenFrame, gap)
   if count == 1 then return {area} end
 
   local inner = gap
-  local leftWidth = math.floor((area.w - inner) / 2)
+  local leftWidth = math.floor((area.w - inner) * (ratio or 0.7))
   local rightX = area.x + leftWidth + inner
   local rightWidth = area.w - leftWidth - inner
   local frames = {{x = area.x, y = area.y, w = leftWidth, h = area.h}}
@@ -24,16 +24,7 @@ function planner.frames(screenFrame, count, gap)
     frames[2] = {x = rightX, y = area.y, w = rightWidth, h = area.h}
     return frames
   end
-
-  local stackCount = count - 1
-  local stackHeight = math.floor((area.h - inner * (stackCount - 1)) / stackCount)
-  local y = area.y
-  for index = 2, count do
-    local height = index == count and area.y + area.h - y or stackHeight
-    frames[index] = {x = rightX, y = y, w = rightWidth, h = height}
-    y = y + height + inner
-  end
-  return frames
+  error("Slot layouts support at most two windows")
 end
 
 return planner
