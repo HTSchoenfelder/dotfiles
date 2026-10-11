@@ -159,9 +159,10 @@ outside the current design.
 
 System installation and session-service ownership remain separate from desktop
 interaction. Replacing shell navigation does not imply replacing Nix setup scripts
-or moving session daemons into the compositor.
-See [desktop integration](hyprland-desktop.md) for the portal, toolkit and upstream
-default configuration audit.
+or moving session daemons into the compositor. Current portal, toolkit and user
+service ownership is declared in `setup/nixos/desktop-integration.nix` and
+`setup/nixos/desktop-session.nix`; compositor-session processes remain in
+`config/session.lua`.
 
 ## Validation
 

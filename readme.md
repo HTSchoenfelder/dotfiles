@@ -29,10 +29,11 @@ alternative but must not run alongside Hammerspoon's window frames. See the
 [macOS window-management architecture](docs/macos-window-management.md) and
 [optional appearance layer](docs/macos-appearance.md).
 
-Both platforms use one or two occupied slots per display. App and window selection
-replaces a slot; Shift targets the other side. Closing a slot window refills it by
-focus history. Dot Mode `M` toggles 70:30/50:50. On macOS, non-slot windows remain
-native windows and form a logical replacement pool; there is no Parking workspace.
+Both platforms retain one or two slots per display, including temporary vacancies.
+App and window selection replaces a slot; Shift targets the other side. Closing a
+slot window refills it by focus history. Dot Mode `M` toggles 70:30/50:50. On
+macOS, non-slot windows remain native windows and form a logical replacement pool;
+there is no Parking workspace.
 
 ## macOS / Hammerspoon quick reference
 
@@ -79,7 +80,7 @@ selection follow Hammerspoon's retained display state instead.
 
 ## Hyprland quick reference
 
-`mainMod` = `Super + Ctrl + Alt`. Each display has one or two occupied slots.
+`mainMod` = `Super + Ctrl + Alt`. Each display retains one or two slots.
 The native master layout owns geometry; navigation changes slot contents.
 The left slot is the master. The right slot is the only stack window.
 
@@ -204,9 +205,7 @@ Media, volume, microphone and brightness hardware keys use their native actions.
 The read-only shortcut catalogs use `Shortcut — Description` rows and include
 global bindings, modifier combinations, Dot mode and hardware/media bindings.
 Hyprland's Lua entry point is `home/.config/hypr/hyprland.lua`; architecture and
-desktop integration notes live in [`docs/hyprland-lua.md`](docs/hyprland-lua.md)
-and [`docs/hyprland-desktop.md`](docs/hyprland-desktop.md). The active macOS
-responsibility split is documented in
+interaction notes live in [`docs/hyprland-lua.md`](docs/hyprland-lua.md). The
+active macOS responsibility split is documented in
 [`docs/macos-window-management.md`](docs/macos-window-management.md). Explicitly
-postponed fixes and refactorings are tracked in
-[`docs/deferred-work.md`](docs/deferred-work.md).
+postponed work and the macOS test procedure are tracked in [`work.md`](work.md).

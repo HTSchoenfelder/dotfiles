@@ -15,8 +15,8 @@ Parking; non-slot native windows form the logical refill pool.
 Application shortcut and text-navigation parity is a separate input concern. Its
 current ownership, incomplete coverage and target contract are documented in
 [macOS keyboard parity](macos-keyboard-parity.md).
-The [macOS tests](macos-tests.md) cover automated and live validation of this
-workflow.
+The [macOS tests](../work.md#macos-tests) cover automated and live validation of
+this workflow.
 
 ## Responsibility boundaries
 

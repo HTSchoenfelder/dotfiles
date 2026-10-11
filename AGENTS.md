@@ -14,8 +14,8 @@ These instructions apply to the entire repository.
   explicitly requested.
 - Update every affected document and shortcut reference with each behavior or
   architecture change. Always inspect `readme.md`.
-- `docs/deferred-work.md` contains postponed work. Only act on an entry when Henrik
-  explicitly requests it.
+- `work.md` is the single backlog and macOS test document. Only act on a pending
+  work entry when Henrik explicitly requests it.
 - Explain ownership boundaries and material trade-offs before broad architecture
   changes.
 
@@ -46,7 +46,8 @@ System and session ownership stays explicit:
 - Hyprland owns compositor behavior, bindings, window rules and compositor events.
 - Shell and terminal behavior stays independent of Hyprland where practical.
 
-See `docs/hyprland-desktop.md` for the current service, portal and toolkit ownership.
+The active NixOS ownership is defined in `setup/nixos/desktop-integration.nix` and
+`setup/nixos/desktop-session.nix`.
 
 ## Hyprland
 
