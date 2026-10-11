@@ -233,6 +233,7 @@
   "settingsSync.keybindingsPerPlatform": false,
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "terminal.integrated.fontSize": 20,
+  "terminal.integrated.stickyScroll.enabled": false,
   "typescript.updateImportsOnFileMove.enabled": "always",
   "update.mode": "none",
   "update.showReleaseNotes": false,
