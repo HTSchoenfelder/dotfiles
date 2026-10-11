@@ -24,6 +24,17 @@
     kustomize
     just
     neovim
+    lua-language-server
+    typescript-language-server
+    vscode-langservers-extracted
+    tree-sitter
+    stylua
+    prettier
+    (ruby.withPackages (rubyPackages: [
+      rubyPackages."erb-formatter"
+      rubyPackages.rubocop
+      rubyPackages.solargraph
+    ]))
     fzf
     curl
     bat

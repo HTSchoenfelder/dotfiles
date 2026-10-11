@@ -5,7 +5,7 @@ return {
     settle_attempts = 10,
     tools = {
         terminal = { command = { "zsh" }, title = "Terminal" },
-        editor = { command = { "nvim" }, title = "Editor" },
+        editor = { command = { "nvim", "." }, title = "Editor" },
         git = { command = { "lazygit" }, title = "Git" },
     },
 }

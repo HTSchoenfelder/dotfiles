@@ -146,6 +146,8 @@ monitor. `M` toggles the active display split. `B` selects and toggles connected
 displays. `V`, `G` and `J` toggle project Neovim, Lazygit and terminal overlays;
 `W` hides all project overlays. `E`, `R` and `T` select emojis,
 configured commands and snippets. The submap resets before the selected tool opens.
+Neovim receives the project directory as `.` in addition to inheriting it as its
+working directory, so the overlay opens the project rather than an empty dashboard.
 `mainMod + R` still opens the application launcher. `mainMod + Shift + R` opens
 the read-only shortcut catalog through the same Rofi picker infrastructure.
 

@@ -52,7 +52,7 @@ end
 
 function ProjectOverlays.new(options)
   options.tools = {
-    editor = {command = {"/run/current-system/sw/bin/nvim"}},
+    editor = {command = {"/run/current-system/sw/bin/nvim", "."}},
     git = {command = {"/run/current-system/sw/bin/lazygit"}},
     terminal = {command = {"/bin/zsh"}},
   }

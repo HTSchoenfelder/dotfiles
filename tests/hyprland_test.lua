@@ -877,10 +877,12 @@ test("dot V opens Neovim and G opens Lazygit for the active project", function(s
     local code = session.add("code", 1)
     code.title = project_path .. " | Code"
     session.focus(code)
-    for _, expected in ipairs({ { "V", "nvim" }, { "G", "lazygit" } }) do
+    for _, expected in ipairs({ { "V", "nvim", "." }, { "G", "lazygit" } }) do
         session.press(modifier .. "period")
         session.press(expected[1])
-        assert(session.commands[#session.commands].arguments[#session.commands[#session.commands].arguments] == expected[2])
+        local arguments = session.commands[#session.commands].arguments
+        assert(arguments[#arguments - (expected[3] and 1 or 0)] == expected[2])
+        if expected[3] then assert(arguments[#arguments] == expected[3]) end
     end
 
     local launch = session.commands[#session.commands]

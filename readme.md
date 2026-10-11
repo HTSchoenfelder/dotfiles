@@ -35,6 +35,16 @@ slot window refills it by focus history. Dot Mode `M` toggles 70:30/50:50. On
 macOS, non-slot windows remain native windows and form a logical replacement pool;
 there is no Parking workspace.
 
+## Neovim
+
+The repository contains a custom `lazy.nvim` configuration rather than LazyVim.
+Nix owns Neovim, language servers, formatters and linters on both platforms;
+`lazy.nvim` owns editor plugins only. Native Neovim LSP runs TypeScript, Ruby,
+HTML and Lua servers. `conform.nvim` formats with `<leader>gf`, while `nvim-lint`
+runs Ruby diagnostics after reading and writing a buffer. Ruby, ERB, Lua and web
+formats use Nix-provided tools. Tree-sitter parsers are explicitly managed for
+the configured languages.
+
 ## macOS / Hammerspoon quick reference
 
 `mainMod` = `Option + Control + Command`. Hammerspoon retains one or two slot sides
