@@ -124,15 +124,16 @@ dot_mode.bind({
         { key = "B", description = "Toggle display", run = function()
             monitor_configuration.open(picker)
         end },
-        { key = "G", description = "Toggle project editor", run = function()
+        { key = "V", description = "Toggle project Neovim", run = function()
             overlays.toggle("editor")
         end },
-        { key = "SHIFT + G", description = "Toggle project Git client", run = function()
+        { key = "G", description = "Toggle project Lazygit", run = function()
             overlays.toggle("git")
         end },
         { key = "J", description = "Toggle project terminal", run = function()
             overlays.toggle("terminal")
         end },
+        { key = "W", description = "Hide all project overlays", run = overlays.hide_all },
         { key = "E", description = "Insert emoji", run = function()
             text_launcher.open(picker, config_directory .. "/launcher-data/emoji.txt", text_launcher.emoji)
         end },

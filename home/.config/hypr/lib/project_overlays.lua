@@ -203,6 +203,11 @@ function project_overlays.new(settings)
         end, { timeout = settings.launch_timeout_ms, type = "oneshot" })
     end
 
+    function overlays.hide_all()
+        latest_request = nil
+        hide_visible()
+    end
+
     return overlays
 end
 

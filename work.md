@@ -6,41 +6,6 @@ when Henrik explicitly requests it. The test procedure can be run when requested
 
 ## Pending work
 
-### Hyprland
-
-#### Project editor overlay leaks `G` input
-
-`dot mode` followed by `J` toggles the project terminal overlay reliably. With
-the LazyVim overlay, the first `dot mode` + `G` opens it, but the same sequence
-does not reliably hide it again. The `G` input can reach the previously focused
-client instead; this was observed as two literal `g` characters in a chat input.
-
-Adding `dont_inhibit` to the dot-mode bindings and
-`no_shortcuts_inhibit = true` to the project-overlay window rule did not resolve
-the behavior. Trace the real key press and release sequence, submap transitions,
-focus changes and possible event forwarding before changing the binding model.
-
-#### Keep configured workspaces permanent
-
-The configured workspaces should remain available while empty. Workspace 1
-(``) currently disappears after its final window leaves it, for example after
-manually switching to Parking. Configure the primary and Parking workspace rules
-as persistent using the current Hyprland Lua API so their names and navigation
-targets remain stable.
-
-#### Reconsider compositor-session process ownership
-
-Hyprpaper and Hypridle currently start from Hyprland's Lua session hook. Consider
-dedicated user units only if their lifetime should move to `systemd --user`.
-Do not resume the paused Hypridle process as part of that change without an
-explicit request.
-
-#### Verify browser screen sharing
-
-The portal audit checked advertised ScreenCast support, not an application-specific
-browser sharing session. Verify capture in a real browser session if this workflow
-needs an end-to-end check.
-
 ### macOS keyboard parity
 
 #### Resolve VS Code shortcut collisions

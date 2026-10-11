@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  pkgsStable,
+  ...
+}:
 let
   sessionService = description: command: {
     inherit description;
@@ -67,6 +72,8 @@ in
     udiskie = (sessionService "Removable media automounter" "${pkgs.udiskie}/bin/udiskie --tray") // {
       enableDefaultPath = false;
     };
+    hyprpaper = sessionService "Hyprland wallpaper daemon" "${pkgsStable.hyprpaper}/bin/hyprpaper";
+    hypridle = sessionService "Hyprland idle daemon" "${pkgs.hypridle}/bin/hypridle";
     clipse-text = clipboardService "text";
     clipse-images = clipboardService "image/png";
   };

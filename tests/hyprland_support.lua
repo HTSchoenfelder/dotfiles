@@ -1,7 +1,7 @@
 local support = {}
 
 function support.session()
-    local session = { orders = {}, windows = {}, spaces = {}, monitors = {}, monitor_rules = {}, workspace_moves = {}, bindings = {}, events = {}, timers = {}, commands = {}, shortcuts = {}, notices = {}, held = {}, submap = "reset" }
+    local session = { orders = {}, windows = {}, spaces = {}, monitors = {}, monitor_rules = {}, workspace_rules = {}, workspace_moves = {}, bindings = {}, events = {}, timers = {}, commands = {}, shortcuts = {}, notices = {}, held = {}, submap = "reset" }
     local defining_submap = "reset"
     local process = require("lib.process")
     local original_spawn = process.spawn
@@ -107,13 +107,28 @@ function support.session()
         end
         session.emit("window.active", window, reason or 2)
     end
-    function session.press(key)
+    function session.key_down(key)
         local binding_key = session.submap == "reset" and key or session.submap .. ":" .. key
         local binding = session.bindings[binding_key] or session.bindings[session.submap .. ":catchall"]
-        assert(binding, "Missing binding: " .. key)
-        if not binding.enabled then return end
+        local release = session.bindings[binding_key .. ":release"]
+            or session.bindings[session.submap .. ":catchall:release"]
+        assert(binding or release, "Missing binding: " .. key)
+        session.held_binding = release
+        if binding and binding.enabled then
+            if type(binding.callback) == "function" then binding.callback()
+            else hl.dispatch(binding.callback) end
+        end
+    end
+    function session.key_up()
+        local binding = session.held_binding
+        session.held_binding = nil
+        if not binding or not binding.enabled then return end
         if type(binding.callback) == "function" then binding.callback()
         else hl.dispatch(binding.callback) end
+    end
+    function session.press(key)
+        session.key_down(key)
+        session.key_up()
     end
     function session.picker_request()
         for index = #session.commands, 1, -1 do
@@ -147,7 +162,9 @@ function support.session()
         return function(arguments) return { kind = kind, arguments = arguments } end
     end
     hl = {
-        config = function() end, workspace_rule = function() end, window_rule = function() end, layer_rule = function() end,
+        config = function() end,
+        workspace_rule = function(rule) session.workspace_rules[#session.workspace_rules + 1] = rule end,
+        window_rule = function() end, layer_rule = function() end,
         get_layers = function() return {} end,
         get_active_workspace = function() return session.current end,
         get_active_special_workspace = function() return nil end,
@@ -196,6 +213,7 @@ function support.session()
         get_current_submap = function() return session.submap end,
         bind = function(key, callback, options)
             key = defining_submap == "reset" and key or defining_submap .. ":" .. key
+            if options and options.release then key = key .. ":release" end
             assert(not session.bindings[key], "Duplicate binding: " .. key)
             local binding = { callback = callback, enabled = true, options = options or {} }
             function binding:set_enabled(enabled) self.enabled = enabled end

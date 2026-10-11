@@ -158,6 +158,16 @@ function ProjectOverlays:toggle(tool)
   end)
 end
 
+function ProjectOverlays:hideAll()
+  self.gate:next()
+  self.repository:listAll(function(records)
+    for _, record in ipairs(records or {}) do
+      if record.title:match("^" .. prefix) and not record.minimized then self:_hide(record) end
+    end
+  end)
+  self.visibleOverlayID = nil
+end
+
 ProjectOverlays.projectFromWindow = projectFromWindow
 ProjectOverlays.overlayTitle = overlayTitle
 ProjectOverlays.overlayProject = overlayProject

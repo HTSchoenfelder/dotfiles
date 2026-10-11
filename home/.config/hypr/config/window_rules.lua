@@ -1,3 +1,5 @@
+local mocha = require("config.catppuccin_mocha")
+
 hl.window_rule({
     name = "suppress-maximize-events",
     match = { class = ".*" },
@@ -14,6 +16,12 @@ hl.window_rule({
     animation = "slide bottom",
     group = "deny",
     no_shortcuts_inhibit = true,
+})
+
+hl.window_rule({
+    name = "project-overlays-active-border",
+    match = { initial_class = "^project-overlay-.*$", focus = true },
+    border_color = mocha.rgb("sky"),
 })
 
 -- The upstream rule prevents empty XWayland drag surfaces from stealing focus.

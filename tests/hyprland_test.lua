@@ -596,6 +596,8 @@ end)
 test("dot mode stays visible until Q captures a region", function(session)
     assert(session.bindings[modifier .. "period"].options.dont_inhibit)
     assert(session.bindings["dot:Q"].options.dont_inhibit)
+    assert(not session.bindings["dot:Q"].options.release)
+    assert(session.bindings["dot:Q:release"].options.release)
     session.press(modifier .. "period")
     assert(session.submap == "dot" and #session.commands == 0)
     local notice = session.notices[#session.notices]
@@ -603,6 +605,25 @@ test("dot mode stays visible until Q captures a region", function(session)
     session.press("Q")
     assert(session.submap == "reset" and not notice.alive)
     assert(table.concat(session.commands[1].arguments, " ") == "hyprshot --mode region")
+end)
+
+test("dot V waits for key release before opening Neovim", function(session)
+    local code = session.add("code", 1)
+    code.title = project_path .. " | Code"
+    session.focus(code)
+    session.press(modifier .. "period")
+    session.key_down("V")
+    assert(session.submap == "dot" and #session.commands == 0 and session.focused == code)
+    session.key_up("V")
+    assert(session.submap == "reset" and #session.commands == 1)
+end)
+
+test("primary and Parking workspaces remain persistent", function(session)
+    local rules = {}
+    for _, rule in ipairs(session.workspace_rules) do rules[rule.workspace] = rule end
+    assert(rules["1"].persistent and rules["1"].default_name == "")
+    assert(rules["10"].persistent and rules["10"].default_name == "󰮍")
+    assert(not rules["2"].persistent)
 end)
 
 test("dot mode captures the active window with A and active output with Z", function(session)
@@ -806,8 +827,11 @@ test("project overlays reuse one floating Kitty window per project and tool", fu
     assert(session.focused == terminal and terminal.floating)
     assert(terminal.centered and terminal.size[1] == 1824 and terminal.size[2] == 972 and session.group_denied)
     session.press(modifier .. "period")
-    session.press("J")
+    session.key_down("J")
+    assert(terminal.workspace.addressable_name == "1" and session.submap == "dot")
+    session.key_up("J")
     assert(terminal.workspace.addressable_name == "special:project-overlays")
+    assert(session.submap == "reset")
     assert(#session.commands == 1)
 end)
 
@@ -849,15 +873,44 @@ test("project overlays remain floating across repeated hide and restore cycles",
     assert(#session.commands == 1)
 end)
 
-test("dot G opens LazyVim and Shift G opens Lazygit for the active project", function(session)
+test("dot V opens Neovim and G opens Lazygit for the active project", function(session)
     local code = session.add("code", 1)
     code.title = project_path .. " | Code"
     session.focus(code)
-    for _, expected in ipairs({ { "G", "nvim" }, { "SHIFT + G", "lazygit" } }) do
+    for _, expected in ipairs({ { "V", "nvim" }, { "G", "lazygit" } }) do
         session.press(modifier .. "period")
         session.press(expected[1])
         assert(session.commands[#session.commands].arguments[#session.commands[#session.commands].arguments] == expected[2])
     end
+
+    local launch = session.commands[#session.commands]
+    local class
+    for index, argument in ipairs(launch.arguments) do
+        if argument == "--class" then class = launch.arguments[index + 1] end
+    end
+    local git = session.add(assert(class), 1)
+    session.emit("window.open", git)
+    session.flush(50)
+    for _ = 1, 3 do session.flush(30) end
+    assert(session.focused == git and git.workspace.addressable_name == "1")
+
+    session.press(modifier .. "period")
+    session.key_down("G")
+    assert(git.workspace.addressable_name == "1" and session.submap == "dot")
+    session.key_up("G")
+    assert(git.workspace.addressable_name == "special:project-overlays" and session.submap == "reset")
+end)
+
+test("dot W hides every visible project overlay on release", function(session)
+    local terminal = session.add("project-overlay-terminal-2f746d70", 1)
+    local git = session.add("project-overlay-git-2f746d70", 1)
+    session.focus(git)
+    session.press(modifier .. "period")
+    session.key_down("W")
+    assert(terminal.workspace.addressable_name == "1" and git.workspace.addressable_name == "1")
+    session.key_up("W")
+    assert(terminal.workspace.addressable_name == "special:project-overlays")
+    assert(git.workspace.addressable_name == "special:project-overlays" and session.submap == "reset")
 end)
 
 print(string.format("%d Hyprland scenarios passed", passed))

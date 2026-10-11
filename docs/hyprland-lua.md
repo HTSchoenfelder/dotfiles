@@ -1,7 +1,7 @@
 # Hyprland Lua architecture
 
 `home/.config/hypr/hyprland.lua` loads the host monitor configuration, environment,
-input, appearance, session startup and keybindings. Files under `config/` describe
+input, appearance and keybindings. Files under `config/` describe
 the setup; files under `lib/` implement reusable behavior.
 
 ## Cross-platform interaction model
@@ -115,6 +115,10 @@ changes complete in 100 ms, window movement in 150 ms and window open/close moti
 uses a short non-overshooting curve. Border-angle interpolation is disabled, while
 workspace transitions retain their separate timing.
 
+Normal active borders retain the Catppuccin Mocha Green–Sky–Mauve gradient.
+Focused project overlays override it with solid Catppuccin Mocha Sky; hidden
+overlays need no inactive override.
+
 Rofi owns the keyboard after its layer opens. Hyprland temporarily disables the
 cycle bindings so Rofi can process repeated presses, Shift and modifier releases.
 A release before the layer opens confirms the initial selection directly.
@@ -134,10 +138,13 @@ launcher data are reused. Snippets retain the `text|alias` format and support
 `\n`, `\t` and `\\` escapes. Both text and alias are searchable.
 
 `mainMod + period` enters dot mode and holds a native Hyprland notification until
-the mode ends. `Q`, `A` and `Z` capture a region, the active window and the active
+the mode ends. A no-op press binding consumes the selected key before its release
+binding runs the action, so a focus-changing action cannot leak either event into
+the old or newly focused client. `Q`, `A` and `Z`
+capture a region, the active window and the active
 monitor. `M` toggles the active display split. `B` selects and toggles connected
-displays. `G`, `Shift+G` and `J` toggle project LazyVim, Lazygit and terminal
-overlays. `E`, `R` and `T` select emojis,
+displays. `V`, `G` and `J` toggle project Neovim, Lazygit and terminal overlays;
+`W` hides all project overlays. `E`, `R` and `T` select emojis,
 configured commands and snippets. The submap resets before the selected tool opens.
 `mainMod + R` still opens the application launcher. `mainMod + Shift + R` opens
 the read-only shortcut catalog through the same Rofi picker infrastructure.
@@ -161,8 +168,8 @@ System installation and session-service ownership remain separate from desktop
 interaction. Replacing shell navigation does not imply replacing Nix setup scripts
 or moving session daemons into the compositor. Current portal, toolkit and user
 service ownership is declared in `setup/nixos/desktop-integration.nix` and
-`setup/nixos/desktop-session.nix`; compositor-session processes remain in
-`config/session.lua`.
+`setup/nixos/desktop-session.nix`. Hyprpaper and Hypridle remain scoped to the
+graphical compositor session while `systemd --user` owns their supervision.
 
 ## Validation
 

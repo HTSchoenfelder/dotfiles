@@ -174,9 +174,10 @@ instead of Rofi.
 | `Z` | Capture the focused monitor |
 | `B` | Toggle a connected display (Hyprland only) |
 | `M` | Toggle the active display split between 70:30 and 50:50 |
-| `G` | Toggle a project Neovim overlay |
-| `Shift + G` | Toggle a project Lazygit overlay |
+| `V` | Toggle a project Neovim overlay |
+| `G` | Toggle a project Lazygit overlay |
 | `J` | Toggle a project Kitty overlay |
+| `W` | Hide all project overlays |
 | `E` | Select and insert an emoji |
 | `R` | Select a configured command (Hyprland) / reset the current window layout (macOS) |
 | `T` | Select and insert a snippet |
@@ -189,7 +190,12 @@ Dot Mode screenshots from both macOS and Hyprland are stored in `~/screenshots`.
 
 Project overlays use the absolute project path from the active VS Code title and
 reuse one Kitty window per project and tool. Toggling an overlay off minimizes
-that window; opening another overlay minimizes the previous one.
+that window with the same shortcut; opening another overlay minimizes the previous
+one. Dot Mode actions consume the selected key press and run on release, preventing
+a focus-changing overlay action from forwarding either event to a client.
+
+The named Terminal and Parking workspaces remain present while empty. Hyprpaper
+and Hypridle are compositor-session services supervised by `systemd --user`.
 
 ## Application shortcut forwarding
 

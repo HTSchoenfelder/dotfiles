@@ -125,9 +125,10 @@ function DotMode:start()
   self:_bind({}, "a", function() self:_captureWindow() end, "Capture focused window")
   self:_bind({}, "z", function() self:_captureScreen() end, "Capture focused monitor")
   self:_bind({}, "m", function() self.toggleRatio() end, "Toggle display split between 70:30 and 50:50")
-  self:_bind({}, "g", function() self.overlays:toggle("editor") end, "Toggle project editor")
-  self:_bind({"shift"}, "g", function() self.overlays:toggle("git") end, "Toggle project Git client")
+  self:_bind({}, "v", function() self.overlays:toggle("editor") end, "Toggle project Neovim")
+  self:_bind({}, "g", function() self.overlays:toggle("git") end, "Toggle project Lazygit")
   self:_bind({}, "j", function() self.overlays:toggle("terminal") end, "Toggle project terminal")
+  self:_bind({}, "w", function() self.overlays:hideAll() end, "Hide all project overlays")
   self:_bind({}, "e", function()
     self.textLauncher:open(self.emojiPath, textData.emoji)
   end, "Insert emoji")
@@ -139,7 +140,7 @@ function DotMode:start()
   catalog.add("Dot mode", "MainMod + . → Escape", "Leave dot mode")
 
   local recognized = {}
-  for _, key in ipairs({"q", "a", "z", "m", "g", "j", "e", "r", "t", "escape"}) do
+  for _, key in ipairs({"q", "a", "z", "m", "v", "g", "j", "w", "e", "r", "t", "escape"}) do
     recognized[hs.keycodes.map[key]] = true
   end
   self.keyTap = hs.eventtap.new({hs.eventtap.event.types.keyDown}, function(event)
