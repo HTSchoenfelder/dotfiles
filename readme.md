@@ -35,6 +35,32 @@ slot window refills it by focus history. Dot Mode `M` toggles 70:30/50:50. On
 macOS, non-slot windows remain native windows and form a logical replacement pool;
 there is no Parking workspace.
 
+## NixOS session startup
+
+The login path is deliberately manual: systemd starts `getty@tty1`, PAM login
+starts the per-user systemd manager and Zsh, and the shell remains a normal TTY
+until `shl` runs `start-hyprland`. Starting Hyprland activates
+`hyprland-session.target`, which binds the general `graphical-session.target` to
+the compositor lifetime. Exiting Hyprland therefore stops both target-owned sets
+of desktop processes without affecting the login shell or system services.
+
+| Owner / trigger | Processes |
+| --- | --- |
+| System boot targets | `getty@tty1`, NetworkManager, Bluetooth, Avahi and machine-level initialization |
+| System socket / D-Bus activation | CUPS, PC/SC and UDisks2 |
+| User login / default target | The user D-Bus broker, SSH agent and GNOME Keyring login component |
+| User socket activation | PipeWire and PipeWire Pulse; PipeWire starts WirePlumber |
+| `graphical-session.target` | Dunst, the Polkit agent, NetworkManager and Blueman applets, Udiskie and Clipse clipboard watchers |
+| `hyprland-session.target` | Waybar, Hyprpaper and Hypridle |
+| D-Bus activation during the session | XDG Desktop Portal and its GTK and Hyprland backends |
+| Hyprland Lua on explicit interaction | Short-lived launchers, screenshots, media commands and requested applications |
+
+NixOS declares packages and units; `systemd --user` supervises long-running
+desktop processes. Hyprland-specific daemons use the Hyprland target rather than
+direct compositor `exec` calls, so they start only with `start-hyprland`, restart
+on failure and stop with the compositor. Hyprland Lua owns compositor behavior
+and user-triggered actions, not daemon lifetime.
+
 ## Neovim
 
 The repository contains a custom `lazy.nvim` configuration rather than LazyVim.
@@ -204,8 +230,9 @@ that window with the same shortcut; opening another overlay minimizes the previo
 one. Dot Mode actions consume the selected key press and run on release, preventing
 a focus-changing overlay action from forwarding either event to a client.
 
-The named Terminal and Parking workspaces remain present while empty. Hyprpaper
-and Hypridle are compositor-session services supervised by `systemd --user`.
+The named Terminal and Parking workspaces remain present while empty. Waybar,
+Hyprpaper and Hypridle are bound to `hyprland-session.target` and supervised by
+`systemd --user`.
 
 ## Application shortcut forwarding
 

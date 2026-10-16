@@ -170,8 +170,10 @@ System installation and session-service ownership remain separate from desktop
 interaction. Replacing shell navigation does not imply replacing Nix setup scripts
 or moving session daemons into the compositor. Current portal, toolkit and user
 service ownership is declared in `setup/nixos/desktop-integration.nix` and
-`setup/nixos/desktop-session.nix`. Hyprpaper and Hypridle remain scoped to the
-graphical compositor session while `systemd --user` owns their supervision.
+`setup/nixos/desktop-session.nix`. Waybar, Hyprpaper and Hypridle are wanted by
+`hyprland-session.target`, while general desktop helpers are wanted by
+`graphical-session.target`. `systemd --user` owns supervision for both groups;
+Hyprland Lua does not launch long-running session daemons directly.
 
 ## Validation
 

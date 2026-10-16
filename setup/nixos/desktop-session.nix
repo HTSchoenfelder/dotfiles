@@ -1,11 +1,12 @@
 {
   config,
+  lib,
   pkgs,
   pkgsStable,
   ...
 }:
 let
-  sessionService = description: command: {
+  graphicalSessionService = description: command: {
     inherit description;
     wantedBy = [ "graphical-session.target" ];
     partOf = [ "graphical-session.target" ];
@@ -20,11 +21,25 @@ let
     };
   };
 
+  hyprlandSessionService = description: command: {
+    inherit description;
+    wantedBy = [ "hyprland-session.target" ];
+    partOf = [ "hyprland-session.target" ];
+    after = [ "hyprland-session.target" ];
+    serviceConfig = {
+      Type = "exec";
+      ExecStart = command;
+      Restart = "on-failure";
+      RestartSec = 2;
+      Slice = "session.slice";
+    };
+  };
+
   # Clipse's Wayland listener launches these two watchers and exits. Supervise
   # the watchers directly so their lifetime and failures remain visible.
   clipboardService =
     mimeType:
-    (sessionService "Clipse clipboard listener (${mimeType})" "${pkgs.wl-clipboard}/bin/wl-paste --type ${mimeType} --watch ${pkgs.clipse}/bin/clipse -wl-store")
+    (graphicalSessionService "Clipse clipboard listener (${mimeType})" "${pkgs.wl-clipboard}/bin/wl-paste --type ${mimeType} --watch ${pkgs.clipse}/bin/clipse -wl-store")
     // {
       path = [
         pkgs.wl-clipboard
@@ -48,6 +63,9 @@ in
     # exported by Hyprland instead of replacing it with a minimal daemon PATH.
     waybar = {
       enableDefaultPath = false;
+      wantedBy = lib.mkForce [ "hyprland-session.target" ];
+      partOf = [ "hyprland-session.target" ];
+      after = [ "hyprland-session.target" ];
       # The upstream unit uses a bare kill command; resolve it declaratively.
       serviceConfig.ExecReload = [
         ""
@@ -69,11 +87,13 @@ in
       };
     };
 
-    udiskie = (sessionService "Removable media automounter" "${pkgs.udiskie}/bin/udiskie --tray") // {
-      enableDefaultPath = false;
-    };
-    hyprpaper = sessionService "Hyprland wallpaper daemon" "${pkgsStable.hyprpaper}/bin/hyprpaper";
-    hypridle = sessionService "Hyprland idle daemon" "${pkgs.hypridle}/bin/hypridle";
+    udiskie =
+      (graphicalSessionService "Removable media automounter" "${pkgs.udiskie}/bin/udiskie --tray")
+      // {
+        enableDefaultPath = false;
+      };
+    hyprpaper = hyprlandSessionService "Hyprland wallpaper daemon" "${pkgsStable.hyprpaper}/bin/hyprpaper";
+    hypridle = hyprlandSessionService "Hyprland idle daemon" "${pkgs.hypridle}/bin/hypridle";
     clipse-text = clipboardService "text";
     clipse-images = clipboardService "image/png";
   };
