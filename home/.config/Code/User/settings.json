@@ -582,8 +582,6 @@
     ],
     "vs-kubernetes.kubeconfig": "/Users/schoenfeldeh/Documents/config"
   },
-  "window.commandCenter": false,
-  "window.menuBarVisibility": "toggle",
   "window.menuStyle": "inherit",
   "window.titleBarStyle": "custom",
   "window.title": "${rootPath} | Code",
@@ -621,6 +619,8 @@
   "workbench.sideBar.location": "right",
   "workbench.secondarySideBar.showLabels": false,
   "chat.titleBar.signIn.enabled": false,
-  "chat.titleBar.openInAgentsWindow.enabled": false,
-  "workbench.browser.showInTitleBar": false
+  "workbench.browser.showInTitleBar": false,
+  "window.commandCenter": false,
+  "window.menuBarVisibility": "hidden",
+  "chat.titleBar.openInAgentsWindow.enabled": false
 }
