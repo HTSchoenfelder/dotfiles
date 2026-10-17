@@ -189,23 +189,15 @@ function slot_layout.new(options)
         if same(old, window) then return true end
         local original = hl.get_active_window()
         local retained_index = state.focused
-        local source_visible = false
-        if source then
-            for _, monitor in ipairs(hl.get_monitors()) do
-                if monitor.active_workspace and monitor.active_workspace.addressable_name == source.workspace then
-                    source_visible = true
-                end
-            end
-        end
         transaction(function()
             ratio_for(state)
             prepare(window)
             if old and alive(old, state) then
-                swap(window, old)
-                if source and source_visible then
+                if source == state then
+                    swap(window, old)
                     source.windows[source_index] = old
-                    source.revision = source.revision + 1
                 else
+                    options.move(window, state.workspace)
                     options.move(old, options.parking)
                     if source then
                         source.windows[source_index] = nil
@@ -246,11 +238,10 @@ function slot_layout.new(options)
                     if candidate then slots.place(candidate, { state = state, index = index }, true) end
                 end
             end
-            if preferred_state and compositor.workspace_is_active(preferred_state.workspace) then
+            if preferred_state then
                 fill(preferred_state, preferred_index)
-            end
-            for _, monitor in ipairs(hl.get_monitors()) do
-                local workspace = monitor.active_workspace
+            else
+                local workspace = hl.get_active_workspace()
                 local state = workspace and states[workspace.addressable_name] and state_for(workspace)
                 if state then
                     for index = 1, state.wanted do

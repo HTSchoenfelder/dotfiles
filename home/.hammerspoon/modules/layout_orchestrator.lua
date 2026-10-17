@@ -257,9 +257,11 @@ function LayoutOrchestrator:activate(target, request, callback)
     layout.slots[index].windowID = target.id
     layout.wanted = math.max(layout.wanted, index)
     layout.revision = layout.revision + 1
-    if source then
+    if source == layout then
       source.slots[sourceIndex].windowID = old
-      if source ~= layout then source.revision = source.revision + 1 end
+    elseif source then
+      source.slots[sourceIndex].windowID = nil
+      source.revision = source.revision + 1
     end
     if source and source ~= layout then self:_reflow(source) end
     self:_reflow(layout)

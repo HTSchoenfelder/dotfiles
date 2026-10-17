@@ -119,9 +119,11 @@ state when its native window appears.
 
 Non-slot windows are neither minimized nor moved to a Parking area. A close refills
 the vacated side from their MRU order; if none exists, the side remains remembered.
-Selecting an occupant on another display swaps the two slot contents. Native
-macOS focus cannot move to an empty display, so the active frame and subsequent app
-selection follow Hammerspoon's retained display state instead.
+Selecting an occupant on the same display swaps the two slot contents. Selecting
+one from another display leaves its source slot vacant and the replaced window
+untracked on its original display. Native macOS focus cannot move to an empty
+display, so the active frame and subsequent app selection follow Hammerspoon's
+retained display state instead.
 
 ## Hyprland quick reference
 
@@ -146,9 +148,10 @@ cycles Gmail then Google Calendar. Shift starts each group from its second entry
 | `mainMod + R` | Toggle the Rofi application launcher |
 
 Normal selection never adds a slot. A Parking or hidden-workspace selection
-replaces the target and parks its previous occupant. Selecting a window in another
-visible slot swaps the two occupants, including across displays. Selecting the
-current occupant does nothing. A window cannot occupy both slots: `S` excludes
+replaces the target and parks its previous occupant. Selecting the other slot on
+the same display swaps both occupants. Selecting from another display parks the
+target's previous occupant and leaves the source slot vacant. Selecting the current
+occupant does nothing. A window cannot occupy both slots: `S` excludes
 the focused instance, chooses another existing instance if available, and otherwise
 does nothing when that app already has only the focused instance. If the app is
 not running, its window is placed only after it appears; failed or stale launches
@@ -177,6 +180,8 @@ Shift in Comma Selection always means backward, never the other slot.
 
 When any slot window closes, its side is filled by the most recently focused
 eligible window in Parking. Other visible windows are never taken for refill.
+A targeted refill changes only that slot; an untargeted deferred refill considers
+only the active workspace, never remembered vacancies on other displays.
 A focused slot's replacement receives focus; background replacement preserves
 keyboard focus. Floating utility windows, native floating dialogs, hidden group
 members outside the Parking container, special-workspace windows and project

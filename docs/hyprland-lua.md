@@ -38,8 +38,9 @@ and modifier-release acceptance as Comma Selection, and Shift reverses their
 order. Held `F` requests instance selection after choosing the application, held
 `S` targets the other slot, and both modifiers compose.
 
-Selection from Parking or a hidden workspace parks the displaced occupant.
-Selection from another visible slot exchanges both occupants through the native
+Selection from Parking, a hidden workspace or another display parks the displaced
+occupant. A cross-display selection leaves its source slot vacant; only selection
+of the other slot on the same display exchanges both occupants through the native
 window-swap dispatcher. `M` switches occupied slots, `N` swaps their contents
 without changing the focused side, and `H` focuses the other display's visible
 workspace. `H` is a no-op with one enabled monitor. There is no held `G` modifier;
@@ -77,11 +78,13 @@ workspaces and project overlays are excluded from slot selection and refill.
 
 `window.close` records the vacated side and focus before native teardown. A
 one-shot callback refills from Parking MRU after teardown, preserving the peer
-and background keyboard focus. If no candidate exists, desired slots and their
-identities remain recorded while native master tiling temporarily enlarges the
-remaining window. Explicit `/` sets the desired count to one, so its parked
-occupant is not immediately restored. Vacancies can be filled after later opens
-or explicit selection places new candidates in Parking.
+and background keyboard focus. Targeted refill is limited to that slot; deferred
+untargeted refill only considers the active workspace, so Parking candidates do
+not migrate to remembered vacancies on another display. If no candidate exists,
+desired slots and their identities remain recorded while native master tiling
+temporarily enlarges the remaining window. Explicit `/` sets the desired count
+to one, so its parked occupant is not immediately restored. Vacancies can be
+filled after later opens or explicit selection places new candidates in Parking.
 
 Session state is saved as data-only TSV under `XDG_RUNTIME_DIR`, keyed by the
 compositor instance, on config unload and consumed on the next load. Only slot
@@ -98,9 +101,10 @@ explicit workspace reset remains responsible for focusing Terminal and reducing
 it to one slot.
 
 macOS uses the same `F` filter, `S` target and Shift direction axes, two-slot model,
-cross-display swaps and ratios. Its native non-slot windows replace Parking as
-refill candidates; an empty display is selected through Hammerspoon's retained
-active-frame state. Dot Mode still uses `M` for the ratio on macOS.
+vacant source slots after cross-display selection and ratios. Its native non-slot
+windows replace Parking as refill candidates; an empty display is selected through
+Hammerspoon's retained active-frame state. Dot Mode still uses `M` for the ratio
+on macOS.
 
 | File | Responsibility |
 | --- | --- |

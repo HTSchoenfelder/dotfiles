@@ -64,11 +64,13 @@ The active NixOS ownership is defined in `setup/nixos/desktop-integration.nix` a
   `P` and Comma Selection replace the focused slot's content.
 - `Shift + App` and `Shift + P` fill the other slot (creating it when needed),
   retaining focus. One window cannot occupy both slots.
-- Selection from another visible slot swaps contents, including across displays;
-  selection from Parking or a hidden workspace parks the displaced occupant.
+- Selection from another slot on the same display swaps its contents. Selection
+  from another display, Parking or a hidden workspace parks the displaced
+  occupant and leaves the source slot vacant.
 - Closing a slot window refills its side from Parking MRU, skipping visible slots,
   floating utility windows/dialogs, hidden group members outside the Parking
-  container and project overlays.
+  container and project overlays. Refill never populates a remembered vacancy on
+  another display unless that display is the explicit target or active workspace.
   If no replacement exists, remember the vacancy and temporarily use native
   single-window geometry. `/` explicitly reduces to one slot without refilling;
   `Shift + /` requests two slots and refills the other side when possible.
@@ -79,7 +81,8 @@ The active NixOS ownership is defined in `setup/nixos/desktop-integration.nix` a
 - `F + App` chooses an instance and `F + comma` filters by the focused app.
 - During Comma Selection, Shift always means backward, never the other slot.
 - macOS uses the same one/two-slot shortcut meanings, including `Shift + /`,
-  Dot Mode `M`, cross-display swaps and close refill from non-slot MRU windows.
+  Dot Mode `M`, vacant source slots after cross-display selection and close refill
+  from non-slot MRU windows.
   Slot state and the active display remain in Hammerspoon Lua memory. `H` paints
   an active frame on an empty display even while native keyboard focus stays elsewhere.
 - **Dot Mode** is the submap entered with `mainMod + period`.
