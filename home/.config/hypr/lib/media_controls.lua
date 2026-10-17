@@ -8,10 +8,10 @@ end
 function media_controls.cycle(picker, options)
     if picker.is_open() then return end
     local items = {
-        { label = "Spotify", open = true },
         { label = "Play/Pause", command = "play-pause" },
         { label = "Next", command = "next" },
         { label = "Previous", command = "previous" },
+        { label = "Spotify", open = true },
     }
     picker.open(items, {
         cycle_key = options.key,

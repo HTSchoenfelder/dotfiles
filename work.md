@@ -78,16 +78,17 @@ slot state, and keep the Hammerspoon Console open for Lua or Accessibility error
    on the target display: its empty slot gets the Green frame even though native
    keyboard focus cannot move there. The next app selection fills that slot.
 4. Use `mainMod + P` to select a window already in a slot on the other display;
-   the two slot contents swap. Check `mainMod + S + P` for the other slot and
-   `mainMod + F + S + P` for its focused-application filter.
+   its source slot becomes vacant and the replaced window remains native on the
+   original display. Check `mainMod + S + P` for the other slot and its
+   focused-application filter with `mainMod + F + S + P`.
    Close a slot window with `mainMod + W`: a recent non-slot window refills it.
    With no replacement available, the side stays vacant until a normal window
    arrives. Other windows are neither minimized nor moved to Parking.
 5. Check `mainMod + F + app key` and Comma Selection: the chosen window fills the
    intended slot, and Comma Selection accepts on `mainMod` release. Reload
    Hammerspoon once more and confirm that the in-memory slot state resets.
-6. Use `mainMod + Y` and confirm that Spotify is the first entry, followed by
-   Play/Pause, Next and Previous. The Hyprland-only `I` and `U` PWA groups cannot
+6. Use `mainMod + Y` and confirm that Play/Pause, Next and Previous are followed
+   by Spotify as the last entry. The Hyprland-only `I` and `U` PWA groups cannot
    be tested here until their macOS Chrome-PWA bundle IDs are configured.
 
 ### Failure handling and report

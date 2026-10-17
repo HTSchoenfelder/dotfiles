@@ -588,19 +588,23 @@ test("removed workspaces are not recreated by stale selection", function(session
     assert(session.current.id == 1 and not session.spaces["2"])
 end)
 
-test("Y starts with Spotify and is confirmed by a quick release", function(session)
+test("Y starts with Play/Pause and is confirmed by a quick release", function(session)
     session.press(modifier .. "Y")
     session.press("Alt_R")
-    assert(session.commands[#session.commands].arguments[1] == "spotify")
+    local arguments = session.commands[#session.commands].arguments
+    assert(arguments[1] == "playerctl" and arguments[4] == "play-pause")
 end)
 
-test("Y has a fixed Play/Pause, Next and Previous order after Spotify", function(session)
+test("Y orders player actions before Spotify", function(session)
     for index, command in ipairs({ "play-pause", "next", "previous" }) do
         session.press(modifier .. "Y")
-        session.choose(index)
+        session.choose(index - 1)
         local arguments = session.commands[#session.commands].arguments
         assert(arguments[1] == "playerctl" and arguments[4] == command)
     end
+    session.press(modifier .. "Y")
+    session.choose(3)
+    assert(session.commands[#session.commands].arguments[1] == "spotify")
 end)
 
 test("I cycles Chat then Meet and U cycles Gmail then Calendar", function(session)
@@ -629,11 +633,10 @@ test("F S Shift I chooses a Meet instance for the other slot", function(session)
     assert(not meet.layout.is_master and peer.workspace.id == 10)
 end)
 
-test("reverse Y starts at Previous", function(session)
+test("reverse Y starts at Spotify", function(session)
     session.press(modifier .. "SHIFT + Y")
     session.press("Control_L")
-    local arguments = session.commands[#session.commands].arguments
-    assert(arguments[1] == "playerctl" and arguments[4] == "previous")
+    assert(session.commands[#session.commands].arguments[1] == "spotify")
 end)
 
 test("text launchers preserve Unicode and snippet escapes", function()
@@ -844,8 +847,10 @@ test("Shift P opens an actionable catalog with descriptions and right-aligned sh
     local rows = assert(io.open(request.path))
     local labels = rows:read("*a")
     rows:close()
+    local arguments = table.concat(session.commands[#session.commands].arguments, " ")
 
     assert(labels:find("Fill focused slot with Kitty / Zellij", 1, true))
+    assert(arguments:find("window { width: calc(70% min 100ch); }", 1, true))
     assert(labels:find("Show shortcut catalog", 1, true))
     assert(labels:find("Show shortcut catalog%s+MainMod %+ Shift %+ P\n"))
     assert(labels:find("Run configured command%s+MainMod %+ Shift %+ R\n"))
@@ -870,6 +875,8 @@ test("Shift P opens an actionable catalog with descriptions and right-aligned sh
         row_width = row_width or assert(utf8.len(row))
         assert(utf8.len(row) == row_width)
     end
+    assert(row_width <= 87)
+    assert(labels:find("Cycle Mail / Calendar applications backwards with insta…", 1, true))
     for _, entry in ipairs(require("lib.shortcut_catalog").items()) do
         assert(type(entry.action) == "function", "Missing catalog action: " .. entry.shortcut)
     end

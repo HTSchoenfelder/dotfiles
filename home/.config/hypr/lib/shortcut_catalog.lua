@@ -9,6 +9,7 @@ local shortcut_catalog = {
         Media = 6,
     },
 }
+local description_limit = 56
 
 local key_names = {
     comma = ",",
@@ -24,6 +25,13 @@ local key_names = {
 
 local function trim(value)
     return value:match("^%s*(.-)%s*$")
+end
+
+local function fit(value, limit)
+    local length = utf8.len(value)
+    if not length or length <= limit then return value, length or #value end
+    local byte = utf8.offset(value, limit)
+    return value:sub(1, byte - 1) .. "…", limit
 end
 
 function shortcut_catalog.format_key(key)
@@ -76,23 +84,27 @@ function shortcut_catalog.open(picker)
     local description_width = 0
     local shortcut_width = 0
     for _, entry in ipairs(shortcut_catalog.items()) do
-        description_width = math.max(description_width, utf8.len(entry.description) or #entry.description)
+        description_width = math.max(description_width,
+            math.min(utf8.len(entry.description) or #entry.description, description_limit))
         shortcut_width = math.max(shortcut_width, utf8.len(entry.shortcut) or #entry.shortcut)
     end
     for _, entry in ipairs(shortcut_catalog.items()) do
-        local description_length = utf8.len(entry.description) or #entry.description
+        local description, description_length = fit(entry.description, description_width)
         local shortcut_length = utf8.len(entry.shortcut) or #entry.shortcut
         items[#items + 1] = {
-            label = entry.description
+            label = description
                 .. string.rep(" ", description_width - description_length + 4
                     + shortcut_width - shortcut_length)
                 .. entry.shortcut,
             action = entry.action,
         }
     end
-    picker.open(items, { on_select = function(item)
-        if item.action then item.action() end
-    end })
+    picker.open(items, {
+        theme = "window { width: calc(70% min 100ch); }",
+        on_select = function(item)
+            if item.action then item.action() end
+        end,
+    })
 end
 
 return shortcut_catalog

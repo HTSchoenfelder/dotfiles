@@ -73,20 +73,21 @@ local media = MediaControls.new({
   notify = function() error("Media action unexpectedly failed") end,
 })
 media:cycle(1)
-assert(chooser.row == 1 and chooser.choices[1].text == "Spotify")
+assert(chooser.row == 1 and chooser.choices[1].text == "Play/Pause")
 taps[#taps].callback({getFlags = function() return {} end})
-assert(tasks[1].open)
+assert(tasks[1].path == "/usr/bin/osascript")
+assert(tasks[1].arguments[2]:match("playpause$"))
 
 media:cycle(1)
 media:cycle(1)
-assert(chooser.row == 2 and chooser.choices[2].text == "Play/Pause")
+assert(chooser.row == 2 and chooser.choices[2].text == "Next")
 taps[#taps].callback({getFlags = function() return {} end})
 assert(tasks[2].path == "/usr/bin/osascript")
-assert(tasks[2].arguments[2]:match("playpause$"))
+assert(tasks[2].arguments[2]:match("next track$"))
 
 media:cycle(-1)
-assert(chooser.row == 4 and chooser.choices[4].text == "Previous")
+assert(chooser.row == 4 and chooser.choices[4].text == "Spotify")
 taps[#taps].callback({getFlags = function() return {} end})
-assert(tasks[3].arguments[2]:match("previous track$"))
+assert(tasks[3].open)
 
 print("Hammerspoon selection tests passed")

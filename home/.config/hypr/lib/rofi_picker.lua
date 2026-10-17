@@ -131,6 +131,10 @@ function rofi_picker.new(options)
         local provider = process.command({ "lua", options.provider, selection.token, rows_path })
         local arguments = { "rofi", "-show", "selection", "-modes", "selection:" .. provider,
             "-no-sort", "-no-show-icons", "-no-auto-select" }
+        if selection.theme then
+            arguments[#arguments + 1] = "-theme-str"
+            arguments[#arguments + 1] = selection.theme
+        end
         if selection.cycle_key then
             for _, argument in ipairs(cycle_arguments(options, selection)) do
                 arguments[#arguments + 1] = argument

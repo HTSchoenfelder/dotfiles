@@ -95,7 +95,7 @@ and `S + App Key` compose those modifiers with that key; for example,
 | `mainMod + ,` / `mainMod + Shift + ,` | Choose focused-slot content by MRU forward/backward; release `mainMod` to accept |
 | `mainMod + F + ,` / `mainMod + F + Shift + ,` | Choose focused-app instances forward/backward |
 | `mainMod + S + ,` / `mainMod + F + S + ,` | Choose all / focused-app windows for the other slot |
-| `mainMod + Y` / `mainMod + Shift + Y` | Cycle through Spotify, Play/Pause, Next and Previous forward/backward; release `mainMod` to accept |
+| `mainMod + Y` / `mainMod + Shift + Y` | Cycle through Play/Pause, Next, Previous and Spotify forward/backward; release `mainMod` to accept |
 | `mainMod + M` | Focus the other occupied slot |
 | `mainMod + N` | Swap slot contents while retaining the focused side |
 | `mainMod + H` | Focus the other display's slot; show its active frame even when empty |
@@ -277,8 +277,8 @@ receive the same navigation translation. Its status is documented in
 [macOS keyboard parity](docs/macos-keyboard-parity.md).
 
 Media, volume, microphone and brightness hardware keys use their native actions.
-The `Y` selection contains Spotify itself followed by Play/Pause, Next and
-Previous, so Spotify no longer needs a direct App Key. The Hyprland `I` and `U`
+The `Y` selection contains Play/Pause, Next and Previous followed by Spotify
+itself, so Spotify no longer needs a direct App Key. The Hyprland `I` and `U`
 PWA groups are not yet mirrored on macOS because their installed Chrome-PWA
 bundle IDs are machine-specific and are not available in this checkout.
 The actionable Hyprland shortcut catalog shows the description first and aligns

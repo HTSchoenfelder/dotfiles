@@ -3,11 +3,6 @@ MediaControls.__index = MediaControls
 
 local actions = {
   {
-    id = "spotify",
-    text = "Spotify",
-    open = true,
-  },
-  {
     id = "play_pause",
     text = "Play/Pause",
     script = 'tell application id "com.spotify.client" to playpause',
@@ -21,6 +16,11 @@ local actions = {
     id = "previous",
     text = "Previous",
     script = 'tell application id "com.spotify.client" to previous track',
+  },
+  {
+    id = "spotify",
+    text = "Spotify",
+    open = true,
   },
 }
 
