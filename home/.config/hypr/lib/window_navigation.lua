@@ -71,13 +71,14 @@ function window_navigation.new(options, picker)
         local origin = compositor.active_workspace()
         if not origin then return nil end
         request_options = request_options or {}
-        local slot = slots.capture(request_options.other_slot)
+        local target = request_options.target or "focused"
+        local slot = slots.capture(target)
         if not slot then return end
         latest_request = {
             slot = slot,
             origin_workspace = origin.addressable_name,
             workspace = origin.addressable_name,
-            other_slot = request_options.other_slot == true,
+            target = target,
             replace_layout = request_options.replace_layout == true,
         }
         return latest_request
@@ -143,11 +144,11 @@ function window_navigation.new(options, picker)
     end
     hl.on("window.open_early", function(window)
         if not window or not window.address then return end
-        opening[window.address] = { window = window, slot = slots.capture(false, window) }
+        opening[window.address] = { window = window, slot = slots.capture("focused", window) }
     end)
     hl.on("window.open", function(window)
         if not window or not window.address then return end
-        local entry = opening[window.address] or { window = window, slot = slots.capture(false, window) }
+        local entry = opening[window.address] or { window = window, slot = slots.capture("focused", window) }
         entry.ready = true
         opening[window.address] = entry
         schedule_launch_completion()

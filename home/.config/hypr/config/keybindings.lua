@@ -65,12 +65,15 @@ local function focused_application()
     return { class = active.class }
 end
 
+local function selection_target()
+    return hl.is_key_down(settings.other_slot_key:lower()) and "other" or "focused"
+end
+
 for _, application in ipairs(settings.applications) do
     if application.class == "kitty" then terminal = application end
     bind(application.key, function()
-        windows.activate(application, {
-            other_slot = hl.is_key_down(settings.other_slot_key:lower()),
-        }, hl.is_key_down(settings.filter_key:lower()))
+        windows.activate(application, { target = selection_target() },
+            hl.is_key_down(settings.filter_key:lower()))
     end, "Fill focused slot with " .. application.name, "Applications")
     shortcut_catalog.add("Applications", shortcut_catalog.main("F + " .. application.key),
         "Select " .. application.name .. " instance", function()
@@ -78,11 +81,11 @@ for _, application in ipairs(settings.applications) do
         end)
     shortcut_catalog.add("Applications", shortcut_catalog.main("S + " .. application.key),
         "Fill other slot with " .. application.name, function()
-            windows.activate(application, { other_slot = true }, false)
+            windows.activate(application, { target = "other" }, false)
         end)
     shortcut_catalog.add("Applications", shortcut_catalog.main("F + S + " .. application.key),
         "Select " .. application.name .. " instance for other slot", function()
-            windows.activate(application, { other_slot = true }, true)
+            windows.activate(application, { target = "other" }, true)
         end)
 end
 assert(terminal, "Kitty must be configured as a navigation application")
@@ -101,51 +104,49 @@ end
 bind("SHIFT + P", function() shortcut_catalog.open(picker) end,
     "Show shortcut catalog", "Launchers")
 bind("SHIFT + R", open_commands, "Run configured command", "Launchers")
-local function select_windows(filtered, other_slot)
+local function select_windows(filtered, target)
     local application = filtered and focused_application() or nil
     if filtered and not application then return end
-    windows.activate(application, { other_slot = other_slot }, true)
+    windows.activate(application, { target = target }, true)
 end
 bind("P", function()
     select_windows(
-        hl.is_key_down(settings.filter_key:lower()),
-        hl.is_key_down(settings.other_slot_key:lower())
+        hl.is_key_down(settings.filter_key:lower()), selection_target()
     )
 end, "Select window for focused slot", "Windows")
 shortcut_catalog.add("Windows", shortcut_catalog.main("F + P"), "Select focused application window",
-    function() select_windows(true, false) end)
+    function() select_windows(true, "focused") end)
 shortcut_catalog.add("Windows", shortcut_catalog.main("S + P"), "Select window for other slot",
-    function() select_windows(false, true) end)
+    function() select_windows(false, "other") end)
 shortcut_catalog.add("Windows", shortcut_catalog.main("F + S + P"),
-    "Select focused application window for other slot", function() select_windows(true, true) end)
-local function cycle_windows(direction, filtered, other_slot)
+    "Select focused application window for other slot", function() select_windows(true, "other") end)
+local function cycle_windows(direction, filtered, target)
     local application = filtered and focused_application() or nil
     if filtered and not application then return end
-    windows.cycle(direction, "comma", { other_slot = other_slot }, application)
+    windows.cycle(direction, "comma", { target = target }, application)
 end
 picker.bind_cycle("comma", function(direction)
     cycle_windows(
         direction,
-        hl.is_key_down(settings.filter_key:lower()),
-        hl.is_key_down(settings.other_slot_key:lower())
+        hl.is_key_down(settings.filter_key:lower()), selection_target()
     )
 end, "Cycle windows by last focus")
 shortcut_catalog.add("Windows", shortcut_catalog.main("comma"), "Choose focused slot content by last focus",
-    function() cycle_windows(1, false, false) end)
+    function() cycle_windows(1, false, "focused") end)
 shortcut_catalog.add("Windows", shortcut_catalog.main("SHIFT + comma"), "Cycle windows backwards",
-    function() cycle_windows(-1, false, false) end)
+    function() cycle_windows(-1, false, "focused") end)
 shortcut_catalog.add("Windows", shortcut_catalog.main("F + comma"), "Cycle application windows",
-    function() cycle_windows(1, true, false) end)
+    function() cycle_windows(1, true, "focused") end)
 shortcut_catalog.add("Windows", shortcut_catalog.main("F + SHIFT + comma"),
-    "Cycle application windows backwards", function() cycle_windows(-1, true, false) end)
+    "Cycle application windows backwards", function() cycle_windows(-1, true, "focused") end)
 shortcut_catalog.add("Windows", shortcut_catalog.main("S + comma"),
-    "Choose other slot content by last focus", function() cycle_windows(1, false, true) end)
+    "Choose other slot content by last focus", function() cycle_windows(1, false, "other") end)
 shortcut_catalog.add("Windows", shortcut_catalog.main("S + SHIFT + comma"),
-    "Cycle other slot windows backwards", function() cycle_windows(-1, false, true) end)
+    "Cycle other slot windows backwards", function() cycle_windows(-1, false, "other") end)
 shortcut_catalog.add("Windows", shortcut_catalog.main("F + S + comma"),
-    "Cycle application windows for other slot", function() cycle_windows(1, true, true) end)
+    "Cycle application windows for other slot", function() cycle_windows(1, true, "other") end)
 shortcut_catalog.add("Windows", shortcut_catalog.main("F + S + SHIFT + comma"),
-    "Cycle application windows backwards for other slot", function() cycle_windows(-1, true, true) end)
+    "Cycle application windows backwards for other slot", function() cycle_windows(-1, true, "other") end)
 picker.bind_cycle("B", function(direction)
     if picker.is_open() then return end
     windows.invalidate_pending_focus()

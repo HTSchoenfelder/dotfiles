@@ -52,6 +52,10 @@ geometry. Window events trigger discrete placement/refill operations; there is n
 polling or permanent geometry/reflow loop. No third-party window manager, service
 or placeholder window is introduced.
 
+Selection requests carry a named `focused` or `other` target rather than a
+placement boolean. This keeps filter and target state independent and leaves the
+request boundary extensible to explicit sides or additional slots later.
+
 `window.open_early` snapshots the intended slot before native focus changes.
 Placement waits until after `window.open`. Explicit launch requests take priority;
 requests invalidated by newer selection, slot revision or focus changes park late

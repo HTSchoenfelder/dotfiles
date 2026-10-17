@@ -147,7 +147,9 @@ function slot_layout.new(options)
         if not ok then error(err) end
     end
 
-    function slots.capture(other, except)
+    function slots.capture(target, except)
+        if target == nil then target = "focused" end
+        assert(target == "focused" or target == "other", "Unsupported slot target: " .. tostring(target))
         local workspace = hl.get_active_workspace()
         local state = state_for(workspace, except)
         if not state then return end
@@ -155,8 +157,8 @@ function slot_layout.new(options)
         for index = 1, 2 do
             if same(state.windows[index], active) then state.focused = index end
         end
-        return { state = state, index = other and (3 - state.focused) or state.focused,
-            other = other == true, focused = state.focused, revision = state.revision, origin = state.workspace }
+        return { state = state, index = target == "other" and (3 - state.focused) or state.focused,
+            target = target, focused = state.focused, revision = state.revision, origin = state.workspace }
     end
 
     function slots.current(request)
@@ -166,7 +168,7 @@ function slot_layout.new(options)
     end
 
     function slots.excluded(request)
-        return request and request.other and request.state.windows[request.state.focused] or nil
+        return request and request.target == "other" and request.state.windows[request.state.focused] or nil
     end
 
     local function parking_candidate()
@@ -180,7 +182,7 @@ function slot_layout.new(options)
         if not slot_layout.eligible(window) or not request then return false end
         local state, index = request.state, request.index
         local source, source_index = locate(window)
-        if request.other and source == state and source_index == state.focused then return false end
+        if request.target == "other" and source == state and source_index == state.focused then return false end
         local old = state.windows[index]
         if same(old, window) then return true end
         local original = hl.get_active_window()
@@ -222,7 +224,7 @@ function slot_layout.new(options)
             if source and source ~= state then order(source) end
             if keep_focus then
                 focus(original)
-            elseif request.other then
+            elseif request.target == "other" then
                 focus(state.windows[retained_index] or window)
             else
                 state.focused = index
