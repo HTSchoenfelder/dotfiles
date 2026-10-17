@@ -79,9 +79,14 @@ per display in memory. Application shortcuts use bundle IDs and the MRU history.
 Normal selection replaces the focused side; held `S` fills the other side while
 retaining focus. Held `F` opens the instance chooser, including for one instance.
 
+An **App Key** is a configured key that identifies either one application or a
+small application group while `mainMod` is held. References such as `F + App Key`
+and `S + App Key` compose those modifiers with that key; for example,
+`mainMod + F + S + K` chooses a VS Code instance for the other slot.
+
 | Shortcut | Action |
 | --- | --- |
-| `mainMod + J/K/L/I/;/O/U` | Fill the focused slot with Kitty / VS Code / Chrome / Google Chat / Obsidian / KeePassXC / Spotify |
+| `mainMod + J/K/L/I/;/O` | Fill the focused slot with Kitty / VS Code / Chrome / Google Chat / Obsidian / KeePassXC |
 | `mainMod + F + app key` | Choose an application instance for the focused slot |
 | `mainMod + S + app key` | Fill the other slot with a distinct instance; retain focus |
 | `mainMod + F + S + app key` | Choose an application instance for the other slot |
@@ -90,7 +95,7 @@ retaining focus. Held `F` opens the instance chooser, including for one instance
 | `mainMod + ,` / `mainMod + Shift + ,` | Choose focused-slot content by MRU forward/backward; release `mainMod` to accept |
 | `mainMod + F + ,` / `mainMod + F + Shift + ,` | Choose focused-app instances forward/backward |
 | `mainMod + S + ,` / `mainMod + F + S + ,` | Choose all / focused-app windows for the other slot |
-| `mainMod + Y` / `mainMod + Shift + Y` | Cycle through Spotify Play/Pause, Next and Previous; release `mainMod` to accept |
+| `mainMod + Y` / `mainMod + Shift + Y` | Cycle through Spotify, Play/Pause, Next and Previous forward/backward; release `mainMod` to accept |
 | `mainMod + M` | Focus the other occupied slot |
 | `mainMod + N` | Swap slot contents while retaining the focused side |
 | `mainMod + H` | Focus the other display's slot; show its active frame even when empty |
@@ -122,13 +127,19 @@ selection follow Hammerspoon's retained display state instead.
 
 `mainMod` = `Super + Ctrl + Alt`. Each display retains one or two slots.
 The native master layout owns geometry; navigation changes slot contents.
-The left slot is the master. The right slot is the only stack window.
+The left slot is the master. The right slot is the only stack window. Direct App
+Keys are `J` = Kitty / Zellij, `K` = VS Code, `L` = Chrome, `;` = Obsidian and
+`O` = KeePassXC. Group App Keys use the same modifier-release selection lifecycle
+as Comma Selection and `Y`: `I` cycles Google Chat then Google Meet, while `U`
+cycles Gmail then Google Calendar. Shift starts each group from its second entry.
 
 ### Application selection
 
 | Shortcut | Action |
 | --- | --- |
-| `mainMod + J/K/L/I/;/O/U` | Fill the focused slot with Kitty / VS Code / Chrome / Google Chat / Obsidian / KeePassXC / Spotify; start the app if needed |
+| `mainMod + J/K/L/;/O` | Fill the focused slot with Kitty / VS Code / Chrome / Obsidian / KeePassXC; start the app if needed |
+| `mainMod + I` / `mainMod + Shift + I` | Cycle Chat → Meet / Meet → Chat; release `mainMod` to accept |
+| `mainMod + U` / `mainMod + Shift + U` | Cycle Gmail → Calendar / Calendar → Gmail; release `mainMod` to accept |
 | `mainMod + F + app key` | Choose an instance for the focused slot |
 | `mainMod + S + app key` | Fill the other slot, creating it if needed; retain focus on the original side |
 | `mainMod + F + S + app key` | Choose an instance for the other slot; retain focus |
@@ -259,6 +270,10 @@ receive the same navigation translation. Its status is documented in
 [macOS keyboard parity](docs/macos-keyboard-parity.md).
 
 Media, volume, microphone and brightness hardware keys use their native actions.
+The `Y` selection contains Spotify itself followed by Play/Pause, Next and
+Previous, so Spotify no longer needs a direct App Key. The Hyprland `I` and `U`
+PWA groups are not yet mirrored on macOS because their installed Chrome-PWA
+bundle IDs are machine-specific and are not available in this checkout.
 The actionable Hyprland shortcut catalog shows the description first and aligns
 the shortcut on the right. It includes global bindings, modifier combinations,
 Dot mode and hardware/media bindings; selecting a row runs that action.

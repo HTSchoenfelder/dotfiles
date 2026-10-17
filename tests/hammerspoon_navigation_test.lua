@@ -65,7 +65,9 @@ assert(not gate:isCurrent(first) and gate:isCurrent(second))
 
 local definitions = require("apps")
 local byKey = {}
-for _, definition in ipairs(definitions) do byKey[definition.key] = definition end
+for _, definition in ipairs(definitions) do
+  if definition.key then byKey[definition.key] = definition end
+end
 assert(byKey.i.bundleID == "com.google.Chrome.app.pommaclcbfghclhalboakcipcmmndhcj")
 assert(byKey.j.launchEnvironment.START_ZELLIJ == "1")
 

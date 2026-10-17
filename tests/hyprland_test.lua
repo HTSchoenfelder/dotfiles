@@ -566,20 +566,45 @@ test("removed workspaces are not recreated by stale selection", function(session
     assert(session.current.id == 1 and not session.spaces["2"])
 end)
 
-test("Y starts with Play/Pause and is confirmed by a quick release", function(session)
+test("Y starts with Spotify and is confirmed by a quick release", function(session)
     session.press(modifier .. "Y")
     session.press("Alt_R")
-    local command = session.commands[#session.commands].arguments
-    assert(command[1] == "playerctl" and command[3] == "spotify" and command[4] == "play-pause")
+    assert(session.commands[#session.commands].arguments[1] == "spotify")
 end)
 
-test("Y has a fixed Next and Previous order after Play/Pause", function(session)
-    for index, command in ipairs({ "next", "previous" }) do
+test("Y has a fixed Play/Pause, Next and Previous order after Spotify", function(session)
+    for index, command in ipairs({ "play-pause", "next", "previous" }) do
         session.press(modifier .. "Y")
         session.choose(index)
         local arguments = session.commands[#session.commands].arguments
         assert(arguments[1] == "playerctl" and arguments[4] == command)
     end
+end)
+
+test("I cycles Chat then Meet and U cycles Gmail then Calendar", function(session)
+    for _, selection in ipairs({
+        { key = "I", index = 0, url = "https://chat.google.com/" },
+        { key = "I", index = 1, url = "https://meet.google.com/" },
+        { key = "U", index = 0, url = "https://mail.google.com/" },
+        { key = "U", index = 1, url = "https://calendar.google.com/" },
+    }) do
+        session.press(modifier .. selection.key)
+        session.choose(selection.index)
+        local arguments = session.commands[#session.commands].arguments
+        assert(arguments[#arguments] == "--app=" .. selection.url)
+    end
+end)
+
+test("F S Shift I chooses a Meet instance for the other slot", function(session)
+    local current = session.add("kitty", 1, 0)
+    local peer = session.add("obsidian", 1, 3)
+    local meet = session.add("chrome-meet.google.com__-Default", 10, 1)
+    session.focus(current)
+    session.held.f = true; session.held.s = true
+    session.press(modifier .. "SHIFT + I"); session.press("Alt_L")
+    session.choose(0)
+    assert(session.focused == current and meet.workspace.id == 1)
+    assert(not meet.layout.is_master and peer.workspace.id == 10)
 end)
 
 test("reverse Y starts at Previous", function(session)

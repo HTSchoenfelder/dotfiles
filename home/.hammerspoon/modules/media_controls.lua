@@ -3,6 +3,11 @@ MediaControls.__index = MediaControls
 
 local actions = {
   {
+    id = "spotify",
+    text = "Spotify",
+    open = true,
+  },
+  {
     id = "play_pause",
     text = "Play/Pause",
     script = 'tell application id "com.spotify.client" to playpause',
@@ -27,6 +32,7 @@ function MediaControls.new(options)
   options = options or {}
   return setmetatable({
     commaSelection = assert(options.commaSelection, "Comma Selection is required"),
+    openSpotify = assert(options.openSpotify, "Spotify opener is required"),
     taskNew = options.taskNew or hs.task.new,
     notify = options.notify or defaultNotify,
     tasks = {},
@@ -35,7 +41,9 @@ function MediaControls.new(options)
 end
 
 function MediaControls:execute(action)
-  if not action or not action.script then return end
+  if not action then return end
+  if action.open then self.openSpotify(); return end
+  if not action.script then return end
   self.taskSerial = self.taskSerial + 1
   local serial = self.taskSerial
   local task

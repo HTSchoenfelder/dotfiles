@@ -126,10 +126,13 @@ Hyprland's `HYPRSHOT_DIR`.
 ## Launcher and hardware integration
 
 `hs.chooser` is the shared native selection surface for applications, windows,
-instances, Spotify actions, emoji, snippets, commands and the shortcut catalog.
+instances, Spotify plus its player actions, emoji, snippets, commands and the
+shortcut catalog.
 The launcher places an existing application window in the captured focused slot;
 new native windows are assigned from window-created events.
 Spotify actions run asynchronously through `osascript`.
+The `I` and `U` PWA groups remain Hyprland-only until the installed macOS Chrome
+PWAs provide stable bundle IDs for Chat, Meet, Gmail and Calendar.
 
 RØDECaster MIDI remains entirely in Hammerspoon. `MainMod + Backslash` sends one
 absolute mute or unmute value; it does not emulate a momentary button press. The

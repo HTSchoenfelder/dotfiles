@@ -54,14 +54,16 @@ function navigation.start()
   heldKeys:track(settings.otherSlotKey)
 
   for _, application in ipairs(applications) do
-    hs.hotkey.bind(config.hyper, application.key, function()
-      applicationNavigation:activate(
-        application,
-        heldKeys:isDown(settings.otherSlotKey) and "other" or "focused",
-        heldKeys:isDown(settings.filterKey)
-      )
-    end)
-    catalog.add("Applications", "MainMod + " .. application.key:upper(), "Focus " .. application.name)
+    if application.key then
+      hs.hotkey.bind(config.hyper, application.key, function()
+        applicationNavigation:activate(
+          application,
+          heldKeys:isDown(settings.otherSlotKey) and "other" or "focused",
+          heldKeys:isDown(settings.filterKey)
+        )
+      end)
+      catalog.add("Applications", "MainMod + " .. application.key:upper(), "Focus " .. application.name)
+    end
   end
 
   catalog.add("Applications", "MainMod + F + App", "Select application window")

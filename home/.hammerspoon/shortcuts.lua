@@ -1,4 +1,5 @@
 local config = require("config")
+local applications = require("apps")
 local DotMode = require("modules.dot_mode")
 local MediaControls = require("modules.media_controls")
 local ProjectOverlays = require("modules.project_overlays")
@@ -16,7 +17,15 @@ function shortcuts.start(services)
   shortcuts.rodecaster = rodecaster
   catalog.add("Media", "MainMod + \\", "Toggle RØDECaster mute")
 
-  local mediaControls = MediaControls.new({commaSelection = services.commaSelection})
+  local spotify
+  for _, application in ipairs(applications) do
+    if application.bundleID == "com.spotify.client" then spotify = application; break end
+  end
+  assert(spotify, "Spotify application must be configured")
+  local mediaControls = MediaControls.new({
+    commaSelection = services.commaSelection,
+    openSpotify = function() services.applications:activate(spotify, "focused", false) end,
+  })
   hs.hotkey.bind(config.hyper, "y", function() mediaControls:cycle(1) end, nil,
     function() mediaControls:cycle(1) end)
   local shiftedHyper = {}
@@ -24,8 +33,8 @@ function shortcuts.start(services)
   shiftedHyper[#shiftedHyper + 1] = "shift"
   hs.hotkey.bind(shiftedHyper, "y", function() mediaControls:cycle(-1) end, nil,
     function() mediaControls:cycle(-1) end)
-  catalog.add("Media", "MainMod + Y", "Cycle Spotify actions")
-  catalog.add("Media", "MainMod + Shift + Y", "Cycle Spotify actions backwards")
+  catalog.add("Media", "MainMod + Y", "Cycle Spotify and player actions")
+  catalog.add("Media", "MainMod + Shift + Y", "Cycle Spotify and player actions backwards")
   shortcuts.mediaControls = mediaControls
 
   local overlays = ProjectOverlays.new({

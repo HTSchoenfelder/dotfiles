@@ -56,6 +56,11 @@ hl.bind(settings.modifier .. " + " .. settings.other_slot_key, hl.dsp.no_op(),
 hl.bind(settings.modifier .. " + " .. settings.filter_key, hl.dsp.no_op(),
     { description = "Filter application instances" })
 local terminal
+local applications_by_id = {}
+for _, application in ipairs(settings.applications) do
+    assert(application.id and not applications_by_id[application.id], "Application IDs must be unique")
+    applications_by_id[application.id] = application
+end
 local function focused_application()
     local active = hl.get_active_window()
     if not active then return end
@@ -71,24 +76,66 @@ end
 
 for _, application in ipairs(settings.applications) do
     if application.class == "kitty" then terminal = application end
-    bind(application.key, function()
-        windows.activate(application, { target = selection_target() },
-            hl.is_key_down(settings.filter_key:lower()))
-    end, "Fill focused slot with " .. application.name, "Applications")
-    shortcut_catalog.add("Applications", shortcut_catalog.main("F + " .. application.key),
-        "Select " .. application.name .. " instance", function()
-            windows.activate(application, {}, true)
-        end)
-    shortcut_catalog.add("Applications", shortcut_catalog.main("S + " .. application.key),
-        "Fill other slot with " .. application.name, function()
-            windows.activate(application, { target = "other" }, false)
-        end)
-    shortcut_catalog.add("Applications", shortcut_catalog.main("F + S + " .. application.key),
-        "Select " .. application.name .. " instance for other slot", function()
-            windows.activate(application, { target = "other" }, true)
-        end)
+    if application.key then
+        bind(application.key, function()
+            windows.activate(application, { target = selection_target() },
+                hl.is_key_down(settings.filter_key:lower()))
+        end, "Fill focused slot with " .. application.name, "Applications")
+        shortcut_catalog.add("Applications", shortcut_catalog.main("F + " .. application.key),
+            "Select " .. application.name .. " instance", function()
+                windows.activate(application, {}, true)
+            end)
+        shortcut_catalog.add("Applications", shortcut_catalog.main("S + " .. application.key),
+            "Fill other slot with " .. application.name, function()
+                windows.activate(application, { target = "other" }, false)
+            end)
+        shortcut_catalog.add("Applications", shortcut_catalog.main("F + S + " .. application.key),
+            "Select " .. application.name .. " instance for other slot", function()
+                windows.activate(application, { target = "other" }, true)
+            end)
+    end
 end
 assert(terminal, "Kitty must be configured as a navigation application")
+
+local function cycle_application_group(group, direction, filtered, target)
+    if picker.is_open() then return end
+    local items = {}
+    for _, id in ipairs(group.applications) do
+        local application = assert(applications_by_id[id], "Unknown grouped application: " .. id)
+        items[#items + 1] = { label = application.name, application = application }
+    end
+    picker.open(items, {
+        cycle_key = group.key,
+        initial_index = direction > 0 and 1 or #items,
+        on_select = function(item)
+            windows.activate(item.application, { target = target }, filtered)
+        end,
+    })
+end
+
+for _, group in ipairs(settings.application_groups) do
+    local current_group = group
+    picker.bind_cycle(current_group.key, function(direction)
+        cycle_application_group(current_group, direction,
+            hl.is_key_down(settings.filter_key:lower()), selection_target())
+    end, "Cycle " .. current_group.name .. " applications")
+    for _, combination in ipairs({
+        { key = current_group.key, direction = 1, filtered = false, target = "focused", suffix = "" },
+        { key = "SHIFT + " .. current_group.key, direction = -1, filtered = false, target = "focused", suffix = " backwards" },
+        { key = "F + " .. current_group.key, direction = 1, filtered = true, target = "focused", suffix = " with instance selection" },
+        { key = "F + SHIFT + " .. current_group.key, direction = -1, filtered = true, target = "focused", suffix = " backwards with instance selection" },
+        { key = "S + " .. current_group.key, direction = 1, filtered = false, target = "other", suffix = " for other slot" },
+        { key = "S + SHIFT + " .. current_group.key, direction = -1, filtered = false, target = "other", suffix = " backwards for other slot" },
+        { key = "F + S + " .. current_group.key, direction = 1, filtered = true, target = "other", suffix = " with instance selection for other slot" },
+        { key = "F + S + SHIFT + " .. current_group.key, direction = -1, filtered = true, target = "other", suffix = " backwards with instance selection for other slot" },
+    }) do
+        local current = combination
+        shortcut_catalog.add("Applications", shortcut_catalog.main(combination.key),
+            "Cycle " .. current_group.name .. " applications" .. combination.suffix, function()
+                cycle_application_group(current_group, current.direction, current.filtered, current.target)
+            end)
+    end
+end
 local reset_workspaces = workspace_reset.new({
     workspaces = workspaces,
     activate_terminal = function() windows.activate(terminal, { replace_layout = true }, false) end,
@@ -159,15 +206,18 @@ shortcut_catalog.add("Navigation", shortcut_catalog.main("SHIFT + B"), "Cycle wo
 picker.bind_cycle("Y", function(direction)
     if picker.is_open() then return end
     windows.invalidate_pending_focus()
-    media_controls.cycle(picker, {
-        key = "Y", direction = direction, player = "spotify",
-    })
-end, "Cycle player actions")
-shortcut_catalog.add("Media", shortcut_catalog.main("Y"), "Cycle player actions", function()
-    media_controls.cycle(picker, { key = "Y", direction = 1, player = "spotify" })
+    local target = selection_target()
+    local filtered = hl.is_key_down(settings.filter_key:lower())
+    media_controls.cycle(picker, { key = "Y", direction = direction, player = "spotify",
+        open = function() windows.activate(applications_by_id.spotify, { target = target }, filtered) end })
+end, "Cycle Spotify and player actions")
+shortcut_catalog.add("Media", shortcut_catalog.main("Y"), "Cycle Spotify and player actions", function()
+    media_controls.cycle(picker, { key = "Y", direction = 1, player = "spotify",
+        open = function() windows.activate(applications_by_id.spotify, { target = "focused" }, false) end })
 end)
-shortcut_catalog.add("Media", shortcut_catalog.main("SHIFT + Y"), "Cycle player actions backwards", function()
-    media_controls.cycle(picker, { key = "Y", direction = -1, player = "spotify" })
+shortcut_catalog.add("Media", shortcut_catalog.main("SHIFT + Y"), "Cycle Spotify and player actions backwards", function()
+    media_controls.cycle(picker, { key = "Y", direction = -1, player = "spotify",
+        open = function() windows.activate(applications_by_id.spotify, { target = "focused" }, false) end })
 end)
 
 dot_mode.bind({

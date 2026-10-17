@@ -25,5 +25,5 @@ return {
   },
   {key = ";", name = "Obsidian", bundleID = "md.obsidian"},
   {key = "o", name = "KeePassXC", bundleID = "org.keepassxc.keepassxc"},
-  {key = "u", name = "Spotify", bundleID = "com.spotify.client"},
+  {name = "Spotify", bundleID = "com.spotify.client"},
 }

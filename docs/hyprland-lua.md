@@ -30,6 +30,14 @@ Within Comma Selection, Shift only reverses direction, including filtered or
 other-slot selection. An `S` selection expands one slot into two only when a
 distinct window becomes available.
 
+“App Key” means a configured application or two-entry application group pressed
+with `mainMod`. Direct keys are `J` = Kitty / Zellij, `K` = VS Code, `L` = Chrome,
+`;` = Obsidian and `O` = KeePassXC. Group key `I` cycles Google Chat then Google
+Meet; `U` cycles Gmail then Google Calendar. The groups use the same Rofi cycling
+and modifier-release acceptance as Comma Selection, and Shift reverses their
+order. Held `F` requests instance selection after choosing the application, held
+`S` targets the other slot, and both modifiers compose.
+
 Selection from Parking or a hidden workspace parks the displaced occupant.
 Selection from another visible slot exchanges both occupants through the native
 window-swap dispatcher. `M` switches occupied slots, `N` swaps their contents
@@ -94,7 +102,7 @@ active-frame state. Dot Mode still uses `M` for the ratio on macOS.
 | File | Responsibility |
 | --- | --- |
 | `config/application_shortcuts.lua` | Ctrl shortcuts and application-specific mappings |
-| `config/navigation.lua` | Modifier, application commands/classes and navigation preferences |
+| `config/navigation.lua` | Modifiers, direct applications, application groups and navigation preferences |
 | `config/project_overlays.lua` | Project overlay tools and hidden workspace |
 | `config/workspaces.lua` | Master layout, workspace icons and Parking destination |
 | `config/keybindings.lua` | Bindings and composition of navigation/launcher actions |
@@ -113,7 +121,7 @@ active-frame state. Dot Mode still uses `M` for the ratio on macOS.
 | `lib/launcher_data.lua` | Shared launcher file loading and validation |
 | `lib/command_launcher.lua` | Configured command parsing and execution after selection |
 | `lib/text_launcher.lua` | Emoji/snippet parsing and insertion into the original window |
-| `lib/media_controls.lua` | Three-action player menu and Spotify MPRIS commands |
+| `lib/media_controls.lua` | Spotify launcher plus three MPRIS player actions |
 | `lib/screenshots.lua` | Hyprshot region, active-window and active-output commands |
 | `lib/process.lua` | Quoted argument vectors and asynchronous process startup |
 | `lib/compositor.lua` | Checked dispatch, current workspace and shared selection indexing |

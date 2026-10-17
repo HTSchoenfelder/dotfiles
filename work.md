@@ -86,6 +86,9 @@ slot state, and keep the Hammerspoon Console open for Lua or Accessibility error
 5. Check `mainMod + F + app key` and Comma Selection: the chosen window fills the
    intended slot, and Comma Selection accepts on `mainMod` release. Reload
    Hammerspoon once more and confirm that the in-memory slot state resets.
+6. Use `mainMod + Y` and confirm that Spotify is the first entry, followed by
+   Play/Pause, Next and Previous. The Hyprland-only `I` and `U` PWA groups cannot
+   be tested here until their macOS Chrome-PWA bundle IDs are configured.
 
 ### Failure handling and report
 
