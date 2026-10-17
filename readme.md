@@ -179,8 +179,10 @@ When any slot window closes, its side is filled by the most recently focused
 eligible window in Parking. Other visible windows are never taken for refill.
 A focused slot's replacement receives focus; background replacement preserves
 keyboard focus. Floating utility windows, native floating dialogs, hidden group
-members, special-workspace windows and project overlays are excluded from slot
-selection and refill.
+members outside the Parking container, special-workspace windows and project
+overlays are excluded from slot selection and refill. Parking windows share one
+hidden tabbed group so they retain a usable client size while parked; its hidden
+members remain selectable.
 
 If Parking has no replacement, the remaining window temporarily fills the screen.
 The missing slot and its side remain remembered; the next available normal window

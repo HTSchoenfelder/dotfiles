@@ -117,6 +117,18 @@ test("H handles an empty other display and a single display; G has no binding", 
     assert(session.focused == current)
 end)
 
+test("Parking groups windows without hiding them from selection", function(session)
+    local current = session.add("kitty", 1, 0)
+    local code = session.add("code", 10, 1)
+    local browser = session.add("google-chrome", 10, 2)
+    session.focus(current)
+    session.press(modifier .. "K")
+    assert(session.focused == code and current.group and current.group == browser.group)
+    assert(browser.hidden)
+    session.press(modifier .. "L")
+    assert(session.focused == browser and browser.workspace.id == 1)
+end)
+
 test("slash explicitly reduces to one slot without refilling it", function(session)
     local left = session.add("kitty", 1, 1)
     local right = session.add("code", 1, 0)

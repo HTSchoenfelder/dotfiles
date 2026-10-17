@@ -67,7 +67,8 @@ The active NixOS ownership is defined in `setup/nixos/desktop-integration.nix` a
 - Selection from another visible slot swaps contents, including across displays;
   selection from Parking or a hidden workspace parks the displaced occupant.
 - Closing a slot window refills its side from Parking MRU, skipping visible slots,
-  floating utility windows/dialogs, hidden group members and project overlays.
+  floating utility windows/dialogs, hidden group members outside the Parking
+  container and project overlays.
   If no replacement exists, remember the vacancy and temporarily use native
   single-window geometry. `/` explicitly reduces to one slot without refilling;
   `Shift + /` requests two slots and refills the other side when possible.

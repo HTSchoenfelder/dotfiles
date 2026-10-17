@@ -30,10 +30,10 @@ local function other_monitor()
     return monitors[current_index % #monitors + 1]
 end
 
-function window_navigation.list(application)
+function window_navigation.list(application, parking)
     local windows = {}
     for _, window in ipairs(hl.get_windows({ mapped = true })) do
-        if slot_layout.eligible(window) and matches_application(window, application) then windows[#windows + 1] = window end
+        if slot_layout.eligible(window, parking) and matches_application(window, application) then windows[#windows + 1] = window end
     end
     local function focus_rank(window)
         -- Hyprland uses 0 for the most recent focus and -1 for never focused.
@@ -55,8 +55,38 @@ end
 function window_navigation.new(options, picker)
     local navigation = {}
     local parking_workspace = tostring(options.parking_workspace)
-    local slots = slot_layout.new({ parking = parking_workspace, list = window_navigation.list,
-        move = window_navigation.move, state_file = options.state_file })
+    local function list(application)
+        return window_navigation.list(application, parking_workspace)
+    end
+    local function normalize_parking()
+        local parked = {}
+        local group
+        for _, window in ipairs(list()) do
+            if window.workspace.addressable_name == parking_workspace then
+                parked[#parked + 1] = window
+                if window.group then group = window.group end
+            end
+        end
+        if #parked < 2 then return end
+        if not group then
+            compositor.dispatch(hl.dsp.group.toggle({ window = parked[1] }))
+            group = parked[1].group
+        end
+        if not group then return end
+        for _, window in ipairs(parked) do
+            if window.group ~= group then
+                if window.group then window.group:remove(window) end
+                group:add(window)
+            end
+        end
+    end
+    local function move(window, workspace)
+        window_navigation.move(window, workspace)
+        if workspace == parking_workspace then normalize_parking() end
+    end
+    normalize_parking()
+    local slots = slot_layout.new({ parking = parking_workspace, list = list,
+        move = move, state_file = options.state_file })
     local pending_launches = {}
     local opening = {}
     local stopped = false
@@ -112,7 +142,7 @@ function window_navigation.new(options, picker)
 
     local function finish_launches()
         for application, launch in pairs(pending_launches) do
-            local window = window_navigation.list(application)[1]
+            local window = list(application)[1]
             if window then
                 pending_launches[application] = nil
                 opening[window.address] = nil
@@ -166,7 +196,7 @@ function window_navigation.new(options, picker)
         picker.cancel()
         local request = create_request(request_options)
         if not request then return end
-        local windows = window_navigation.list(application)
+        local windows = list(application)
         local excluded = slots.excluded(request.slot)
         local had_windows = #windows > 0
         if excluded then
@@ -208,7 +238,7 @@ function window_navigation.new(options, picker)
 
     function navigation.cycle(direction, key, request_options, application)
         if picker.is_open() then return end
-        local windows = window_navigation.list(application)
+        local windows = list(application)
         if #windows == 0 then return end
         local request = create_request(request_options)
         if not request then return end
@@ -245,7 +275,7 @@ function window_navigation.new(options, picker)
         -- Focus only the displayed workspace, never a hidden workspace from global MRU.
         local workspace = monitor.active_special_workspace or monitor.active_workspace
         if workspace then
-            for _, window in ipairs(window_navigation.list()) do
+            for _, window in ipairs(list()) do
                 if window.workspace and window.workspace.addressable_name == workspace.addressable_name then
                     compositor.dispatch(hl.dsp.focus({ window = window }))
                     return

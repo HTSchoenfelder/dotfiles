@@ -3,8 +3,10 @@ local overlays = require("lib.project_overlays")
 local slot_layout = {}
 
 -- Floating utility windows (including native dialogs) and overlays are not slots.
-function slot_layout.eligible(window)
-    return window and window.mapped and not window.floating and not window.hidden
+function slot_layout.eligible(window, parking)
+    local parked = window and window.workspace
+        and window.workspace.addressable_name == parking
+    return window and window.mapped and not window.floating and (not window.hidden or parked)
         and not overlays.is_overlay(window) and window.workspace and not window.workspace.special
 end
 
@@ -55,7 +57,7 @@ function slot_layout.new(options)
     local function members(workspace, except)
         local result = {}
         for _, window in ipairs(options.list()) do
-            if slot_layout.eligible(window) and not same(window, except) and not closing[window.address]
+            if slot_layout.eligible(window, options.parking) and not same(window, except) and not closing[window.address]
                 and window.workspace.addressable_name == workspace.addressable_name then
                 result[#result + 1] = window
             end
@@ -71,7 +73,7 @@ function slot_layout.new(options)
     end
 
     local function alive(window, state)
-        return slot_layout.eligible(window) and not closing[window.address]
+        return slot_layout.eligible(window, options.parking) and not closing[window.address]
             and window.workspace.addressable_name == state.workspace
     end
 
@@ -134,7 +136,7 @@ function slot_layout.new(options)
     local function apply_ratio(state)
         if not compositor.workspace_is_active(state.workspace) then return end
         local active = hl.get_active_window()
-        if not slot_layout.eligible(active) then return end
+        if not slot_layout.eligible(active, options.parking) then return end
         local _, ratio = ratio_for(state)
         compositor.dispatch(hl.dsp.layout("mfact exact " .. tostring(ratio)))
     end
@@ -173,13 +175,13 @@ function slot_layout.new(options)
 
     local function parking_candidate()
         for _, window in ipairs(options.list()) do
-            if slot_layout.eligible(window) and not closing[window.address]
+            if slot_layout.eligible(window, options.parking) and not closing[window.address]
                 and window.workspace.addressable_name == options.parking then return window end
         end
     end
 
     function slots.place(window, request, keep_focus)
-        if not slot_layout.eligible(window) or not request then return false end
+        if not slot_layout.eligible(window, options.parking) or not request then return false end
         local state, index = request.state, request.index
         local source, source_index = locate(window)
         if request.target == "other" and source == state and source_index == state.focused then return false end
@@ -270,7 +272,7 @@ function slot_layout.new(options)
     function slots.keep_only()
         local active = hl.get_active_window()
         local state = active and state_for(active.workspace)
-        if not state or not slot_layout.eligible(active) then return end
+        if not state or not slot_layout.eligible(active, options.parking) then return end
         transaction(function()
             ratio_for(state)
             state.wanted, state.windows, state.focused = 1, { active }, 1
@@ -325,7 +327,7 @@ function slot_layout.new(options)
     end
 
     function slots.opened(window, request)
-        if not slot_layout.eligible(window) then return end
+        if not slot_layout.eligible(window, options.parking) then return end
         local state = state_for(window.workspace, window)
         if not state then return end
         if request and request.state == state and request.revision ~= state.revision then

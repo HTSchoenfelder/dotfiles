@@ -58,7 +58,10 @@ slot in workspace 1.
 per-display split preferences. Hyprland owns native window lifetime and master
 geometry. Window events trigger discrete placement/refill operations; there is no
 polling or permanent geometry/reflow loop. No third-party window manager, service
-or placeholder window is introduced.
+or placeholder window is introduced. Parking windows share one hidden tabbed group
+so inactive clients retain usable geometry instead of being compressed into a
+large master stack. Hidden members of that Parking group remain eligible for MRU
+selection; hidden group members elsewhere remain excluded.
 
 Selection requests carry a named `focused` or `other` target rather than a
 placement boolean. This keeps filter and target state independent and leaves the
@@ -69,8 +72,8 @@ Placement waits until after `window.open`. Explicit launch requests take priorit
 requests invalidated by newer selection, slot revision or focus changes park late
 results instead of replacing current work. Unsolicited normal windows fill a
 remembered vacancy or replace their original focused slot. Floating utility
-windows/dialogs, hidden group members, special workspaces and project overlays
-are excluded from slot selection and refill.
+windows/dialogs, hidden group members outside the Parking container, special
+workspaces and project overlays are excluded from slot selection and refill.
 
 `window.close` records the vacated side and focus before native teardown. A
 one-shot callback refills from Parking MRU after teardown, preserving the peer

@@ -244,6 +244,7 @@ function support.session()
         end },
         dsp = {
             send_shortcut = dispatcher("shortcut"), no_op = dispatcher("noop"), layout = dispatcher("layout"), focus = dispatcher("focus"), submap = dispatcher("submap"),
+            group = { toggle = dispatcher("group_toggle") },
             window = {
                 swap = dispatcher("swap"), close = dispatcher("close"), move = dispatcher("move"), float = dispatcher("float"),
                 resize = dispatcher("resize"), center = dispatcher("center"), deny_from_group = dispatcher("deny_group"),
@@ -292,6 +293,28 @@ function support.session()
                         session.current.monitor.active_workspace = session.current
                     end
                     session.emit("workspace.active", session.current)
+                end
+            elseif action.kind == "group_toggle" then
+                local target = window or session.focused
+                if target and not target.group then
+                    local group = { members = { target }, current = target, current_index = 1, size = 1 }
+                    function group:add(candidate, index)
+                        if candidate.group and candidate.group ~= self then candidate.group:remove(candidate) end
+                        table.insert(self.members, index or (#self.members + 1), candidate)
+                        candidate.group = self
+                        self.size = #self.members
+                        for _, member in ipairs(self.members) do member.hidden = member ~= self.current end
+                    end
+                    function group:remove(candidate)
+                        for index, member in ipairs(self.members) do
+                            if member == candidate then table.remove(self.members, index); break end
+                        end
+                        candidate.group, candidate.hidden = nil, false
+                        if self.current == candidate then self.current = self.members[1] end
+                        self.size = #self.members
+                        for _, member in ipairs(self.members) do member.hidden = member ~= self.current end
+                    end
+                    target.group = group
                 end
             elseif action.kind == "float" then window.floating = arguments.action == "set"
             elseif action.kind == "resize" then window.size = { arguments.x, arguments.y }
