@@ -37,15 +37,18 @@ function WindowNavigation:_records(callback)
   end)
 end
 
-function WindowNavigation:chooseAny(mode)
+function WindowNavigation:chooseAny(mode, instancesOnly)
   local generation = self.gate:next()
   local request = self.orchestrator:capture(mode, generation)
   if not request then return end
   self:_records(function(records)
     if not self.gate:isCurrent(generation) then return end
+    local focused = instancesOnly and self.repository:focusedRecord(records) or nil
     local choices = {}
     for _, record in ipairs(self.repository:orderedByHistory(records)) do
-      choices[#choices + 1] = windowChoice(record)
+      if not instancesOnly or (focused and record.bundleID == focused.bundleID) then
+        choices[#choices + 1] = windowChoice(record)
+      end
     end
     local excluded = self.orchestrator:excluded(request)
     local chooser = self.chooserFactory()

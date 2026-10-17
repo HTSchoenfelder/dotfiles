@@ -4,7 +4,8 @@ local instance = os.getenv("HYPRLAND_INSTANCE_SIGNATURE")
 return {
     slot_state_file = runtime and instance and (runtime .. "/hypr-slots-" .. instance .. ".tsv") or nil,
     modifier = "SUPER + CTRL + ALT",
-    instance_key = "F",
+    filter_key = "F",
+    other_slot_key = "S",
     cycle_rows = 7,
     launch_timeout_ms = 15000,
     applications = {

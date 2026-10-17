@@ -71,8 +71,10 @@ display, the active slot frame is still drawn. `H` changes the active display ev
 when macOS cannot move native keyboard focus there; the next app or window action
 uses that retained display and side.
 
-App keys, `P` and Comma Selection replace the focused side. Shift app and `P`
-selection fill the other side, expanding one to two, without leaving focus there.
+App keys, `P` and Comma Selection replace the focused side. Held `S` fills the
+other side, expanding one to two, without leaving focus there. Held `F` filters
+`P` and Comma Selection to the focused application or requests an explicit
+instance for an app key; `F + S` combines filter and placement.
 A selected window in another visible slot swaps identities; Hammerspoon places
 both windows into their new display frames. An untracked selection leaves the
 replaced window native and unchanged. Non-slot windows are neither hidden nor
@@ -92,11 +94,12 @@ windows. `clearScreen` and Dot Mode reset remain explicit layout reset actions.
 
 ## Selection and modifiers
 
-`F` selects an application instance or filters Comma Selection by application.
-Shift with Comma Selection and media selection means backward cycling, never
-other-slot placement. Comma Selection queries native windows once, cycles locally
-and accepts on base `MainMod` release. Its accepted window uses the captured
-focused side, including across displays, and can swap with another slot occupant.
+`F` selects an application instance or filters `P` and Comma Selection by
+application. `S` targets the other slot. Shift with Comma Selection and media
+selection means backward cycling, never placement or filtering. Comma Selection
+queries native windows once, cycles locally and accepts on base `MainMod` release.
+Its accepted window uses the captured target side, including across displays, and
+can swap with another slot occupant.
 Window and application choices use Hammerspoon's focus history. Held `G` display
 placement is removed; `H` selects the other display without moving its existing
 windows.

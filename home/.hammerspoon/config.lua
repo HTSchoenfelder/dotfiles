@@ -4,7 +4,8 @@ config.hyper = {"alt", "ctrl", "cmd"}
 config.log = hs.logger.new("hammerspoon", "debug")
 
 config.navigation = {
-  instanceKey = "f",
+  filterKey = "f",
+  otherSlotKey = "s",
   launchTimeoutSeconds = 15,
   launchPollIntervalSeconds = 0.1,
   restoreDelaySeconds = 0.08,

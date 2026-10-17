@@ -33,7 +33,9 @@ local overlays = project_overlays.new(require("config.project_overlays"))
 shortcut_forwarding.bind(require("config.application_shortcuts"), shortcut_catalog)
 
 local function bind(key, action, description, section)
-    shortcut_catalog.add(section or "Navigation", shortcut_catalog.main(key), description)
+    shortcut_catalog.add(section or "Navigation", shortcut_catalog.main(key), description, function()
+        if type(action) == "function" then action() else hl.dispatch(action) end
+    end)
     return hl.bind(settings.modifier .. " + " .. key, action, { description = description })
 end
 
@@ -42,9 +44,6 @@ bind("R", function()
     windows.invalidate_pending_focus()
     picker.toggle_app_launcher()
 end, "Toggle application launcher", "Launchers")
-bind("SHIFT + R", function()
-    shortcut_catalog.open(picker)
-end, "Show shortcut catalog", "Launchers")
 bind("W", hl.dsp.window.close(), "Close window", "Windows")
 bind("H", windows.focus_other_monitor, "Focus other display", "Navigation")
 bind("slash", windows.keep_focused_only, "Keep focused slot only", "Windows")
@@ -52,9 +51,10 @@ bind("SHIFT + slash", windows.enable_two_slots, "Use two slots on focused displa
 bind("M", windows.focus_next_slot, "Focus other slot", "Navigation")
 bind("N", windows.rotate_positions, "Swap slot contents and retain focused side", "Windows")
 
-bind(settings.instance_key, hl.dsp.no_op(), "Select application instance", "Applications")
-shortcut_catalog.add("Applications", shortcut_catalog.main("F + App"), "Select application instance")
-shortcut_catalog.add("Applications", shortcut_catalog.main("SHIFT + App"), "Fill other slot with application")
+hl.bind(settings.modifier .. " + " .. settings.other_slot_key, hl.dsp.no_op(),
+    { description = "Target other slot" })
+hl.bind(settings.modifier .. " + " .. settings.filter_key, hl.dsp.no_op(),
+    { description = "Filter application instances" })
 local terminal
 local function focused_application()
     local active = hl.get_active_window()
@@ -68,11 +68,22 @@ end
 for _, application in ipairs(settings.applications) do
     if application.class == "kitty" then terminal = application end
     bind(application.key, function()
-        windows.activate(application, {}, hl.is_key_down(settings.instance_key:lower()))
+        windows.activate(application, {
+            other_slot = hl.is_key_down(settings.other_slot_key:lower()),
+        }, hl.is_key_down(settings.filter_key:lower()))
     end, "Fill focused slot with " .. application.name, "Applications")
-    hl.bind(settings.modifier .. " + SHIFT + " .. application.key, function()
-        windows.activate(application, { other_slot = true }, hl.is_key_down(settings.instance_key:lower()))
-    end, { description = "Fill other slot with " .. application.name })
+    shortcut_catalog.add("Applications", shortcut_catalog.main("F + " .. application.key),
+        "Select " .. application.name .. " instance", function()
+            windows.activate(application, {}, true)
+        end)
+    shortcut_catalog.add("Applications", shortcut_catalog.main("S + " .. application.key),
+        "Fill other slot with " .. application.name, function()
+            windows.activate(application, { other_slot = true }, false)
+        end)
+    shortcut_catalog.add("Applications", shortcut_catalog.main("F + S + " .. application.key),
+        "Select " .. application.name .. " instance for other slot", function()
+            windows.activate(application, { other_slot = true }, true)
+        end)
 end
 assert(terminal, "Kitty must be configured as a navigation application")
 local reset_workspaces = workspace_reset.new({
@@ -81,25 +92,69 @@ local reset_workspaces = workspace_reset.new({
 })
 monitor_configuration.set_workspace_reconciler(reset_workspaces.restore_roles)
 
-bind("P", function() windows.activate(nil, {}, true) end, "Select window for focused slot", "Windows")
-hl.bind(settings.modifier .. " + SHIFT + P", function()
-    windows.activate(nil, { other_slot = true }, true)
-end, { description = "Select window for other slot" })
+local function open_commands()
+    command_launcher.open(picker, config_directory .. "/launcher-data/execute.txt", {
+        ["reset-workspaces"] = reset_workspaces.run,
+    })
+end
+
+bind("SHIFT + P", function() shortcut_catalog.open(picker) end,
+    "Show shortcut catalog", "Launchers")
+bind("SHIFT + R", open_commands, "Run configured command", "Launchers")
+local function select_windows(filtered, other_slot)
+    local application = filtered and focused_application() or nil
+    if filtered and not application then return end
+    windows.activate(application, { other_slot = other_slot }, true)
+end
+bind("P", function()
+    select_windows(
+        hl.is_key_down(settings.filter_key:lower()),
+        hl.is_key_down(settings.other_slot_key:lower())
+    )
+end, "Select window for focused slot", "Windows")
+shortcut_catalog.add("Windows", shortcut_catalog.main("F + P"), "Select focused application window",
+    function() select_windows(true, false) end)
+shortcut_catalog.add("Windows", shortcut_catalog.main("S + P"), "Select window for other slot",
+    function() select_windows(false, true) end)
+shortcut_catalog.add("Windows", shortcut_catalog.main("F + S + P"),
+    "Select focused application window for other slot", function() select_windows(true, true) end)
+local function cycle_windows(direction, filtered, other_slot)
+    local application = filtered and focused_application() or nil
+    if filtered and not application then return end
+    windows.cycle(direction, "comma", { other_slot = other_slot }, application)
+end
 picker.bind_cycle("comma", function(direction)
-    local application = hl.is_key_down(settings.instance_key:lower()) and focused_application() or nil
-    windows.cycle(direction, "comma", {}, application)
+    cycle_windows(
+        direction,
+        hl.is_key_down(settings.filter_key:lower()),
+        hl.is_key_down(settings.other_slot_key:lower())
+    )
 end, "Cycle windows by last focus")
-shortcut_catalog.add("Windows", shortcut_catalog.main("comma"), "Choose focused slot content by last focus")
-shortcut_catalog.add("Windows", shortcut_catalog.main("SHIFT + comma"), "Cycle windows backwards")
-shortcut_catalog.add("Windows", shortcut_catalog.main("F + comma"), "Cycle application windows")
-shortcut_catalog.add("Windows", shortcut_catalog.main("SHIFT + P"), "Select window for other slot")
+shortcut_catalog.add("Windows", shortcut_catalog.main("comma"), "Choose focused slot content by last focus",
+    function() cycle_windows(1, false, false) end)
+shortcut_catalog.add("Windows", shortcut_catalog.main("SHIFT + comma"), "Cycle windows backwards",
+    function() cycle_windows(-1, false, false) end)
+shortcut_catalog.add("Windows", shortcut_catalog.main("F + comma"), "Cycle application windows",
+    function() cycle_windows(1, true, false) end)
+shortcut_catalog.add("Windows", shortcut_catalog.main("F + SHIFT + comma"),
+    "Cycle application windows backwards", function() cycle_windows(-1, true, false) end)
+shortcut_catalog.add("Windows", shortcut_catalog.main("S + comma"),
+    "Choose other slot content by last focus", function() cycle_windows(1, false, true) end)
+shortcut_catalog.add("Windows", shortcut_catalog.main("S + SHIFT + comma"),
+    "Cycle other slot windows backwards", function() cycle_windows(-1, false, true) end)
+shortcut_catalog.add("Windows", shortcut_catalog.main("F + S + comma"),
+    "Cycle application windows for other slot", function() cycle_windows(1, true, true) end)
+shortcut_catalog.add("Windows", shortcut_catalog.main("F + S + SHIFT + comma"),
+    "Cycle application windows backwards for other slot", function() cycle_windows(-1, true, true) end)
 picker.bind_cycle("B", function(direction)
     if picker.is_open() then return end
     windows.invalidate_pending_focus()
     spaces.cycle(direction, "B")
 end, "Cycle workspaces by last focus")
-shortcut_catalog.add("Navigation", shortcut_catalog.main("B"), "Cycle workspaces by last focus")
-shortcut_catalog.add("Navigation", shortcut_catalog.main("SHIFT + B"), "Cycle workspaces backwards")
+shortcut_catalog.add("Navigation", shortcut_catalog.main("B"), "Cycle workspaces by last focus",
+    function() spaces.cycle(1, "B") end)
+shortcut_catalog.add("Navigation", shortcut_catalog.main("SHIFT + B"), "Cycle workspaces backwards",
+    function() spaces.cycle(-1, "B") end)
 picker.bind_cycle("Y", function(direction)
     if picker.is_open() then return end
     windows.invalidate_pending_focus()
@@ -107,8 +162,12 @@ picker.bind_cycle("Y", function(direction)
         key = "Y", direction = direction, player = "spotify",
     })
 end, "Cycle player actions")
-shortcut_catalog.add("Media", shortcut_catalog.main("Y"), "Cycle player actions")
-shortcut_catalog.add("Media", shortcut_catalog.main("SHIFT + Y"), "Cycle player actions backwards")
+shortcut_catalog.add("Media", shortcut_catalog.main("Y"), "Cycle player actions", function()
+    media_controls.cycle(picker, { key = "Y", direction = 1, player = "spotify" })
+end)
+shortcut_catalog.add("Media", shortcut_catalog.main("SHIFT + Y"), "Cycle player actions backwards", function()
+    media_controls.cycle(picker, { key = "Y", direction = -1, player = "spotify" })
+end)
 
 dot_mode.bind({
     modifier = settings.modifier,
@@ -118,7 +177,7 @@ dot_mode.bind({
         picker.cancel()
     end,
     actions = {
-        { key = "M", description = "Toggle display split between 70:30 and 50:50", run = windows.toggle_ratio },
+        { key = "slash", description = "Toggle display split between 70:30 and 50:50", run = windows.toggle_ratio },
         { key = "Q", description = "Capture region", run = screenshots.capture_region },
         { key = "A", description = "Capture active window", run = screenshots.capture_active_window },
         { key = "Z", description = "Capture active screen", run = screenshots.capture_active_output },
@@ -137,11 +196,6 @@ dot_mode.bind({
         { key = "W", description = "Hide all project overlays", run = overlays.hide_all },
         { key = "E", description = "Insert emoji", run = function()
             text_launcher.open(picker, config_directory .. "/launcher-data/emoji.txt", text_launcher.emoji)
-        end },
-        { key = "R", description = "Run configured command", run = function()
-            command_launcher.open(picker, config_directory .. "/launcher-data/execute.txt", {
-                ["reset-workspaces"] = reset_workspaces.run,
-            })
         end },
         { key = "T", description = "Insert snippet", run = function()
             text_launcher.open(picker, config_directory .. "/launcher-data/snippets.txt", text_launcher.snippet)

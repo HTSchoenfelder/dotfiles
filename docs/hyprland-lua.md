@@ -23,11 +23,12 @@ shortcut and text-input differences are tracked separately in
 [macOS keyboard parity](macos-keyboard-parity.md).
 
 Hyprland uses at most two normal tiled windows per displayed workspace. App keys,
-instance selection, `P` and Comma Selection replace the focused slot. Shift app
-and `P` selection target the other slot and retain the focused side; they expand
-one slot into two only when a distinct selected window becomes available. Shift
-in Comma Selection remains backward cycling. `F` selects an instance or filters
-Comma Selection by application.
+instance selection, `P` and Comma Selection replace the focused slot. Held `F`
+filters by application or requests an explicit instance, while held `S` targets
+the other slot and retains the focused side. `F + S` composes both meanings.
+Within Comma Selection, Shift only reverses direction, including filtered or
+other-slot selection. An `S` selection expands one slot into two only when a
+distinct window becomes available.
 
 Selection from Parking or a hidden workspace parks the displaced occupant.
 Selection from another visible slot exchanges both occupants through the native
@@ -38,7 +39,7 @@ Dot Mode project-tool bindings retain their independent meanings.
 
 `/` explicitly reduces the layout to the focused window. `Shift + /` requests
 two slots and refills the other side from Parking MRU; without a candidate, the
-vacancy remains remembered for the next normal window. Dot Mode `M` toggles
+vacancy remains remembered for the next normal window. Dot Mode `/` toggles
 70:30 and 50:50, with the master always on the left and the ratio remembered per
 display. The existing workspace reset explicitly places the terminal as the only
 slot in workspace 1.
@@ -81,9 +82,10 @@ secondary display. This repair preserves the active window and slot contents; th
 explicit workspace reset remains responsible for focusing Terminal and reducing
 it to one slot.
 
-macOS uses the same two-slot shortcut semantics, cross-display swaps and ratio
-toggle. Its native non-slot windows replace Parking as refill candidates; an
-empty display is selected through Hammerspoon's retained active-frame state.
+macOS uses the same `F` filter, `S` target and Shift direction axes, two-slot model,
+cross-display swaps and ratios. Its native non-slot windows replace Parking as
+refill candidates; an empty display is selected through Hammerspoon's retained
+active-frame state. Dot Mode still uses `M` for the ratio on macOS.
 
 | File | Responsibility |
 | --- | --- |
@@ -99,7 +101,7 @@ empty display is selected through Hammerspoon's retained active-frame state.
 | `lib/workspace_navigation.lua` | Workspace MRU history and workspace selection |
 | `lib/rofi_picker.lua` | One active selection, native cycling/release bindings, cancellation and cleanup |
 | `lib/rofi_mode.lua` | Standalone Rofi script provider and numeric selection replies |
-| `lib/shortcut_catalog.lua` | Read-only searchable catalog of global, Dot mode and hardware shortcuts |
+| `lib/shortcut_catalog.lua` | Searchable, actionable catalog of global, Dot mode and hardware shortcuts |
 | `lib/shortcut_forwarding.lua` | Native shortcut delivery to the focused application |
 | `lib/dot_mode.lua` | Dot mode lifecycle and persistent native notification |
 | `lib/monitor_configuration.lua` | Host monitor rules, Rofi display toggling and deferred workspace-role repair |
@@ -149,14 +151,18 @@ the mode ends. A no-op press binding consumes the selected key before its releas
 binding runs the action, so a focus-changing action cannot leak either event into
 the old or newly focused client. `Q`, `A` and `Z`
 capture a region, the active window and the active
-monitor. `M` toggles the active display split. `B` selects and toggles connected
+monitor. `/` toggles the active display split. `B` selects and toggles connected
 displays. `V`, `G` and `J` toggle project Neovim, Lazygit and terminal overlays;
-`W` hides all project overlays. `E`, `R` and `T` select emojis,
-configured commands and snippets. The submap resets before the selected tool opens.
+`W` hides all project overlays. `E` and `T` select emojis and snippets. The submap
+resets before the selected tool opens.
 Neovim receives the project directory as `.` in addition to inheriting it as its
 working directory, so the overlay opens the project rather than an empty dashboard.
-`mainMod + R` still opens the application launcher. `mainMod + Shift + R` opens
-the read-only shortcut catalog through the same Rofi picker infrastructure.
+`mainMod + R` still opens the application launcher. `mainMod + Shift + P` opens
+the actionable shortcut catalog through the same Rofi picker infrastructure,
+matching the command-palette shape. `mainMod + Shift + R` selects configured
+commands directly instead of routing them through Dot Mode.
+Rows show their description first and a right-aligned shortcut; accepting a row
+runs its action after Rofi has closed and keyboard focus has returned.
 
 Command entries use `command|label`, split at the last `|` to allow shell pipelines.
 Only labels appear in Rofi. Numeric row selection preserves duplicate labels;

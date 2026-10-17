@@ -94,6 +94,24 @@ local windowNavigation = WindowNavigation.new({
 windowNavigation:commaItems(true, function(items) filtered = items end)
 assert(#filtered == 2 and filtered[1].id == 10 and filtered[2].id == 11)
 
+local chooserItems
+local filteredChooser = WindowNavigation.new({
+  repository = fakeRepository,
+  gate = RequestGate.new(),
+  orchestrator = {
+    capture = function(_, mode, generation)
+      assert(mode == "other")
+      return {generation = generation, screen = {}}
+    end,
+    excluded = function() return nil end,
+  },
+  chooserFactory = function()
+    return {show = function(_, choices) chooserItems = choices end}
+  end,
+})
+filteredChooser:chooseAny("other", true)
+assert(#chooserItems == 2 and chooserItems[1].id == 10 and chooserItems[2].id == 11)
+
 local commaRecord = {id = 40, window = {}}
 local adoptedRecord, adoptedRequest
 local commaGate = RequestGate.new()

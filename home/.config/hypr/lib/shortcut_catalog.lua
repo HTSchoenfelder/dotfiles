@@ -49,11 +49,12 @@ function shortcut_catalog.reset()
     shortcut_catalog.entries = {}
 end
 
-function shortcut_catalog.add(section, shortcut, description)
+function shortcut_catalog.add(section, shortcut, description, action)
     shortcut_catalog.entries[#shortcut_catalog.entries + 1] = {
         section = section,
         shortcut = shortcut,
         description = description,
+        action = action,
         order = #shortcut_catalog.entries + 1,
     }
 end
@@ -72,12 +73,26 @@ end
 
 function shortcut_catalog.open(picker)
     local items = {}
+    local description_width = 0
+    local shortcut_width = 0
     for _, entry in ipairs(shortcut_catalog.items()) do
+        description_width = math.max(description_width, utf8.len(entry.description) or #entry.description)
+        shortcut_width = math.max(shortcut_width, utf8.len(entry.shortcut) or #entry.shortcut)
+    end
+    for _, entry in ipairs(shortcut_catalog.items()) do
+        local description_length = utf8.len(entry.description) or #entry.description
+        local shortcut_length = utf8.len(entry.shortcut) or #entry.shortcut
         items[#items + 1] = {
-            label = entry.shortcut .. " — " .. entry.description,
+            label = entry.description
+                .. string.rep(" ", description_width - description_length + 4
+                    + shortcut_width - shortcut_length)
+                .. entry.shortcut,
+            action = entry.action,
         }
     end
-    picker.open(items, { on_select = function() end })
+    picker.open(items, { on_select = function(item)
+        if item.action then item.action() end
+    end })
 end
 
 return shortcut_catalog

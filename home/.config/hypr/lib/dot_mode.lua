@@ -3,14 +3,6 @@ local mocha = require("config.catppuccin_mocha")
 local dot_mode = {}
 
 function dot_mode.bind(options)
-    if options.catalog then
-        options.catalog.add("Dot mode", options.catalog.main("period"), "Enter dot mode")
-        for _, action in ipairs(options.actions) do
-            options.catalog.add("Dot mode", options.catalog.dot(action.key), action.description)
-        end
-        options.catalog.add("Dot mode", options.catalog.dot("Escape"), "Leave dot mode")
-    end
-
     local notice
     local function dismiss()
         if notice then notice:dismiss(); notice = nil end
@@ -27,10 +19,19 @@ function dot_mode.bind(options)
     end)
     hl.on("config.unload", dismiss)
 
-    hl.bind(options.modifier .. " + period", function()
+    local function enter()
         options.before_enter()
         compositor.dispatch(hl.dsp.submap("dot"))
-    end, { dont_inhibit = true, description = "Enter dot mode" })
+    end
+    hl.bind(options.modifier .. " + period", enter,
+        { dont_inhibit = true, description = "Enter dot mode" })
+
+    if options.catalog then
+        options.catalog.add("Dot mode", options.catalog.main("period"), "Enter dot mode", enter)
+        for _, action in ipairs(options.actions) do
+            options.catalog.add("Dot mode", options.catalog.dot(action.key), action.description, action.run)
+        end
+    end
 
     hl.define_submap("dot", function()
         for _, action in ipairs(options.actions) do

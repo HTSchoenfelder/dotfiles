@@ -30,10 +30,11 @@ alternative but must not run alongside Hammerspoon's window frames. See the
 [optional appearance layer](docs/macos-appearance.md).
 
 Both platforms retain one or two slots per display, including temporary vacancies.
-App and window selection replaces a slot; Shift targets the other side. Closing a
-slot window refills it by focus history. Dot Mode `M` toggles 70:30/50:50. On
-macOS, non-slot windows remain native windows and form a logical replacement pool;
-there is no Parking workspace.
+App and window selection replaces a slot; held `F` filters application instances,
+held `S` targets the other side, and Shift reverses cyclic selection. Closing a
+slot window refills it by focus history. Hyprland Dot Mode `/` toggles 70:30/50:50;
+macOS currently retains Dot Mode `M`. Its non-slot windows remain native windows
+and form a logical replacement pool.
 
 ## NixOS session startup
 
@@ -75,17 +76,20 @@ the configured languages.
 
 `mainMod` = `Option + Control + Command`. Hammerspoon retains one or two slot sides
 per display in memory. Application shortcuts use bundle IDs and the MRU history.
-Normal selection replaces the focused side; Shift fills the other side while
-retaining focus. `F` opens the instance chooser, including for one instance.
+Normal selection replaces the focused side; held `S` fills the other side while
+retaining focus. Held `F` opens the instance chooser, including for one instance.
 
 | Shortcut | Action |
 | --- | --- |
 | `mainMod + J/K/L/I/;/O/U` | Fill the focused slot with Kitty / VS Code / Chrome / Google Chat / Obsidian / KeePassXC / Spotify |
-| `mainMod + Shift + app key` | Fill the other slot with a distinct instance; retain focus |
 | `mainMod + F + app key` | Choose an application instance for the focused slot |
-| `mainMod + P` / `mainMod + Shift + P` | Choose a window for the focused / other slot |
+| `mainMod + S + app key` | Fill the other slot with a distinct instance; retain focus |
+| `mainMod + F + S + app key` | Choose an application instance for the other slot |
+| `mainMod + P` / `mainMod + S + P` | Choose a window for the focused / other slot |
+| `mainMod + F + P` / `mainMod + F + S + P` | Choose focused-app windows for the focused / other slot |
 | `mainMod + ,` / `mainMod + Shift + ,` | Choose focused-slot content by MRU forward/backward; release `mainMod` to accept |
-| `mainMod + F + ,` | Choose focused-app instances for the focused slot |
+| `mainMod + F + ,` / `mainMod + F + Shift + ,` | Choose focused-app instances forward/backward |
+| `mainMod + S + ,` / `mainMod + F + S + ,` | Choose all / focused-app windows for the other slot |
 | `mainMod + Y` / `mainMod + Shift + Y` | Cycle through Spotify Play/Pause, Next and Previous; release `mainMod` to accept |
 | `mainMod + M` | Focus the other occupied slot |
 | `mainMod + N` | Swap slot contents while retaining the focused side |
@@ -125,15 +129,15 @@ The left slot is the master. The right slot is the only stack window.
 | Shortcut | Action |
 | --- | --- |
 | `mainMod + J/K/L/I/;/O/U` | Fill the focused slot with Kitty / VS Code / Chrome / Google Chat / Obsidian / KeePassXC / Spotify; start the app if needed |
-| `mainMod + Shift + app key` | Fill the other slot, creating it if needed; retain focus on the original side |
 | `mainMod + F + app key` | Choose an instance for the focused slot |
-| `mainMod + Shift + F + app key` | Choose another instance for the other slot; retain focus |
+| `mainMod + S + app key` | Fill the other slot, creating it if needed; retain focus on the original side |
+| `mainMod + F + S + app key` | Choose an instance for the other slot; retain focus |
 | `mainMod + R` | Toggle the Rofi application launcher |
 
 Normal selection never adds a slot. A Parking or hidden-workspace selection
 replaces the target and parks its previous occupant. Selecting a window in another
 visible slot swaps the two occupants, including across displays. Selecting the
-current occupant does nothing. A window cannot occupy both slots: Shift excludes
+current occupant does nothing. A window cannot occupy both slots: `S` excludes
 the focused instance, chooses another existing instance if available, and otherwise
 does nothing when that app already has only the focused instance. If the app is
 not running, its window is placed only after it appears; failed or stale launches
@@ -143,9 +147,13 @@ do not displace existing slot contents.
 
 | Shortcut | Action |
 | --- | --- |
-| `mainMod + P` / `mainMod + Shift + P` | Search for a window for the focused / other slot |
+| `mainMod + P` / `mainMod + S + P` | Search for a window for the focused / other slot |
+| `mainMod + F + P` / `mainMod + F + S + P` | Search focused-app windows for the focused / other slot |
+| `mainMod + Shift + P` | Show the searchable shortcut catalog |
+| `mainMod + Shift + R` | Select and run a configured command |
 | `mainMod + ,` / `mainMod + Shift + ,` | Select by focus history forward/backward; replace the focused slot on modifier release |
-| `mainMod + F + ,` | Select instances of the focused app for the focused slot |
+| `mainMod + F + ,` / `mainMod + F + Shift + ,` | Select focused-app instances forward/backward |
+| `mainMod + S + ,` / `mainMod + F + S + ,` | Select all / focused-app windows for the other slot |
 | `mainMod + M` | Focus the other occupied slot on the same display |
 | `mainMod + N` | Swap both slot contents; keep focus on the same visual side |
 | `mainMod + H` | Focus the most recent slot window on the other display, or the empty display itself |
@@ -181,21 +189,22 @@ window when possible.
 | --- | --- |
 | `mainMod + /` | Keep the focused window as the only slot; park the other content without refilling that slot |
 | `mainMod + Shift + /` | Use two slots; refill the other side from Parking or remember it until a window appears |
-| `mainMod + .`, then `M` | Toggle the focused display between 70:30 and 50:50 |
+| `mainMod + .`, then `/` | Toggle the focused display between 70:30 and 50:50 |
 
 70:30 always means left 70%, right 30%, regardless of focus. The ratio is remembered
-per display even with a single window. `Shift + /` and Shift selection expand a
+per display even with a single window. `Shift + /` and `S` selection expand a
 one-slot layout using that ratio. With a temporarily vacant slot, focus can only
 visit occupied slots because native master tiling has no independently focusable
 empty slot.
 
 For example, Code left and Chrome right remain a two-slot layout when `J` replaces
-Code with Kitty. `Shift + K` then replaces Chrome with Code while focus stays on
+Code with Kitty. `S + K` then replaces Chrome with Code while focus stays on
 Kitty. `N` swaps Kitty and Code while focus stays on the same screen side.
 
 Workspace selection remains `mainMod + B` / `Shift + B`; media selection remains
-`mainMod + Y` / `Shift + Y`. `mainMod + Shift + R` opens the shortcut catalog.
-The existing workspace reset explicitly restores a single terminal slot.
+`mainMod + Y` / `Shift + Y`. `mainMod + Shift + P` opens the shortcut catalog,
+while `mainMod + Shift + R` opens configured commands. The existing workspace
+reset explicitly restores a single terminal slot.
 
 ## Dot mode
 
@@ -209,13 +218,14 @@ instead of Rofi.
 | `A` | Capture the focused window |
 | `Z` | Capture the focused monitor |
 | `B` | Toggle a connected display (Hyprland only) |
-| `M` | Toggle the active display split between 70:30 and 50:50 |
+| `/` | Toggle the active display split between 70:30 and 50:50 (Hyprland) |
+| `M` | Toggle the active display split between 70:30 and 50:50 (macOS) |
 | `V` | Toggle a project Neovim overlay |
 | `G` | Toggle a project Lazygit overlay |
 | `J` | Toggle a project Kitty overlay |
 | `W` | Hide all project overlays |
 | `E` | Select and insert an emoji |
-| `R` | Select a configured command (Hyprland) / reset the current window layout (macOS) |
+| `R` | Reset the current window layout (macOS only) |
 | `T` | Select and insert a snippet |
 | `Escape` | Leave dot mode |
 
@@ -249,8 +259,9 @@ receive the same navigation translation. Its status is documented in
 [macOS keyboard parity](docs/macos-keyboard-parity.md).
 
 Media, volume, microphone and brightness hardware keys use their native actions.
-The read-only shortcut catalogs use `Shortcut — Description` rows and include
-global bindings, modifier combinations, Dot mode and hardware/media bindings.
+The actionable Hyprland shortcut catalog shows the description first and aligns
+the shortcut on the right. It includes global bindings, modifier combinations,
+Dot mode and hardware/media bindings; selecting a row runs that action.
 Hyprland's Lua entry point is `home/.config/hypr/hyprland.lua`; architecture and
 interaction notes live in [`docs/hyprland-lua.md`](docs/hyprland-lua.md). The
 active macOS responsibility split is documented in
