@@ -621,9 +621,11 @@ end)
 test("primary and Parking workspaces remain persistent", function(session)
     local rules = {}
     for _, rule in ipairs(session.workspace_rules) do rules[rule.workspace] = rule end
-    assert(rules["1"].persistent and rules["1"].default_name == "")
-    assert(rules["10"].persistent and rules["10"].default_name == "󰮍")
-    assert(not rules["2"].persistent)
+    assert(rules["1"].persistent and rules["1"].default_name == ""
+        and rules["1"].monitor == "HDMI-A-1")
+    assert(rules["10"].persistent and rules["10"].default_name == "󰮍"
+        and rules["10"].monitor == "HDMI-A-1")
+    assert(not rules["2"].persistent and rules["2"].monitor == "HDMI-A-2")
 end)
 
 test("dot mode captures the active window with A and active output with Z", function(session)
@@ -795,6 +797,25 @@ test("dot B shows display status and enables the selected output", function(sess
     session.choose(1)
     assert(session.monitors[2].enabled)
     assert(session.monitor_rules[#session.monitor_rules].output == "HDMI-A-2")
+end)
+
+test("enabling a display restores workspace roles without changing focus", function(session)
+    local code = session.add("code", 1)
+    session.focus(code)
+    session.spaces["2"] = nil
+    session.space(10).monitor = session.monitors[1]
+    session.space(3).monitor = session.monitors[2]
+    session.monitors[2].active_workspace = session.space(3)
+
+    session.press(modifier .. "period")
+    session.press("B")
+    session.choose(1)
+    session.flush(50)
+
+    assert(session.spaces["1"].monitor == session.monitors[1])
+    assert(session.spaces["2"].monitor == session.monitors[2])
+    assert(session.spaces["10"].monitor == session.monitors[1])
+    assert(session.focused == code and session.current == session.spaces["1"])
 end)
 
 test("dot B refuses to disable the last active display", function(session)

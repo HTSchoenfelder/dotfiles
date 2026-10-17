@@ -21,16 +21,19 @@ function workspace_reset.new(options)
     local function ensure_workspace(address)
         if not hl.get_workspace(address) then
             compositor.dispatch(hl.dsp.focus({ workspace = address }))
+            return true
         end
+        return false
     end
 
     local function move_workspace(address, monitor)
-        if monitor then
+        local workspace = hl.get_workspace(address)
+        if monitor and workspace and (not workspace.monitor or workspace.monitor.name ~= monitor) then
             compositor.dispatch(hl.dsp.workspace.move({ workspace = address, monitor = monitor }))
         end
     end
 
-    function reset.run()
+    function reset.restore_roles()
         local roles = monitor_configuration.workspace_roles()
         local primary_monitor = enabled_monitor(roles.primary, 1)
         local secondary_monitor = enabled_monitor(roles.secondary, 2) or primary_monitor
@@ -39,13 +42,26 @@ function workspace_reset.new(options)
             return
         end
 
-        ensure_workspace(terminal_workspace)
-        ensure_workspace(display_workspace)
-        ensure_workspace(parking_workspace)
+        local active_window = hl.get_active_window()
+        local active_workspace = hl.get_active_workspace()
+        local focus_changed = ensure_workspace(terminal_workspace)
+        focus_changed = ensure_workspace(display_workspace) or focus_changed
+        focus_changed = ensure_workspace(parking_workspace) or focus_changed
         move_workspace(terminal_workspace, primary_monitor)
         move_workspace(display_workspace, secondary_monitor)
         move_workspace(parking_workspace, primary_monitor)
 
+        if focus_changed then
+            if active_window then
+                compositor.dispatch(hl.dsp.focus({ window = active_window }))
+            elseif active_workspace then
+                compositor.dispatch(hl.dsp.focus({ workspace = active_workspace.addressable_name }))
+            end
+        end
+    end
+
+    function reset.run()
+        reset.restore_roles()
         compositor.dispatch(hl.dsp.focus({ workspace = terminal_workspace }))
         options.activate_terminal()
     end

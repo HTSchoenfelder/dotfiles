@@ -230,9 +230,13 @@ that window with the same shortcut; opening another overlay minimizes the previo
 one. Dot Mode actions consume the selected key press and run on release, preventing
 a focus-changing overlay action from forwarding either event to a client.
 
-The named Terminal and Parking workspaces remain present while empty. Waybar,
-Hyprpaper and Hypridle are bound to `hyprland-session.target` and supervised by
-`systemd --user`.
+The named Terminal and Parking workspaces remain present while empty. Their
+workspace rules are scoped to the configured primary display so Waybar does not
+duplicate their persistent buttons across outputs. When a display returns after
+being disabled or disconnected, Hyprland restores Terminal and Parking to the
+primary display and Display to the secondary display without resetting focus or
+slot contents. Waybar, Hyprpaper and Hypridle are bound to
+`hyprland-session.target` and supervised by `systemd --user`.
 
 ## Application shortcut forwarding
 

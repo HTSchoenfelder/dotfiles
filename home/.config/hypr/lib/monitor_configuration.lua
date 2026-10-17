@@ -2,6 +2,19 @@ local compositor = require("lib.compositor")
 local monitor_configuration = {}
 local configured = {}
 local workspace_roles = {}
+local workspace_reconciler
+local reconcile_revision = 0
+
+local function schedule_workspace_reconcile()
+    if not workspace_reconciler then return end
+    reconcile_revision = reconcile_revision + 1
+    local revision = reconcile_revision
+    hl.timer(function()
+        if revision == reconcile_revision then workspace_reconciler() end
+    end, { timeout = 50, type = "oneshot" })
+end
+
+hl.on("monitor.added", schedule_workspace_reconcile)
 
 function monitor_configuration.apply(specification)
     configured[specification.output] = specification
@@ -16,6 +29,11 @@ function monitor_configuration.workspace_roles()
     return workspace_roles
 end
 
+function monitor_configuration.set_workspace_reconciler(callback)
+    workspace_reconciler = callback
+    schedule_workspace_reconcile()
+end
+
 local function connected(name)
     for _, monitor in ipairs(hl.get_monitors({ all = true })) do
         if monitor.name == name then return monitor end
@@ -25,6 +43,7 @@ end
 function monitor_configuration.toggle(name)
     local monitor = connected(name)
     if not monitor then return end
+    local enabling = not monitor.enabled
     if monitor.enabled then
         local enabled = 0
         for _, output in ipairs(hl.get_monitors()) do
@@ -44,6 +63,7 @@ function monitor_configuration.toggle(name)
     specification.output = name
     specification.disabled = monitor.enabled
     hl.monitor(specification)
+    if enabling then schedule_workspace_reconcile() end
 end
 
 function monitor_configuration.open(picker)

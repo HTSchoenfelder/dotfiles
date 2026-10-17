@@ -74,6 +74,13 @@ or executable Lua. A new compositor session adopts its live windows. Existing
 layouts with more than two normal windows are normalized once, preserving the
 master and focused window when possible and parking excess occupants.
 
+Workspace rules scope Terminal and Parking persistence to the configured primary
+display. After an output is enabled or reconnected, a deferred role reconciliation
+moves Terminal and Parking back to the primary display and Display to the
+secondary display. This repair preserves the active window and slot contents; the
+explicit workspace reset remains responsible for focusing Terminal and reducing
+it to one slot.
+
 macOS uses the same two-slot shortcut semantics, cross-display swaps and ratio
 toggle. Its native non-slot windows replace Parking as refill candidates; an
 empty display is selected through Hammerspoon's retained active-frame state.
@@ -95,7 +102,7 @@ empty display is selected through Hammerspoon's retained active-frame state.
 | `lib/shortcut_catalog.lua` | Read-only searchable catalog of global, Dot mode and hardware shortcuts |
 | `lib/shortcut_forwarding.lua` | Native shortcut delivery to the focused application |
 | `lib/dot_mode.lua` | Dot mode lifecycle and persistent native notification |
-| `lib/monitor_configuration.lua` | Host monitor rules and Rofi display toggling |
+| `lib/monitor_configuration.lua` | Host monitor rules, Rofi display toggling and deferred workspace-role repair |
 | `lib/project_overlays.lua` | Project discovery and reusable floating Kitty overlays |
 | `lib/launcher_data.lua` | Shared launcher file loading and validation |
 | `lib/command_launcher.lua` | Configured command parsing and execution after selection |

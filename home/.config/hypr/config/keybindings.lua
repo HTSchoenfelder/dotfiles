@@ -79,6 +79,7 @@ local reset_workspaces = workspace_reset.new({
     workspaces = workspaces,
     activate_terminal = function() windows.activate(terminal, { replace_layout = true }, false) end,
 })
+monitor_configuration.set_workspace_reconciler(reset_workspaces.restore_roles)
 
 bind("P", function() windows.activate(nil, {}, true) end, "Select window for focused slot", "Windows")
 hl.bind(settings.modifier .. " + SHIFT + P", function()
