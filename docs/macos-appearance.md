@@ -38,11 +38,12 @@ focus. Before enabling it, set the Hammerspoon frame configuration to
 
 ## Native choosers
 
-Comma Selection, `P`, instance selection, the application launcher and the
-shortcut catalog all use the shared native `hs.chooser` helper. It applies a dark
-presentation with Catppuccin Text and Subtext colors, consistent dimensions and
-application icons. Window names are the primary row and titles are subdued
-subtext. Set `config.chooser.showWindowTitles = false` to omit titles entirely.
+Comma Selection, `P`, instance selection, the application launcher, clipboard
+history and the shortcut catalog all use the shared native `hs.chooser` helper.
+It applies a dark presentation with Catppuccin Text and Subtext colors,
+consistent dimensions and application icons. Window names are the primary row
+and titles are subdued subtext. Set `config.chooser.showWindowTitles = false` to
+omit titles entirely.
 
 The native chooser deliberately remains in use to preserve filtering speed and
 selection behavior. Its container background, shape, row height and corners are

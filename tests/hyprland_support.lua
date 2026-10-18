@@ -244,6 +244,7 @@ function support.session()
         end },
         dsp = {
             send_shortcut = dispatcher("shortcut"), no_op = dispatcher("noop"), layout = dispatcher("layout"), focus = dispatcher("focus"), submap = dispatcher("submap"),
+            exec_cmd = dispatcher("exec"),
             group = { toggle = dispatcher("group_toggle") },
             window = {
                 swap = dispatcher("swap"), close = dispatcher("close"), move = dispatcher("move"), float = dispatcher("float"),
@@ -256,6 +257,8 @@ function support.session()
             local arguments = action.arguments
             local window = type(arguments) == "table" and arguments.window
             if action.kind == "shortcut" then table.insert(session.shortcuts, arguments)
+            elseif action.kind == "exec" then
+                session.commands[#session.commands + 1] = { command = arguments }
             elseif action.kind == "submap" then
                 session.submap = arguments == "reset" and "reset" or arguments
                 session.emit("keybinds.submap", arguments == "reset" and "" or arguments)

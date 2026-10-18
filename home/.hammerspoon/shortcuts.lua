@@ -1,5 +1,6 @@
 local config = require("config")
 local applications = require("apps")
+local ClipboardHistory = require("modules.clipboard_history")
 local DotMode = require("modules.dot_mode")
 local MediaControls = require("modules.media_controls")
 local ProjectOverlays = require("modules.project_overlays")
@@ -10,6 +11,17 @@ local catalog = require("shortcut_catalog")
 local shortcuts = {}
 
 function shortcuts.start(services)
+  local clipboardHistory = ClipboardHistory.new({
+    chooserFactory = services.chooserFactory,
+    excludedBundleIDs = config.clipboardHistory.excludedBundleIDs,
+    maxEntries = config.clipboardHistory.maxEntries,
+  }):start()
+  shortcuts.clipboardHistoryBinding = hs.hotkey.bind(config.hyper, "v", function()
+    clipboardHistory:open()
+  end)
+  shortcuts.clipboardHistory = clipboardHistory
+  catalog.add("Launchers", "MainMod + V", "Paste from clipboard history")
+
   local rodecaster = Rodecaster.new(config.rodecaster):start()
   shortcuts.rodecasterBinding = hs.hotkey.bind(config.hyper, "\\", function()
     rodecaster:toggleMute()

@@ -90,6 +90,12 @@ slot state, and keep the Hammerspoon Console open for Lua or Accessibility error
 6. Use `mainMod + Y` and confirm that Play/Pause, Next and Previous are followed
    by Spotify as the last entry. The Hyprland-only `I` and `U` PWA groups cannot
    be tested here until their macOS Chrome-PWA bundle IDs are configured.
+7. Copy two text values and an image outside a password manager. Press
+   `mainMod + V`, filter the chooser and select each older item in turn. The
+   chooser closes, the original window regains focus and the selected text or
+   image is pasted. Copy a value in KeePassXC and confirm it does not appear.
+   Reload Hammerspoon and confirm that the clipboard history is empty apart from
+   the pasteboard item current at reload time.
 
 ### Failure handling and report
 

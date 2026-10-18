@@ -102,6 +102,7 @@ and `S + App Key` compose those modifiers with that key; for example,
 | `mainMod + /` / `mainMod + Shift + /` | Use one / two slots on the active display |
 | `mainMod + .`, then `M` | Toggle the active display between 70:30 and 50:50 |
 | `mainMod + W` | Close the focused slot window and refill it from the non-slot MRU pool |
+| `mainMod + V` | Choose and paste a recent clipboard item |
 | `mainMod + R` | Toggle the native application launcher |
 | `mainMod + Shift + R` | Show the searchable shortcut catalog |
 | `mainMod + Backslash` | Toggle the RØDECaster mute state |
@@ -112,6 +113,11 @@ titles. The application launcher lists top-level bundles from standard applicati
 directories. Green marks the active slot, including an empty display selected by
 `H`; other retained slots are Pink. Untracked windows have no frame. Both titles
 and frames can be disabled in `home/.hammerspoon/config.lua`.
+
+Clipboard history is kept in Hammerspoon memory and resets when Hammerspoon
+reloads. It retains text and image pasteboard data, ignores configured password
+manager bundle IDs and restores the selected item to the originating window with
+native `Command+V`.
 
 The application launcher also places an existing app window into the captured
 focused slot. A newly launched normal window follows the same active-display
@@ -165,6 +171,7 @@ do not displace existing slot contents.
 | `mainMod + F + P` / `mainMod + F + S + P` | Search focused-app windows for the focused / other slot |
 | `mainMod + Shift + P` | Show the searchable shortcut catalog |
 | `mainMod + Shift + R` | Select and run a configured command |
+| `mainMod + V` | Choose and paste a recent Clipse item |
 | `mainMod + ,` / `mainMod + Shift + ,` | Select by focus history forward/backward; replace the focused slot on modifier release |
 | `mainMod + F + ,` / `mainMod + F + Shift + ,` | Select focused-app instances forward/backward |
 | `mainMod + S + ,` / `mainMod + F + S + ,` | Select all / focused-app windows for the other slot |
@@ -223,6 +230,13 @@ Workspace selection remains `mainMod + B` / `Shift + B`; media selection remains
 `mainMod + Y` / `Shift + Y`. `mainMod + Shift + P` opens the shortcut catalog,
 while `mainMod + Shift + R` opens configured commands. The existing workspace
 reset explicitly restores a single terminal slot.
+
+Clipboard history is recorded persistently by the existing text and PNG Clipse
+watchers owned by `graphical-session.target`. `mainMod + V` starts a short-lived
+Lua helper outside the compositor thread. The helper snapshots the history,
+selects an entry with Rofi, restores text or PNG data with `wl-copy` and sends
+`Ctrl+V` after Rofi exits. Failures in Clipse, `jq`, Rofi or clipboard restoration
+therefore cannot invalidate the Hyprland Lua configuration.
 
 ## Dot mode
 

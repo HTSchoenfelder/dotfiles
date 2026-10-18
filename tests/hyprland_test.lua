@@ -840,6 +840,14 @@ test("period T inserts snippets and direct R remains the application launcher", 
     assert(not session.bindings[modifier .. "E"] and not session.bindings[modifier .. "Q"])
 end)
 
+test("V starts the isolated clipboard history picker", function(session)
+    session.press(modifier .. "V")
+    local command = session.commands[#session.commands].command
+    assert(command:match("^'lua' "))
+    assert(command:find("/lib/clipboard_history_picker.lua'", 1, true))
+    assert(command:find("/clipse/clipboard_history.json'", 1, true))
+end)
+
 test("Shift P opens an actionable catalog with descriptions and right-aligned shortcuts", function(session)
     local kitty = session.add("kitty", 10)
     session.press(modifier .. "SHIFT + P")
@@ -854,6 +862,7 @@ test("Shift P opens an actionable catalog with descriptions and right-aligned sh
     assert(labels:find("Show shortcut catalog", 1, true))
     assert(labels:find("Show shortcut catalog%s+MainMod %+ Shift %+ P\n"))
     assert(labels:find("Run configured command%s+MainMod %+ Shift %+ R\n"))
+    assert(labels:find("Paste from clipboard history%s+MainMod %+ V\n"))
     assert(labels:find("Fill other slot with Kitty / Zellij%s+MainMod %+ S %+ J\n"))
     assert(labels:find("Select Kitty / Zellij instance%s+MainMod %+ F %+ J\n"))
     assert(labels:find("Select Kitty / Zellij instance for other slot%s+MainMod %+ F %+ S %+ J\n"))

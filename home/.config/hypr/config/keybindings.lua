@@ -6,6 +6,7 @@ local workspace_navigation = require("lib.workspace_navigation")
 local media_controls = require("lib.media_controls")
 local text_launcher = require("lib.text_launcher")
 local command_launcher = require("lib.command_launcher")
+local process = require("lib.process")
 local shortcut_forwarding = require("lib.shortcut_forwarding")
 local screenshots = require("lib.screenshots")
 local dot_mode = require("lib.dot_mode")
@@ -151,6 +152,15 @@ end
 bind("SHIFT + P", function() shortcut_catalog.open(picker) end,
     "Show shortcut catalog", "Launchers")
 bind("SHIFT + R", open_commands, "Run configured command", "Launchers")
+local config_home = os.getenv("XDG_CONFIG_HOME")
+    or (os.getenv("HOME") and os.getenv("HOME") .. "/.config")
+if config_home then
+    bind("V", hl.dsp.exec_cmd(process.command({
+        "lua",
+        config_directory .. "/lib/clipboard_history_picker.lua",
+        config_home .. "/clipse/clipboard_history.json",
+    })), "Paste from clipboard history", "Launchers")
+end
 local function select_windows(filtered, target)
     local application = filtered and focused_application() or nil
     if filtered and not application then return end

@@ -128,6 +128,7 @@ on macOS.
 | `lib/launcher_data.lua` | Shared launcher file loading and validation |
 | `lib/command_launcher.lua` | Configured command parsing and execution after selection |
 | `lib/text_launcher.lua` | Emoji/snippet parsing and insertion into the original window |
+| `lib/clipboard_history_picker.lua` | Isolated Clipse snapshot, Rofi selection and text/image paste |
 | `lib/media_controls.lua` | Spotify launcher plus three MPRIS player actions |
 | `lib/screenshots.lua` | Hyprshot region, active-window and active-output commands |
 | `lib/process.lua` | Quoted argument vectors and asynchronous process startup |
@@ -158,6 +159,14 @@ reload. The provider runs outside the compositor; its short `hyprctl eval` calls
 report only its owning Rofi PID and the selected index. Selection actions wait
 until the Rofi layer closes and keyboard focus is restored. No blocking subprocess
 I/O runs in Hyprland's Lua thread.
+
+`mainMod + V` deliberately does not extend the compositor-owned picker lifecycle.
+It asynchronously starts `clipboard_history_picker.lua`, then returns immediately.
+That external Lua process may block while Rofi is open, snapshots the persistent
+Clipse history, restores the selected text or PNG through `wl-copy`, and sends
+`Ctrl+V` after Rofi exits. A missing or malformed history therefore affects only
+that invocation and cannot remove the compositor bindings. This is separate from
+Dot Mode `V`, which continues to toggle project Neovim.
 
 `playerctl --player spotify` remains responsible for MPRIS, and `wtype` remains
 responsible for Wayland text input. Their arguments are quoted centrally; window

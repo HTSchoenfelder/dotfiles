@@ -31,6 +31,16 @@ config.chooser = {
   width = 40,
 }
 
+config.clipboardHistory = {
+  maxEntries = 100,
+  excludedBundleIDs = {
+    ["com.1password.1password"] = true,
+    ["com.apple.Passwords"] = true,
+    ["com.bitwarden.desktop"] = true,
+    ["org.keepassxc.keepassxc"] = true,
+  },
+}
+
 config.keyboard = {
   chromeBundleID = "com.google.Chrome",
   vsCodeBundleID = "com.microsoft.VSCode",
