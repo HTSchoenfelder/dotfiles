@@ -18,13 +18,12 @@ return {
       yaml = { "prettier" },
     },
   },
-  keys = {
-    {
-      "<leader>gf",
-      function()
-        require("conform").format({ async = true, lsp_format = "fallback" })
-      end,
-      desc = "Format buffer",
-    },
-  },
+  config = function(_, opts)
+    local conform = require("conform")
+    conform.setup(opts)
+
+    vim.api.nvim_create_user_command("Format", function()
+      conform.format({ async = true, lsp_format = "fallback" })
+    end, { desc = "Format the current buffer" })
+  end,
 }

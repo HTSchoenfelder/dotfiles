@@ -8,6 +8,11 @@ modifier even when the native macOS command uses `Command` or `Option`.
 Hammerspoon translates the intent; users should not have to remember a second
 platform-specific shortcut.
 
+Those physical habits originate in the fixed Advantage 360 Pro ZMK layout.
+In particular, thumb-held Ctrl and the Space-held `mainMod` are intentional,
+first-class shortcut inputs. The firmware boundary is documented in
+[Keyboard input model](keyboard-input.md).
+
 This is separate from window management. `mainMod` continues to own global
 application and window navigation, while this layer owns shortcuts delivered to
 the focused application and movement inside text.

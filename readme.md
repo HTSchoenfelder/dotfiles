@@ -20,6 +20,13 @@ where macOS expects `Command` or `Option`. The current implementation and remain
 VS Code and application-specific gaps are tracked in the
 [macOS keyboard parity](docs/macos-keyboard-parity.md) document.
 
+The fixed Kinesis Advantage 360 Pro ZMK layout is the physical foundation for
+this workflow. Its thumb modifiers and layers are intentionally well suited to
+both shortcut chords and Vim-style sequences; software adapts to that input
+contract rather than redesigning the firmware around application conflicts. See
+the [keyboard input model](docs/keyboard-input.md) for the ownership boundaries
+and the future Zellij constraint.
+
 Hammerspoon is the only macOS workflow and window-management process. It owns
 shortcuts, modes, choosers, application intentions, MRU state, MIDI integration,
 passive two-slot geometry and layout-slot frames through native windows.
@@ -84,13 +91,13 @@ and user-triggered actions, not daemon lifetime.
 
 ## Neovim
 
-The repository contains a custom `lazy.nvim` configuration rather than LazyVim.
-Nix owns Neovim, language servers, formatters and linters on both platforms;
-`lazy.nvim` owns editor plugins only. Native Neovim LSP runs TypeScript, Ruby,
-HTML and Lua servers. `conform.nvim` formats with `<leader>gf`, while `nvim-lint`
-runs Ruby diagnostics after reading and writing a buffer. Ruby, ERB, Lua and web
-formats use Nix-provided tools. Tree-sitter parsers are explicitly managed for
-the configured languages.
+The repository contains a small custom `lazy.nvim` configuration rather than a
+Neovim distribution. Nix owns Neovim, language servers, formatters and linters
+on both platforms; `lazy.nvim` owns editor plugins only. Native Neovim LSP runs
+TypeScript, Ruby, HTML and Lua servers and retains its built-in mappings and
+manual completion. `conform.nvim` formats through `:Format`, while `nvim-lint`
+runs Ruby diagnostics after reading and writing a buffer. See the active
+[Neovim design](docs/neovim.md) for the target, current state and plugin boundary.
 
 ## VS Code Vim
 

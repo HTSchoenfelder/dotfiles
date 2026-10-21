@@ -18,6 +18,9 @@ New mappings must not replace a useful Vim command without an explicit trade-off
 Prefer VSCodeVim mappings for modal behavior and `keybindings.json` for workbench
 behavior that needs VS Code context. Physical shortcuts must behave identically
 on NixOS and macOS even where the platform defaults use different modifiers.
+The fixed ZMK layout is explicitly designed to make both Ctrl chords and modal
+sequences accessible; its contract is documented in
+[Keyboard input model](keyboard-input.md).
 
 ## Current state
 
