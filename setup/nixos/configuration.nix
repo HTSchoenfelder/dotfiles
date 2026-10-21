@@ -36,7 +36,7 @@ in
     ./desktop-session.nix
   ];
 
-  users.users."${userName}" = {
+  users.users.${userName} = {
     isNormalUser = true;
     description = userDescription;
     extraGroups = [
@@ -46,7 +46,6 @@ in
       "libvirtd"
       "dialout"
     ];
-    packages = with pkgs; [ ];
   };
 
   boot.loader = {
@@ -55,7 +54,7 @@ in
       configurationLimit = 3;
     };
     efi.canTouchEfiVariables = true;
-    timeout = 2; 
+    timeout = 2;
   };
 
   programs.hyprland = {
@@ -65,13 +64,30 @@ in
     portalPackage = hyprlandPortalPackage;
   };
 
-  nix.settings = {
-    substituters = [ "https://hyprland.cachix.org" ];
-    trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
+  nix = {
+    settings = {
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+      substituters = [ "https://hyprland.cachix.org" ];
+      trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
+      # NIX_PATH is still used by tools such as `nix repl '<nixpkgs>'`.
+      nix-path = lib.mkForce "nixpkgs=/etc/nix/inputs/nixpkgs";
+    };
+    registry.nixpkgs.flake = inputs.nixpkgs;
+    channel.enable = false;
   };
 
-  networking.networkmanager.enable = true;
-  networking.hostName = "nixos";
+  networking = {
+    hostName = "nixos";
+    networkmanager.enable = true;
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [ ];
+      allowedUDPPorts = [ ];
+    };
+  };
 
   time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
@@ -134,9 +150,7 @@ in
   # Scanning / Printing (CUPS)
   services.printing = {
     enable = true;
-    browsed = {
-      enable = false;
-    };
+    browsed.enable = false;
     drivers = with pkgs; [
       hplip
       gutenprint
@@ -151,9 +165,10 @@ in
 
   services.gvfs.enable = true;
 
-  # Bluetooth
-  hardware.bluetooth.enable = true;
-  hardware.bluetooth.powerOnBoot = true;
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+  };
   services.blueman.enable = true;
 
   # Enable sound with pipewire.
@@ -183,11 +198,6 @@ in
 
   nixpkgs.config.allowUnfree = true;
 
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
-
   security.polkit.enable = true;
   services.udisks2.enable = true;
 
@@ -200,16 +210,8 @@ in
     '';
   };
 
-  # https://nixos-and-flakes.thiscute.world/best-practices/nix-path-and-flake-registry#custom-nix-path-and-flake-registry-1
-  # make `nix run nixpkgs#nixpkgs` use the same nixpkgs as the one used by this flake.
-  nix.registry.nixpkgs.flake = inputs.nixpkgs;
-  nix.channel.enable = false; # remove nix-channel related tools & configs, we use flakes instead.
-
-  # but NIX_PATH is still used by many useful tools, so we set it to the same value as the one used by this flake.
-  # Make `nix repl '<nixpkgs>'` use the same nixpkgs as the one used by this flake.
+  # Keep legacy NIX_PATH consumers pinned to the flake's nixpkgs input.
   environment.etc."nix/inputs/nixpkgs".source = "${inputs.nixpkgs}";
-  # https://github.com/NixOS/nix/issues/9574
-  nix.settings.nix-path = lib.mkForce "nixpkgs=/etc/nix/inputs/nixpkgs";
   systemd.tmpfiles.rules = [
     "r /root/.nix-defexpr/channels"
     "r /nix/var/nix/profiles/per-user/root/channels"
@@ -220,16 +222,13 @@ in
     enableVirtualCamera = true;
   };
 
-  programs.ssh = {
-    startAgent = true;
-  };
-
-  virtualisation.docker = {
-    enable = true;
-    enableOnBoot = true;
-  };
+  programs.ssh.startAgent = true;
 
   virtualisation = {
+    docker = {
+      enable = true;
+      enableOnBoot = true;
+    };
     libvirtd.enable = true;
     spiceUSBRedirection.enable = true;
   };
@@ -254,10 +253,6 @@ in
     enable = true;
     enableSSHSupport = false;
   };
-
-  networking.firewall.allowedTCPPorts = [ ];
-  networking.firewall.allowedUDPPorts = [ ];
-  networking.firewall.enable = true;
 
   system.stateVersion = "24.11";
 }

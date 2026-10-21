@@ -6,23 +6,28 @@
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-stable, nix-darwin, ... }@inputs:
-  let
-    hostname = import ./hostname.nix;
-    system = "aarch64-darwin";
-    pkgsStable = import nixpkgs-stable {
-      inherit system;
-      config.allowUnfree = true;
+  outputs =
+    {
+      nixpkgs,
+      nixpkgs-stable,
+      nix-darwin,
+      ...
+    }:
+    let
+      system = "aarch64-darwin";
+      pkgsStable = import nixpkgs-stable {
+        inherit system;
+        config.allowUnfree = true;
+      };
+    in
+    {
+      darwinConfigurations.macbook = nix-darwin.lib.darwinSystem {
+        inherit system;
+        specialArgs = { inherit pkgsStable; };
+        modules = [
+          ./configuration.nix
+          ./packages.nix
+        ];
+      };
     };
-  in
-  {
-    darwinConfigurations."macbook" = nix-darwin.lib.darwinSystem {
-      inherit system; 
-      modules = [
-        ./configuration.nix
-        ./packages.nix
-      ];
-      specialArgs = { inherit inputs pkgsStable; };
-    };
-  };
 }

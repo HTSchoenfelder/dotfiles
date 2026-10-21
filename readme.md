@@ -36,6 +36,26 @@ slot window refills it by focus history. Hyprland Dot Mode `/` toggles 70:30/50:
 macOS currently retains Dot Mode `M`. Its non-slot windows remain native windows
 and form a logical replacement pool.
 
+## Nix configuration
+
+Linux and macOS use independent flakes and lock files under `setup/nixos` and
+`setup/macos`. The NixOS flake defines the shared module stack once and supplies
+only the host-specific hardware module for `desktop`, `notebook` and `qemu`.
+
+On NixOS, `configuration.nix` owns system-level policy,
+`desktop-integration.nix` owns toolkit and desktop integration, and
+`desktop-session.nix` owns long-running graphical user services. Host hardware
+stays in `configurations/<host>/hardware.nix`; package and font selection stays in
+`packages.nix`. On macOS, `configuration.nix` owns nix-darwin settings and
+LaunchAgents, while `packages.nix` owns packages and fonts.
+
+Evaluate all declared systems without building them:
+
+```sh
+nix flake check --no-build ./setup/nixos
+nix flake check --no-build ./setup/macos
+```
+
 ## NixOS session startup
 
 The login path is deliberately manual: systemd starts `getty@tty1`, PAM login

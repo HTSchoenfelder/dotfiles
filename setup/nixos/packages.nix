@@ -81,7 +81,6 @@
     libreoffice
     simple-scan
     system-config-printer
-    terraform
     nodejs
     gcc
     clang
@@ -114,7 +113,6 @@
     kubectx
     strace
     fd
-    ripgrep
     # linphone
     audacity
     usbview
@@ -136,7 +134,6 @@
     socat
     python313
     python313Packages.west
-    python313Packages.pykwalify
     python313Packages.pykwalify
     python313Packages.ruamel-yaml
     python313Packages.pyocd

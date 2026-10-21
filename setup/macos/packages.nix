@@ -44,7 +44,7 @@
     colima
     lua
 
-    #Apps
+    # Applications
     pkgsStable.kitty
     cyberduck
     obsidian

@@ -12,7 +12,6 @@
 
   outputs =
     {
-      self,
       nixpkgs,
       nixpkgs-stable,
       nixpkgs-latest,
@@ -20,55 +19,35 @@
       ...
     }@inputs:
     let
-      pkgsStable = import nixpkgs-stable {
-        system = "x86_64-linux";
-        config = {
-          allowUnfree = true;
+      system = "x86_64-linux";
+      mkPkgs =
+        source:
+        import source {
+          inherit system;
+          config.allowUnfree = true;
         };
-      };
-      pkgsLatest = import nixpkgs-latest {
-        system = "x86_64-linux";
-        config = {
-          allowUnfree = true;
+      pkgsStable = mkPkgs nixpkgs-stable;
+      pkgsLatest = mkPkgs nixpkgs-latest;
+      mkHost =
+        hardwareModule:
+        nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = {
+            inherit inputs pkgsStable pkgsLatest;
+          };
+          modules = [
+            ./configuration.nix
+            hardwareModule
+            ./packages.nix
+            home-manager.nixosModules.home-manager
+          ];
         };
-      };
     in
     {
-      nixosConfigurations.desktop = nixpkgs.lib.nixosSystem {
-        specialArgs = {
-          inherit inputs pkgsStable pkgsLatest;
-        };
-        system = "x86_64-linux";
-        modules = [
-          ./configuration.nix
-          ./configurations/desktop/hardware.nix
-          ./packages.nix
-          home-manager.nixosModules.home-manager
-        ];
-      };
-      nixosConfigurations.notebook = nixpkgs.lib.nixosSystem {
-        specialArgs = {
-          inherit inputs pkgsStable pkgsLatest;
-        };
-        system = "x86_64-linux";
-        modules = [
-          ./configuration.nix
-          ./configurations/notebook/hardware.nix
-          ./packages.nix
-          home-manager.nixosModules.home-manager
-        ];
-      };
-      nixosConfigurations.qemu = nixpkgs.lib.nixosSystem {
-        specialArgs = {
-          inherit inputs pkgsStable pkgsLatest;
-        };
-        system = "x86_64-linux";
-        modules = [
-          ./configuration.nix
-          ./configurations/qemu/hardware.nix
-          ./packages.nix
-          home-manager.nixosModules.home-manager
-        ];
+      nixosConfigurations = {
+        desktop = mkHost ./configurations/desktop/hardware.nix;
+        notebook = mkHost ./configurations/notebook/hardware.nix;
+        qemu = mkHost ./configurations/qemu/hardware.nix;
       };
     };
 }
