@@ -95,13 +95,18 @@ through its terminal Accessibility identity. The shared
 macOS; the file under `home/Library/Application Support/Code/User/` is a symlink
 to it.
 
-The current file deliberately keeps only physical `Ctrl+P` and `Ctrl+Shift+P`
-for Quick Open and the Command Palette, `Ctrl+,` and `Ctrl+Shift+,` for forward
-and backward editor MRU selection, and `Ctrl+E` for returning focus to the editor
-from non-editor surfaces. `Ctrl+E` is inactive while editor text has focus so
-VSCodeVim retains its native meaning there. VSCodeVim has no repository-defined
-modal remappings; only Space as leader and relative line numbers form the shared
-presentation baseline. The complete target and current state are documented in
+The current file deliberately keeps physical `Ctrl+P` and `Ctrl+Shift+P` for
+Quick Open and the Command Palette, `Ctrl+,` and `Ctrl+Shift+,` for forward and
+backward editor MRU selection, `Ctrl+E` for returning focus to the editor from
+non-editor surfaces, `Ctrl+J` and `Ctrl+Shift+J` for toggling and creating an
+integrated terminal, and `Ctrl+'` for maximizing the panel. `Ctrl+E` is inactive
+while editor text has focus. The J shortcuts are inactive in VSCodeVim Insert
+mode, but VS Code owns them in Normal mode and while the terminal has focus; the
+equivalent Normal-mode downward motion remains available as `j`. An explicit
+Insert-mode rule routes `Ctrl+J` back through VSCodeVim, where a non-recursive
+mapping to `<Enter>` preserves the standard line break at the modal cursor
+position. Space as leader and relative line numbers form the shared presentation
+baseline. The complete target and current state are documented in
 [VS Code Vim](vscode-vim.md).
 
 Native fields and extension webviews continue to use the Accessibility-gated

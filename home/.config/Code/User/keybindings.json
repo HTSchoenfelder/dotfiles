@@ -25,6 +25,25 @@
         "when": "inEditorsPicker && inQuickOpen"
     },
     {
+        "command": "workbench.action.terminal.toggleTerminal",
+        "key": "ctrl+j",
+        "when": "terminal.active && (!editorTextFocus || !vim.active || vim.mode != 'Insert')"
+    },
+    {
+        "command": "extension.vim_ctrl+j",
+        "key": "ctrl+j",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Insert' && vim.use<C-j> && !inDebugRepl"
+    },
+    {
+        "command": "workbench.action.terminal.new",
+        "key": "ctrl+shift+j",
+        "when": "(terminalProcessSupported || terminalWebExtensionContributedProfile) && (!editorTextFocus || !vim.active || vim.mode != 'Insert')"
+    },
+    {
+        "command": "workbench.action.toggleMaximizedPanel",
+        "key": "ctrl+'"
+    },
+    {
         "command": "workbench.action.quickOpen",
         "key": "ctrl+p"
     },

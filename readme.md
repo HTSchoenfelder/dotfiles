@@ -104,8 +104,11 @@ runs Ruby diagnostics after reading and writing a buffer. See the active
 VSCodeVim stays close to its defaults and uses the same physical workflow on
 NixOS and macOS. Relative line numbers and Space as leader are the intentional
 baseline customizations. The shared VS Code keybindings retain only Quick Open,
-the Command Palette, editor MRU selection and context-limited editor focus; all
-other modal behavior comes from VSCodeVim. See the active
+the Command Palette, editor MRU selection, context-limited editor focus and the
+intentional integrated-terminal controls on `Ctrl+J`, `Ctrl+Shift+J` and
+`Ctrl+'`; Insert-mode `Ctrl+J` is explicitly mapped to VSCodeVim `<Enter>` so the
+terminal shortcut preserves standard editing behavior. All other modal behavior
+comes from VSCodeVim. See the active
 [VS Code Vim design](docs/vscode-vim.md) for the target and current state.
 
 ## macOS / Hammerspoon quick reference

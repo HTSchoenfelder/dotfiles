@@ -237,6 +237,12 @@
   "typescript.updateImportsOnFileMove.enabled": "always",
   "update.mode": "none",
   "update.showReleaseNotes": false,
+  "vim.insertModeKeyBindingsNonRecursive": [
+    {
+      "before": ["<C-j>"],
+      "after": ["<Enter>"]
+    }
+  ],
   "vim.leader": "<space>",
   "vs-kubernetes": {
     "vs-kubernetes.knownKubeconfigs": [

@@ -82,7 +82,12 @@ panes; it must not silently redefine the firmware or editor contract.
 
 Before enabling a custom Zellij workflow, its control modes must be checked
 against terminal interrupts, shell bindings and the editor shortcuts that need
-to pass through, especially `Ctrl+C`, `Ctrl+P`, `Ctrl+E`, `Ctrl+W` and their
-shifted variants. The normal editing path should deliver those keys to the
-focused terminal application, with Zellij actions entered through an explicit
-and deliberately chosen mode or prefix.
+to pass through, especially `Ctrl+C`, `Ctrl+P`, `Ctrl+E`, `Ctrl+J`, `Ctrl+W` and
+their shifted variants. Outside VSCodeVim Insert mode, VS Code deliberately owns
+`Ctrl+J` and `Ctrl+Shift+J` for its integrated terminal; `Ctrl+'` also remains a
+VS Code panel command. In Insert mode, VSCodeVim maps `Ctrl+J` to `<Enter>` so
+the same chord retains its standard editing meaning. A future Zellij
+configuration must account for that application boundary. The normal editing
+path should otherwise deliver terminal keys to the focused application, with
+Zellij actions entered through an explicit and deliberately chosen mode or
+prefix.
