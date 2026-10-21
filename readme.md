@@ -92,6 +92,15 @@ runs Ruby diagnostics after reading and writing a buffer. Ruby, ERB, Lua and web
 formats use Nix-provided tools. Tree-sitter parsers are explicitly managed for
 the configured languages.
 
+## VS Code Vim
+
+VSCodeVim stays close to its defaults and uses the same physical workflow on
+NixOS and macOS. Relative line numbers and Space as leader are the intentional
+baseline customizations. The shared VS Code keybindings retain only Quick Open,
+the Command Palette, editor MRU selection and context-limited editor focus; all
+other modal behavior comes from VSCodeVim. See the active
+[VS Code Vim design](docs/vscode-vim.md) for the target and current state.
+
 ## macOS / Hammerspoon quick reference
 
 `mainMod` = `Option + Control + Command`. Hammerspoon retains one or two slot sides

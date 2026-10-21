@@ -8,13 +8,6 @@ when Henrik explicitly requests it. The test procedure can be run when requested
 
 ### macOS keyboard parity
 
-#### Resolve VS Code shortcut collisions
-
-Audit editor, Vim, list, Quick Pick, webview and integrated-terminal contexts.
-`Ctrl+H/L` currently work in VSCodeVim Normal mode but not consistently in other
-surfaces. Reduce duplicated keybindings, add precise `when` clauses and build an
-explicit conflict matrix without stealing shell or modal keys.
-
 #### Decide Chrome `Ctrl+Click` ownership
 
 The current Hammerspoon event tap handles key-down events, not mouse clicks.
