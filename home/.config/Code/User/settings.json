@@ -217,7 +217,7 @@
   "markdown.validate.enabled": true,
   "mssql.connectionGroups": [
     {
-      "id": "5A2122A7-BB7A-4781-A9A0-7DB63782256D",
+      "id": "ROOT",
       "name": "ROOT"
     }
   ],
