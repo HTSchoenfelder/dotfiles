@@ -110,16 +110,18 @@ function DotMode:_commands()
 end
 
 function DotMode:_bind(modifiers, key, callback, description)
-  self.modal:bind(modifiers, key, self:_action(callback))
+  local action = self:_action(callback)
+  self.modal:bind(modifiers, key, action)
   local prefix = "MainMod + . → "
   local label = (#modifiers > 0 and "Shift + " or "") .. key:upper()
-  catalog.add("Dot mode", prefix .. label, description)
+  catalog.add("Dot mode", prefix .. label, description, action)
 end
 
 function DotMode:start()
   self.modal = hs.hotkey.modal.new()
   self.binding = hs.hotkey.bind(self.modifiers, ".", function() self:enter() end)
-  catalog.add("Dot mode", "MainMod + .", "Enter dot mode")
+  catalog.add("Dot mode", "MainMod + .", "Enter dot mode",
+    function() self:enter() end)
 
   self:_bind({}, "q", function() self:_captureRegion() end, "Capture region")
   self:_bind({}, "a", function() self:_captureWindow() end, "Capture focused window")
@@ -137,7 +139,8 @@ function DotMode:start()
     self.textLauncher:open(self.snippetPath, textData.snippet)
   end, "Insert snippet")
   self.modal:bind({}, "escape", function() self:exit() end)
-  catalog.add("Dot mode", "MainMod + . → Escape", "Leave dot mode")
+  catalog.add("Dot mode", "MainMod + . → Escape", "Leave dot mode",
+    function() self:exit() end)
 
   local recognized = {}
   for _, key in ipairs({"q", "a", "z", "m", "v", "g", "j", "w", "e", "r", "t", "escape"}) do

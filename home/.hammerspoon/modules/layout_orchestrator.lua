@@ -126,6 +126,10 @@ function LayoutOrchestrator:_focus(window)
   if not focused or focused:id() ~= window:id() then window:focus() end
 end
 
+function LayoutOrchestrator:_raise(window)
+  if window then window:raise() end
+end
+
 function LayoutOrchestrator:_apply(slot)
   local window = slot and self:_window(slot.windowID)
   if not window or not slot.frame then return end
@@ -167,7 +171,6 @@ function LayoutOrchestrator:_available(exceptID)
   self.repository:listAll(function(records)
     for _, record in ipairs(self.repository:orderedByHistory(records)) do
       if record.id ~= exceptID and WindowRepository.isSlotCandidate(record)
-          and record.visible ~= false and not record.minimized
           and not self:_slotForWindow(record.id) then
         result = record
         break
@@ -265,9 +268,8 @@ function LayoutOrchestrator:activate(target, request, callback)
     end
     if source and source ~= layout then self:_reflow(source) end
     self:_reflow(layout)
-    -- Raise the selected window before restoring focus for Shift selection.
-    self:_focus(target.window)
     if request.mode == "other" then
+      self:_raise(target.window)
       if original and original ~= target.window then
         if original:screen() and self:_key(original:screen()) ~= request.screenKey then
           self.ignoreFocusID = tonumber(original:id())
@@ -276,6 +278,7 @@ function LayoutOrchestrator:activate(target, request, callback)
       end
     else
       layout.focusedSlot = index
+      self:_focus(target.window)
     end
     self.activeKey = request.screenKey
     self:_notify()
@@ -306,37 +309,66 @@ function LayoutOrchestrator:_refill(layout, index, closedID, focusReplacement)
     layout.slots[index].windowID = candidate.id
     layout.revision = layout.revision + 1
     self:_reflow(layout)
-    self:_focus(candidate.window)
-    if not focusReplacement and original and original ~= candidate.window then
-      if original:screen() and self:_key(original:screen()) ~= self:_key(layout.screen) then
-        self.ignoreFocusID = tonumber(original:id())
+    if focusReplacement then
+      self:_focus(candidate.window)
+    else
+      self:_raise(candidate.window)
+      if original and original ~= candidate.window then
+        if original:screen() and self:_key(original:screen()) ~= self:_key(layout.screen) then
+          self.ignoreFocusID = tonumber(original:id())
+        end
+        self:_focus(original)
       end
-      self:_focus(original)
     end
     self:_notify()
   end)
 end
 
+function LayoutOrchestrator:_focusedCandidate(layout)
+  local focused = self.repository.focusedWindow()
+  if not focused or not self.repository:isUsable(focused)
+      or self:_key(focused:screen()) ~= self:_key(layout.screen) then return end
+  local id = tonumber(focused:id())
+  local record = id and self.repository:recordForID(id)
+  if WindowRepository.isSlotCandidate(record) then return id end
+end
+
 function LayoutOrchestrator:keepOnly()
   local layout, key = self:_layout(self:activeScreen())
   if not layout then return end
-  local focused = self.repository.focusedWindow()
-  local focusedID = focused and tonumber(focused:id())
-  local source, _, sourceKey = self:_slotForWindow(focusedID)
-  local id = source and sourceKey == key and focusedID
-    or layout.slots[layout.focusedSlot].windowID
+  local focusedID = self:_focusedCandidate(layout)
+  local id = focusedID or layout.slots[layout.focusedSlot].windowID
   if not id then return end
+  local source, sourceIndex, sourceKey = self:_slotForWindow(id)
+  if source and sourceKey ~= key then
+    source.slots[sourceIndex].windowID = nil
+    source.revision = source.revision + 1
+    self:_reflow(source)
+  end
   layout.slots = {{windowID = id}}
   layout.wanted, layout.focusedSlot = 1, 1
   layout.revision = layout.revision + 1
+  self.activeKey = key
   self:_reflow(layout)
   self:_notify()
 end
 
 function LayoutOrchestrator:enableTwo()
-  local layout = self:_layout(self:activeScreen())
+  local layout, key = self:_layout(self:activeScreen())
   if not layout then return end
+  self.activeKey = key
   if layout.wanted ~= 2 then
+    local focusedID = self:_focusedCandidate(layout)
+    if focusedID and focusedID ~= layout.slots[layout.focusedSlot].windowID then
+      local source, sourceIndex = self:_slotForWindow(focusedID)
+      layout.slots[layout.focusedSlot].windowID = focusedID
+      layout.revision = layout.revision + 1
+      if source then
+        source.slots[sourceIndex].windowID = nil
+        source.revision = source.revision + 1
+        if source ~= layout then self:_reflow(source) end
+      end
+    end
     layout.wanted = 2
     layout.slots[2] = layout.slots[2] or {windowID = nil}
     layout.revision = layout.revision + 1
@@ -348,8 +380,9 @@ function LayoutOrchestrator:enableTwo()
 end
 
 function LayoutOrchestrator:toggleRatio()
-  local layout = self:_layout(self:activeScreen())
+  local layout, key = self:_layout(self:activeScreen())
   if not layout then return end
+  self.activeKey = key
   layout.ratio = layout.ratio > 0.6 and 0.5 or 0.7
   self:_reflow(layout)
   self:_notify()
@@ -439,17 +472,11 @@ function LayoutOrchestrator:_validateFocus()
     return
   end
   local screen = focused:screen()
-  local layout, key = self:_layout(screen)
-  if not layout then return end
+  local key = self:_key(screen)
+  if not key then return end
   self.activeKey = key
   local source, index = self:_slotForWindow(focused:id())
-  if source == layout then
-    layout.focusedSlot = index
-  elseif not source then
-    layout.slots[layout.focusedSlot].windowID = tonumber(focused:id())
-    layout.revision = layout.revision + 1
-    self:_reflow(layout)
-  end
+  if source and source == self.layouts[key] then source.focusedSlot = index end
   self:_notify()
 end
 

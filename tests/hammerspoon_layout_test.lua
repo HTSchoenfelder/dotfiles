@@ -20,14 +20,19 @@ local function fixture()
   local windows, focused, rank = {}, nil, {}
   local application = {isHidden = function() return false end,
     bundleID = function() return "example.app" end}
-  local function add(id, screen)
-    local window = {number = id, display = screen, currentFrame = {x = screen.x + 30, y = 30, w = 400, h = 300}}
+  local function add(id, screen, options)
+    options = options or {}
+    local window = {number = id, display = screen, minimized = options.minimized == true,
+      visible = options.visible ~= false, focusCount = 0, raiseCount = 0,
+      currentFrame = {x = screen.x + 30, y = 30, w = 400, h = 300}}
     function window:id() return self.number end
     function window:screen() return self.display end
     function window:frame() return self.currentFrame end
     function window:application() return application end
-    function window:isMinimized() return false end
-    function window:focus() focused = self end
+    function window:isMinimized() return self.minimized end
+    function window:unminimize() self.minimized = false; self.visible = true end
+    function window:focus() self.focusCount = self.focusCount + 1; focused = self end
+    function window:raise() self.raiseCount = self.raiseCount + 1 end
     function window:close() self.closed = true; windows[id] = nil; if focused == self then focused = nil end end
     function window:setFrameWithWorkarounds(frame)
       self.currentFrame = frame
@@ -43,13 +48,15 @@ local function fixture()
     recordForID = function(_, id)
       local window = windows[id]
       return window and {id = id, window = window, screen = window:screen(),
-        screenID = window:screen():getUUID()}
+        screenID = window:screen():getUUID(), minimized = window.minimized,
+        visible = window.visible}
     end,
     listAll = function(_, callback)
       local records = {}
       for id, window in pairs(windows) do
         records[#records + 1] = {id = id, window = window,
-          screen = window:screen(), screenID = window:screen():getUUID()}
+          screen = window:screen(), screenID = window:screen():getUUID(),
+          minimized = window.minimized, visible = window.visible}
       end
       callback(records)
     end,
@@ -91,6 +98,7 @@ assert(left:screen() == session.first and session.focused() == parked)
 session.select(older, "other")
 assert(layout.wanted == 2 and layout.slots[1].windowID == 2 and layout.slots[2].windowID == 3)
 assert(session.focused() == parked and parked:frame().w == 689)
+assert(older.raiseCount == 1 and older.focusCount == 0)
 session.orchestrator:focusNext()
 assert(session.focused() == older)
 session.orchestrator:rotatePositions()
@@ -103,6 +111,57 @@ assert(layout.wanted == 1 and layout.slots[1].windowID == 2)
 session.orchestrator:enableTwo()
 assert(layout.wanted == 2 and layout.slots[2].windowID == 1)
 assert(session.focused() == parked)
+assert(left.raiseCount == 1 and left.focusCount == 0)
+
+local minimizedRefill = fixture()
+local visibleMaster = minimizedRefill.add(5, minimizedRefill.first)
+local minimizedCandidate = minimizedRefill.add(
+  6, minimizedRefill.first, {minimized = true, visible = false}
+)
+minimizedRefill.focus(visibleMaster)
+minimizedRefill.rank[6] = 0
+minimizedRefill.orchestrator:capture("focused", minimizedRefill.gate:next())
+minimizedRefill.orchestrator:enableTwo()
+local restored = minimizedRefill.orchestrator.layouts.first
+assert(restored.wanted == 2 and restored.slots[2].windowID == 6)
+assert(not minimizedCandidate.minimized and minimizedCandidate.visible)
+assert(minimizedCandidate.raiseCount == 1 and minimizedCandidate.focusCount == 0)
+assert(minimizedRefill.focused() == visibleMaster)
+
+local freshLayout = fixture()
+local freshWindow = freshLayout.add(70, freshLayout.first)
+freshLayout.focus(freshWindow)
+freshLayout.orchestrator:enableTwo()
+assert(freshLayout.orchestrator:layoutSnapshot().first.active)
+assert(freshLayout.orchestrator.layouts.first.wanted == 2)
+
+local nativeFocus = fixture()
+local tracked = nativeFocus.add(7, nativeFocus.first)
+nativeFocus.focus(tracked)
+nativeFocus.orchestrator:capture("focused", nativeFocus.gate:next())
+local untracked = nativeFocus.add(8, nativeFocus.first)
+local nativeFrame = untracked:frame()
+nativeFocus.focus(untracked)
+nativeFocus.orchestrator:_validateFocus()
+local nativeLayout = nativeFocus.orchestrator.layouts.first
+assert(nativeLayout.wanted == 1 and nativeLayout.slots[1].windowID == 7)
+assert(nativeFocus.orchestrator:_slotForWindow(8) == nil)
+assert(untracked:frame() == nativeFrame)
+nativeFocus.orchestrator:enableTwo()
+assert(nativeLayout.wanted == 2 and nativeLayout.slots[1].windowID == 8)
+assert(nativeLayout.slots[2].windowID == 7 and nativeFocus.focused() == untracked)
+assert(untracked:frame().w == 689 and tracked:frame().w == 296)
+
+local singleNative = fixture()
+local previous = singleNative.add(9, singleNative.first)
+singleNative.focus(previous)
+singleNative.orchestrator:capture("focused", singleNative.gate:next())
+local clicked = singleNative.add(10, singleNative.first)
+singleNative.focus(clicked)
+singleNative.orchestrator:_validateFocus()
+singleNative.orchestrator:keepOnly()
+assert(singleNative.orchestrator.layouts.first.slots[1].windowID == 10)
+assert(clicked:frame().w == 990 and singleNative.focused() == clicked)
 
 local remote = session.add(4, session.second)
 session.select(remote, "focused")

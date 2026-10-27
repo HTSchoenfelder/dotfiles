@@ -29,4 +29,6 @@ local function reloadConfig(files)
   end
 end
 
-configWatcher = hs.pathwatcher.new(hs.configdir, reloadConfig):start()
+configWatcher = hs.pathwatcher.new(
+  config.paths.repository .. "/home/.hammerspoon", reloadConfig
+):start()

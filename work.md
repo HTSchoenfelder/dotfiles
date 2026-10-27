@@ -32,6 +32,9 @@ Run these checks on the Mac after changes to Hammerspoon navigation. First verif
 that `~/.hammerspoon` uses this checkout and that Hammerspoon has macOS
 Accessibility permission. Use disposable app windows for the live checks because
 they move, resize and close windows. `mainMod` means `Option + Control + Command`.
+Changes to Lua files in the checkout should trigger Hammerspoon's path watcher;
+confirm a reload before testing new behavior because `~/.hammerspoon` contains
+symlinks to the checkout.
 The app keys are listed in the
 [README quick reference](readme.md#macos--hammerspoon-quick-reference).
 
@@ -65,8 +68,10 @@ slot state, and keep the Hammerspoon Console open for Lua or Accessibility error
    the focused side. Check the Green active frame and Pink inactive frame.
 2. Press `mainMod + /` and `mainMod + Shift + /` in turn. The display changes to
    one slot and back to two, refilling the other side from recent non-slot windows
-   if one is available. In a one-slot layout, `S` plus an app key also opens the
-   second slot. `mainMod + .`, then `M`, toggles 70:30 and 50:50 on that display.
+   if one is available. Repeat with that recent candidate minimized or its app
+   hidden; it is restored into the other slot while the original slot retains
+   focus. In a one-slot layout, `S` plus an app key also opens the second slot.
+   `mainMod + .`, then `M`, toggles 70:30 and 50:50 on that display.
 3. Press `mainMod + H` to change the active display. Repeat with no slot window
    on the target display: its empty slot gets the Green frame even though native
    keyboard focus cannot move there. The next app selection fills that slot.
@@ -79,11 +84,18 @@ slot state, and keep the Hammerspoon Console open for Lua or Accessibility error
    arrives. Other windows are neither minimized nor moved to Parking.
 5. Check `mainMod + F + app key` and Comma Selection: the chosen window fills the
    intended slot, and Comma Selection accepts on `mainMod` release. Reload
-   Hammerspoon once more and confirm that the in-memory slot state resets.
-6. Use `mainMod + Y` and confirm that Play/Pause, Next and Previous are followed
+   Hammerspoon once more and confirm that the in-memory slot state resets. Click
+   an untracked native window and confirm that its frame remains unchanged and it
+   does not replace either retained slot. Then invoke `mainMod + Shift + /` and
+   confirm that the clicked window becomes the first slot while the former slot
+   window fills the other side.
+6. Open the macOS shortcut catalog with `mainMod + Shift + R` and select
+   `Use two slots`, then a window chooser row. Confirm that both commands run and
+   that canceling the catalog performs no action.
+7. Use `mainMod + Y` and confirm that Play/Pause, Next and Previous are followed
    by Spotify as the last entry. The Hyprland-only `I` and `U` PWA groups cannot
    be tested here until their macOS Chrome-PWA bundle IDs are configured.
-7. Copy two text values and an image outside a password manager. Press
+8. Copy two text values and an image outside a password manager. Press
    `mainMod + V`, filter the chooser and select each older item in turn. The
    chooser closes, the original window regains focus and the selected text or
    image is pasted. Copy a value in KeePassXC and confirm it does not appear.

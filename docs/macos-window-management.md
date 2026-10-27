@@ -38,6 +38,10 @@ actions. It keeps only two slot identities per display in memory, not a model of
 every native window. It does not run a permanent reflow loop, create virtual
 workspaces or hide unrelated applications.
 
+The live configuration is linked into `~/.hammerspoon` from this checkout. Its
+path watcher observes the checkout directory itself so edits to linked Lua
+targets trigger a reload. Reloading clears the in-memory slot identities.
+
 The optional Catppuccin frame module draws only the retained layout slots. Its
 canvases are visual and click-through; replacing the window in a slot does not
 recreate or reposition that slot's frame. See the
@@ -82,16 +86,24 @@ leaves the replaced window native and unchanged. Non-slot windows are neither
 hidden nor minimized to emulate Parking.
 
 `/` keeps one slot; `Shift + /` requests two and immediately refills the second
-side from the non-slot MRU pool. Dot Mode `M` toggles the ratio per display. `M`
-focuses the other occupied side; `N` swaps contents while focus remains on the
-same visual side. Closing a slot window refills its side from the most recently
-focused usable non-slot window. If there is no candidate, a later normal window
-can fill the vacancy. Window-created and close notifications trigger discrete
-updates; there is no continuous tiler.
+side from the non-slot MRU pool, restoring a hidden or minimized candidate when
+needed. Background placement raises its window without focusing it, so filling
+the other side does not distort MRU order. Dot Mode `M` toggles the ratio per
+display. `M` focuses the other occupied side; `N` swaps contents while focus
+remains on the same visual side. Closing a slot window refills its side from the
+most recently focused usable non-slot window. If there is no candidate, a later
+normal window can fill the vacancy. Window-created and close notifications
+trigger discrete updates; there is no continuous tiler.
 
-Manual movement of a tracked window removes it from its slot. Display topology
-changes clear the in-memory slot records so the next action adopts current native
-windows. `clearScreen` and Dot Mode reset remain explicit layout reset actions.
+When an untracked native window has focus, `/` uses it as the retained single
+slot, and `Shift + /` uses it as the first slot before refilling the second.
+The click itself does not change window geometry.
+
+Clicking or focusing an untracked native window only changes the active display;
+it never adopts or resizes that window. Manual movement of a tracked window
+removes it from its slot. Display topology changes clear the in-memory slot
+records so the next explicit action adopts the focused native window.
+`clearScreen` and Dot Mode reset remain explicit layout reset actions.
 
 ## Selection and modifiers
 
@@ -128,7 +140,8 @@ Hyprland's `HYPRSHOT_DIR`.
 
 `hs.chooser` is the shared native selection surface for applications, windows,
 instances, Spotify plus its player actions, emoji, snippets, commands and the
-shortcut catalog.
+shortcut catalog. Selecting a catalog row runs its registered action; choosing a
+Comma Selection or media row opens its normal chooser for the final selection.
 The launcher places an existing application window in the captured focused slot;
 new native windows are assigned from window-created events.
 Spotify actions run asynchronously through `osascript`.

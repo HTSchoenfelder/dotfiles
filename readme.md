@@ -153,6 +153,10 @@ directories. Green marks the active slot, including an empty display selected by
 `H`; other retained slots are Pink. Untracked windows have no frame. Both titles
 and frames can be disabled in `home/.hammerspoon/config.lua`.
 
+The macOS shortcut catalog is actionable: selecting a row runs its action. Comma
+Selection and media rows open their chooser so a window or player action can then
+be selected.
+
 Clipboard history is kept in Hammerspoon memory and resets when Hammerspoon
 reloads. It retains text and image pasteboard data, ignores configured password
 manager bundle IDs and restores the selected item to the originating window with
@@ -163,12 +167,18 @@ focused slot. A newly launched normal window follows the same active-display
 state when its native window appears.
 
 Non-slot windows are neither minimized nor moved to a Parking area. A close refills
-the vacated side from their MRU order; if none exists, the side remains remembered.
+the vacated side from their MRU order, restoring the selected candidate if it was
+hidden or minimized; if none exists, the side remains remembered. Background slot
+placement raises its window without changing native focus or MRU order.
 Selecting an occupant on the same display swaps the two slot contents. Selecting
 one from another display leaves its source slot vacant and the replaced window
 untracked on its original display. Native macOS focus cannot move to an empty
 display, so the active frame and subsequent app selection follow Hammerspoon's
 retained display state instead.
+
+Clicking or otherwise focusing an untracked native window never adopts or resizes
+it. `/` or `Shift + /` can explicitly adopt that window as the focused slot;
+the latter refills the other side from non-slot MRU windows.
 
 ## Hyprland quick reference
 

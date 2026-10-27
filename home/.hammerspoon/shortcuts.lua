@@ -20,14 +20,16 @@ function shortcuts.start(services)
     clipboardHistory:open()
   end)
   shortcuts.clipboardHistory = clipboardHistory
-  catalog.add("Launchers", "MainMod + V", "Paste from clipboard history")
+  catalog.add("Launchers", "MainMod + V", "Paste from clipboard history",
+    function() clipboardHistory:open() end)
 
   local rodecaster = Rodecaster.new(config.rodecaster):start()
   shortcuts.rodecasterBinding = hs.hotkey.bind(config.hyper, "\\", function()
     rodecaster:toggleMute()
   end)
   shortcuts.rodecaster = rodecaster
-  catalog.add("Media", "MainMod + \\", "Toggle RØDECaster mute")
+  catalog.add("Media", "MainMod + \\", "Toggle RØDECaster mute",
+    function() rodecaster:toggleMute() end)
 
   local spotify
   for _, application in ipairs(applications) do
@@ -45,8 +47,10 @@ function shortcuts.start(services)
   shiftedHyper[#shiftedHyper + 1] = "shift"
   hs.hotkey.bind(shiftedHyper, "y", function() mediaControls:cycle(-1) end, nil,
     function() mediaControls:cycle(-1) end)
-  catalog.add("Media", "MainMod + Y", "Cycle Spotify and player actions")
-  catalog.add("Media", "MainMod + Shift + Y", "Cycle Spotify and player actions backwards")
+  catalog.add("Media", "MainMod + Y", "Cycle Spotify and player actions",
+    function() mediaControls:cycle(1) end)
+  catalog.add("Media", "MainMod + Shift + Y", "Cycle Spotify and player actions backwards",
+    function() mediaControls:cycle(-1) end)
   shortcuts.mediaControls = mediaControls
 
   local overlays = ProjectOverlays.new({

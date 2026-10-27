@@ -113,7 +113,8 @@ end
 
 function Launcher:start()
   self.binding = hs.hotkey.bind(self.modifiers, "r", function() self:toggle() end)
-  catalog.add("Launchers", "MainMod + R", "Toggle application launcher")
+  catalog.add("Launchers", "MainMod + R", "Toggle application launcher",
+    function() self:toggle() end)
 end
 
 return Launcher

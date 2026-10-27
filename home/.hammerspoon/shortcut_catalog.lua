@@ -1,3 +1,4 @@
+-- Keep chooser actions beside their shortcut descriptions.
 local catalog = {
   entries = {},
   sectionOrder = {
@@ -10,11 +11,12 @@ local catalog = {
   },
 }
 
-function catalog.add(section, shortcut, description)
+function catalog.add(section, shortcut, description, action)
   catalog.entries[#catalog.entries + 1] = {
     section = section,
     shortcut = shortcut,
     description = description,
+    action = action,
     order = #catalog.entries + 1,
   }
 end
@@ -45,14 +47,19 @@ function catalog.show()
     choices[#choices + 1] = {
       text = entry.shortcut,
       subText = entry.description,
+      action = entry.action,
     }
   end
-  catalog.chooser:show(choices, function() end)
+  catalog.chooser:show(choices, function(selected)
+    if selected and selected.action then
+      hs.timer.doAfter(0, selected.action)
+    end
+  end)
 end
 
 function catalog.start(modifiers, chooserFactory)
   catalog.chooserFactory = chooserFactory
-  catalog.add("Launchers", "MainMod + Shift + R", "Show shortcut catalog")
+  catalog.add("Launchers", "MainMod + Shift + R", "Show shortcut catalog", catalog.show)
   local shiftedModifiers = {}
   for _, modifier in ipairs(modifiers) do
     shiftedModifiers[#shiftedModifiers + 1] = modifier
