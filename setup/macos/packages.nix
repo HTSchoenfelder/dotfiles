@@ -45,7 +45,8 @@
     lua
 
     # Applications
-    pkgsStable.kitty
+    # macOS 27 reports pid -1 for the wrapped source build, breaking Accessibility clients.
+    kitty-bin
     cyberduck
     obsidian
     utm
