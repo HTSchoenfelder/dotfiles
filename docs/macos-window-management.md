@@ -85,19 +85,28 @@ window native and untracked on its original display. An untracked selection also
 leaves the replaced window native and unchanged. Non-slot windows are neither
 hidden nor minimized to emulate Parking.
 
-`/` keeps one slot; `Shift + /` requests two and immediately refills the second
-side from the non-slot MRU pool, restoring a hidden or minimized candidate when
-needed. Background placement raises its window without focusing it, so filling
-the other side does not distort MRU order. Dot Mode `M` toggles the ratio per
-display. `M` focuses the other occupied side; `N` swaps contents while focus
-remains on the same visual side. Closing a slot window refills its side from the
-most recently focused usable non-slot window. If there is no candidate, a later
-normal window can fill the vacancy. Window-created and close notifications
-trigger discrete updates; there is no continuous tiler.
+`MainMod + /` opens a three-entry Comma Selection: one full-screen slot, two
+50:50 slots and two 70:30 slots. Repeating `/` cycles the entries; releasing
+`MainMod` applies the selected layout to the display captured when the chooser
+opened. The chooser does not change geometry before acceptance. Either two-slot
+choice immediately refills the other side from the non-slot MRU pool, restoring
+a hidden or minimized candidate when needed. Background placement raises its
+window without focusing it, so filling the other side does not distort MRU order.
+Dot Mode `M` still toggles the ratio per display. `M` focuses the other occupied
+side; `N` swaps contents while focus remains on the same visual side. Closing a
+slot window refills its side from the most recently focused usable non-slot
+window. If there is no candidate, a later normal window can fill the vacancy.
+Window-created and close notifications trigger discrete updates; there is no
+continuous tiler.
 
-When an untracked native window has focus, `/` uses it as the retained single
-slot, and `Shift + /` uses it as the first slot before refilling the second.
-The click itself does not change window geometry.
+Hyprland retains direct `/` and `Shift + /` actions. On Henrik's Bluetooth
+keyboard, the physical four-modifier `MainMod + Shift + /` chord sends no `/`
+key event to Hammerspoon. The macOS layout chooser provides both actions and
+an explicit ratio choice through the reliable three-modifier chord.
+
+When an untracked native window has focus, choosing one slot adopts it as the
+retained single slot; choosing two slots uses it as the first slot before
+refilling the second. The click itself does not change window geometry.
 
 Clicking or focusing an untracked native window only changes the active display;
 it never adopts or resizes that window. Manual movement of a tracked window
@@ -116,6 +125,11 @@ only swaps with another slot occupant on the same display.
 Window and application choices use Hammerspoon's focus history. Held `G` display
 placement is removed; `H` selects the other display without moving its existing
 windows.
+
+`I` cycles Google Chat then Google Meet, and `U` cycles Gmail then Google Calendar.
+Shift starts at the second app; `F` requests an instance chooser after acceptance,
+and `S` retains the other-slot destination captured when the group chooser opened.
+The Google apps are identified by the bundle IDs of the installed Chrome PWAs.
 
 ## Application and overlay lifecycle
 
@@ -145,8 +159,6 @@ Comma Selection or media row opens its normal chooser for the final selection.
 The launcher places an existing application window in the captured focused slot;
 new native windows are assigned from window-created events.
 Spotify actions run asynchronously through `osascript`.
-The `I` and `U` PWA groups remain Hyprland-only until the installed macOS Chrome
-PWAs provide stable bundle IDs for Chat, Meet, Gmail and Calendar.
 
 RØDECaster MIDI remains entirely in Hammerspoon. `MainMod + Backslash` sends one
 absolute mute or unmute value; it does not emulate a momentary button press. The

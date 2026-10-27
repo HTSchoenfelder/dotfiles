@@ -40,8 +40,9 @@ Both platforms retain one or two slots per display, including temporary vacancie
 App and window selection replaces a slot; held `F` filters application instances,
 held `S` targets the other side, and Shift reverses cyclic selection. Closing a
 slot window refills it by focus history. Hyprland Dot Mode `/` toggles 70:30/50:50;
-macOS currently retains Dot Mode `M`. Its non-slot windows remain native windows
-and form a logical replacement pool.
+macOS chooses one slot or a 50:50/70:30 split through `mainMod + /` Comma Selection
+and retains Dot Mode `M`. Its non-slot windows remain native windows and form a
+logical replacement pool.
 
 ## Nix configuration
 
@@ -125,7 +126,9 @@ and `S + App Key` compose those modifiers with that key; for example,
 
 | Shortcut | Action |
 | --- | --- |
-| `mainMod + J/K/L/I/;/O` | Fill the focused slot with Kitty / VS Code / Chrome / Google Chat / Obsidian / KeePassXC |
+| `mainMod + J/K/L/;/O` | Fill the focused slot with Kitty / VS Code / Chrome / Obsidian / KeePassXC |
+| `mainMod + I` / `mainMod + Shift + I` | Cycle Google Chat → Google Meet / Meet → Chat; release `mainMod` to accept |
+| `mainMod + U` / `mainMod + Shift + U` | Cycle Gmail → Google Calendar / Calendar → Gmail; release `mainMod` to accept |
 | `mainMod + F + app key` | Choose an application instance for the focused slot |
 | `mainMod + S + app key` | Fill the other slot with a distinct instance; retain focus |
 | `mainMod + F + S + app key` | Choose an application instance for the other slot |
@@ -138,7 +141,7 @@ and `S + App Key` compose those modifiers with that key; for example,
 | `mainMod + M` | Focus the other occupied slot |
 | `mainMod + N` | Swap slot contents while retaining the focused side |
 | `mainMod + H` | Focus the other display's slot; show its active frame even when empty |
-| `mainMod + /` / `mainMod + Shift + /` | Use one / two slots on the active display |
+| `mainMod + /` | Cycle one full-screen slot, two slots at 50:50, or two slots at 70:30; release `mainMod` to apply on the active display |
 | `mainMod + .`, then `M` | Toggle the active display between 70:30 and 50:50 |
 | `mainMod + W` | Close the focused slot window and refill it from the non-slot MRU pool |
 | `mainMod + V` | Choose and paste a recent clipboard item |
@@ -155,7 +158,8 @@ and frames can be disabled in `home/.hammerspoon/config.lua`.
 
 The macOS shortcut catalog is actionable: selecting a row runs its action. Comma
 Selection and media rows open their chooser so a window or player action can then
-be selected.
+be selected. Google app group rows open the same group chooser; `F` and `S`
+variants preserve instance selection and other-slot placement.
 
 Clipboard history is kept in Hammerspoon memory and resets when Hammerspoon
 reloads. It retains text and image pasteboard data, ignores configured password
@@ -177,8 +181,9 @@ display, so the active frame and subsequent app selection follow Hammerspoon's
 retained display state instead.
 
 Clicking or otherwise focusing an untracked native window never adopts or resizes
-it. `/` or `Shift + /` can explicitly adopt that window as the focused slot;
-the latter refills the other side from non-slot MRU windows.
+it. Choosing one or two slots from `mainMod + /` can explicitly adopt that window
+as the focused slot; either two-slot choice refills the other side from non-slot
+MRU windows.
 
 ## Hyprland quick reference
 
@@ -341,9 +346,9 @@ receive the same navigation translation. Its status is documented in
 
 Media, volume, microphone and brightness hardware keys use their native actions.
 The `Y` selection contains Play/Pause, Next and Previous followed by Spotify
-itself, so Spotify no longer needs a direct App Key. The Hyprland `I` and `U`
-PWA groups are not yet mirrored on macOS because their installed Chrome-PWA
-bundle IDs are machine-specific and are not available in this checkout.
+itself, so Spotify no longer needs a direct App Key. The `I` and `U` Google PWA
+groups use the locally installed Chrome app bundle IDs on macOS and the same
+modifier-release selection flow as Hyprland.
 The actionable Hyprland shortcut catalog shows the description first and aligns
 the shortcut on the right. It includes global bindings, modifier combinations,
 Dot mode and hardware/media bindings; selecting a row runs that action.

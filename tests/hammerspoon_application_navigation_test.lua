@@ -69,6 +69,16 @@ appNavigation:activate({bundleID = "example.app"}, "focused", false)
 assert(activated.id == 9)
 
 activated = nil
+local captured = {generation = gate:next(), mode = "other", screen = "screen"}
+appNavigation:activate({bundleID = "example.app"}, "other", false, captured)
+assert(activated.id == 9 and gate:current() == captured.generation)
+
+activated = nil
+gate:next()
+appNavigation:activate({bundleID = "example.app"}, "other", false, captured)
+assert(activated == nil)
+
+activated = nil
 local staleGeneration = gate:next()
 gate:next()
 appNavigation:_waitForWindow({bundleID = "example.app"}, {generation = staleGeneration}, false)

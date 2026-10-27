@@ -80,9 +80,10 @@ The active NixOS ownership is defined in `setup/nixos/desktop-integration.nix` a
   Existing Dot Mode project-tool keys remain separate from navigation.
 - `F + App` chooses an instance and `F + comma` filters by the focused app.
 - During Comma Selection, Shift always means backward, never the other slot.
-- macOS uses the same one/two-slot shortcut meanings, including `Shift + /`,
-  Dot Mode `M`, vacant source slots after cross-display selection and close refill
-  from non-slot MRU windows.
+- macOS chooses one full-screen slot, two 50:50 slots or two 70:30 slots through
+  `mainMod + /` Comma Selection on the active display. It retains Dot Mode `M`,
+  vacant source slots after cross-display selection and close refill from non-slot
+  MRU windows.
   Slot state and the active display remain in Hammerspoon Lua memory. `H` paints
   an active frame on an empty display even while native keyboard focus stays elsewhere.
 - **Dot Mode** is the submap entered with `mainMod + period`.

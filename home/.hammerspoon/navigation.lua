@@ -1,5 +1,6 @@
 local config = require("config")
 local applications = require("apps")
+local ApplicationGroups = require("modules.application_groups")
 local ApplicationNavigation = require("modules.application_navigation")
 local Chooser = require("modules.chooser")
 local CommaSelection = require("modules.comma_selection")
@@ -48,6 +49,13 @@ function navigation.start()
     gate = gate,
   })
   local commaSelection = CommaSelection.new(chooserFactory)
+  local applicationGroups = ApplicationGroups.new({
+    applications = applications,
+    commaSelection = commaSelection,
+    navigation = applicationNavigation,
+    orchestrator = orchestrator,
+    gate = gate,
+  })
   local heldKeys = HeldKeys.new(config.hyper)
 
   heldKeys:track(settings.filterKey)
@@ -76,11 +84,49 @@ function navigation.start()
     end
   end
 
+  for _, group in ipairs(applications.groups or {}) do
+    local currentGroup = group
+    local function cycle(direction, filtered, mode)
+      applicationGroups:cycle(currentGroup, direction, filtered, mode)
+    end
+    local function cycleHeld(direction)
+      cycle(direction, heldKeys:isDown(settings.filterKey),
+        heldKeys:isDown(settings.otherSlotKey) and "other" or "focused")
+    end
+    hs.hotkey.bind(config.hyper, currentGroup.key,
+      function() cycleHeld(1) end, nil, function() cycleHeld(1) end)
+    hs.hotkey.bind(shifted(config.hyper), currentGroup.key,
+      function() cycleHeld(-1) end, nil, function() cycleHeld(-1) end)
+    for _, combination in ipairs({
+      {keys = "", direction = 1, filtered = false, mode = "focused", suffix = ""},
+      {keys = "Shift + ", direction = -1, filtered = false, mode = "focused",
+        suffix = " backwards"},
+      {keys = "F + ", direction = 1, filtered = true, mode = "focused",
+        suffix = " with instance selection"},
+      {keys = "F + Shift + ", direction = -1, filtered = true, mode = "focused",
+        suffix = " backwards with instance selection"},
+      {keys = "S + ", direction = 1, filtered = false, mode = "other",
+        suffix = " for other slot"},
+      {keys = "S + Shift + ", direction = -1, filtered = false, mode = "other",
+        suffix = " backwards for other slot"},
+      {keys = "F + S + ", direction = 1, filtered = true, mode = "other",
+        suffix = " with instance selection for other slot"},
+      {keys = "F + S + Shift + ", direction = -1, filtered = true, mode = "other",
+        suffix = " backwards with instance selection for other slot"},
+    }) do
+      local entry = combination
+      catalog.add("Applications", "MainMod + " .. entry.keys .. currentGroup.key:upper(),
+        "Cycle " .. currentGroup.name .. " applications" .. entry.suffix,
+        function() cycle(entry.direction, entry.filtered, entry.mode) end)
+    end
+  end
+
   hs.hotkey.bind(config.hyper, "m", function() windowNavigation:focusNext() end)
   hs.hotkey.bind(config.hyper, "n", function() windowNavigation:rotatePositions() end)
   hs.hotkey.bind(config.hyper, "h", function() windowNavigation:focusOtherDisplay() end)
-  hs.hotkey.bind(config.hyper, "/", function() windowNavigation:makeFocusedSingle() end)
-  hs.hotkey.bind(shifted(config.hyper), "/", function() windowNavigation:enableTwo() end)
+  hs.hotkey.bind(config.hyper, "/",
+    function() windowNavigation:cycleLayout(commaSelection) end, nil,
+    function() windowNavigation:cycleLayout(commaSelection) end)
   hs.hotkey.bind(config.hyper, "w", function() windowNavigation:closeFocused() end)
   hs.hotkey.bind(config.hyper, "p", function()
     windowNavigation:chooseAny(
@@ -159,15 +205,14 @@ function navigation.start()
     function() windowNavigation:rotatePositions() end)
   catalog.add("Navigation", "MainMod + H", "Focus other display",
     function() windowNavigation:focusOtherDisplay() end)
-  catalog.add("Windows", "MainMod + /", "Keep only focused window in layout",
-    function() windowNavigation:makeFocusedSingle() end)
-  catalog.add("Windows", "MainMod + Shift + /", "Use two slots",
-    function() windowNavigation:enableTwo() end)
+  catalog.add("Windows", "MainMod + /", "Choose one slot or a two-slot ratio",
+    function() windowNavigation:cycleLayout(commaSelection) end)
   catalog.add("Windows", "MainMod + W", "Close focused window",
     function() windowNavigation:closeFocused() end)
 
   navigation.services = {
     applications = applicationNavigation,
+    applicationGroups = applicationGroups,
     chooserFactory = chooserFactory,
     commaSelection = commaSelection,
     gate = gate,

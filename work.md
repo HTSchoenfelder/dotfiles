@@ -66,11 +66,14 @@ slot state, and keep the Hammerspoon Console open for Lua or Accessibility error
    A plain app key then replaces the focused slot without changing the slot count.
    `mainMod + M` changes slot focus; `mainMod + N` swaps contents while retaining
    the focused side. Check the Green active frame and Pink inactive frame.
-2. Press `mainMod + /` and `mainMod + Shift + /` in turn. The display changes to
-   one slot and back to two, refilling the other side from recent non-slot windows
-   if one is available. Repeat with that recent candidate minimized or its app
-   hidden; it is restored into the other slot while the original slot retains
-   focus. In a one-slot layout, `S` plus an app key also opens the second slot.
+2. Press `mainMod + /` once, twice and three times while holding `mainMod`.
+   The chooser highlights one full-screen slot, two 50:50 slots and two 70:30
+   slots in that order; geometry stays unchanged until `mainMod` is released.
+   Accept each choice and verify the active display's slot count and ratio.
+   The two-slot choices refill the other side from recent non-slot windows if one
+   is available. Repeat with that candidate minimized or its app hidden; it is
+   restored into the other slot while the original slot retains focus. In a
+   one-slot layout, `S` plus an app key also opens the second slot.
    `mainMod + .`, then `M`, toggles 70:30 and 50:50 on that display.
 3. Press `mainMod + H` to change the active display. Repeat with no slot window
    on the target display: its empty slot gets the Green frame even though native
@@ -86,15 +89,18 @@ slot state, and keep the Hammerspoon Console open for Lua or Accessibility error
    intended slot, and Comma Selection accepts on `mainMod` release. Reload
    Hammerspoon once more and confirm that the in-memory slot state resets. Click
    an untracked native window and confirm that its frame remains unchanged and it
-   does not replace either retained slot. Then invoke `mainMod + Shift + /` and
-   confirm that the clicked window becomes the first slot while the former slot
-   window fills the other side.
+   does not replace either retained slot. Then choose a two-slot entry through
+   `mainMod + /` and confirm that the clicked window becomes the first slot while
+   the former slot window fills the other side.
 6. Open the macOS shortcut catalog with `mainMod + Shift + R` and select
-   `Use two slots`, then a window chooser row. Confirm that both commands run and
-   that canceling the catalog performs no action.
-7. Use `mainMod + Y` and confirm that Play/Pause, Next and Previous are followed
-   by Spotify as the last entry. The Hyprland-only `I` and `U` PWA groups cannot
-   be tested here until their macOS Chrome-PWA bundle IDs are configured.
+   `Choose one slot or a two-slot ratio`, then a layout entry and a window chooser
+   row. Confirm that both commands run and that canceling the catalog performs
+   no action.
+7. Use `mainMod + I` and `mainMod + U` to cycle Chat/Meet and Gmail/Calendar.
+   Shift starts at Meet or Calendar, and release of `mainMod` accepts the current
+   app. Check `F` for instance selection and `S` for the other slot without
+   moving focus from the original side. Then use `mainMod + Y` and confirm that
+   Play/Pause, Next and Previous are followed by Spotify as the last entry.
 8. Copy two text values and an image outside a password manager. Press
    `mainMod + V`, filter the chooser and select each older item in turn. The
    chooser closes, the original window regains focus and the selected text or

@@ -333,8 +333,8 @@ function LayoutOrchestrator:_focusedCandidate(layout)
   if WindowRepository.isSlotCandidate(record) then return id end
 end
 
-function LayoutOrchestrator:keepOnly()
-  local layout, key = self:_layout(self:activeScreen())
+function LayoutOrchestrator:keepOnly(screen)
+  local layout, key = self:_layout(screen or self:activeScreen())
   if not layout then return end
   local focusedID = self:_focusedCandidate(layout)
   local id = focusedID or layout.slots[layout.focusedSlot].windowID
@@ -353,10 +353,12 @@ function LayoutOrchestrator:keepOnly()
   self:_notify()
 end
 
-function LayoutOrchestrator:enableTwo()
-  local layout, key = self:_layout(self:activeScreen())
+function LayoutOrchestrator:enableTwo(screen, ratio)
+  local layout, key = self:_layout(screen or self:activeScreen())
   if not layout then return end
   self.activeKey = key
+  local ratioChanged = ratio and layout.ratio ~= ratio
+  if ratioChanged then layout.ratio = ratio end
   if layout.wanted ~= 2 then
     local focusedID = self:_focusedCandidate(layout)
     if focusedID and focusedID ~= layout.slots[layout.focusedSlot].windowID then
@@ -377,6 +379,7 @@ function LayoutOrchestrator:enableTwo()
     self:_refill(layout, layout.focusedSlot, nil, true)
   end
   self:_refill(layout, 3 - layout.focusedSlot, nil, false)
+  if ratioChanged then self:_reflow(layout); self:_notify() end
 end
 
 function LayoutOrchestrator:toggleRatio()

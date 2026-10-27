@@ -29,6 +29,8 @@ end
 
 local CommaSelection = require("modules.comma_selection")
 local MediaControls = require("modules.media_controls")
+local RequestGate = require("modules.request_gate")
+local WindowNavigation = require("modules.window_navigation")
 local comma = CommaSelection.new(chooserFactory)
 local selected
 comma:cycle("windows", 1, {
@@ -89,5 +91,46 @@ media:cycle(-1)
 assert(chooser.row == 4 and chooser.choices[4].text == "Spotify")
 taps[#taps].callback({getFlags = function() return {} end})
 assert(tasks[3].open)
+
+local activeScreen = "first"
+local actions = {}
+local layoutGate = RequestGate.new()
+local layoutNavigation = WindowNavigation.new({
+  gate = layoutGate,
+  orchestrator = {
+    activeScreen = function() return activeScreen end,
+    keepOnly = function(_, screen) actions[#actions + 1] = {"single", screen} end,
+    enableTwo = function(_, screen, ratio)
+      actions[#actions + 1] = {"split", screen, ratio}
+    end,
+  },
+})
+local function releaseLayout()
+  taps[#taps].callback({getFlags = function() return {} end})
+end
+
+layoutNavigation:cycleLayout(comma)
+assert(chooser.row == 1 and chooser.choices[1].text == "One slot, full screen")
+assert(chooser.choices[2].text == "Two slots, 50:50")
+assert(chooser.choices[3].text == "Two slots, 70:30")
+assert(#actions == 0)
+activeScreen = "second"
+releaseLayout()
+assert(actions[1][1] == "single" and actions[1][2] == "first")
+
+layoutNavigation:cycleLayout(comma)
+layoutNavigation:cycleLayout(comma)
+assert(chooser.row == 2 and #actions == 1)
+releaseLayout()
+assert(actions[2][1] == "split" and actions[2][2] == "second"
+  and actions[2][3] == 0.5)
+
+layoutNavigation:cycleLayout(comma)
+layoutNavigation:cycleLayout(comma)
+layoutNavigation:cycleLayout(comma)
+assert(chooser.row == 3 and #actions == 2)
+releaseLayout()
+assert(actions[3][1] == "split" and actions[3][2] == "second"
+  and actions[3][3] == 0.7)
 
 print("Hammerspoon selection tests passed")

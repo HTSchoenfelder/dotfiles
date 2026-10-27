@@ -116,14 +116,46 @@ function WindowNavigation:_otherScreen(current)
   return screens[currentIndex % #screens + 1]
 end
 
-function WindowNavigation:makeFocusedSingle()
+function WindowNavigation:makeFocusedSingle(screen)
   self.gate:next()
-  self.orchestrator:keepOnly()
+  self.orchestrator:keepOnly(screen)
 end
 
-function WindowNavigation:enableTwo()
+function WindowNavigation:enableTwo(screen, ratio)
   self.gate:next()
-  self.orchestrator:enableTwo()
+  self.orchestrator:enableTwo(screen, ratio)
+end
+
+function WindowNavigation:cycleLayout(commaSelection)
+  local kind = "layout"
+  local session = commaSelection.session
+  if session and session.kind == kind and self.gate:isCurrent(session.generation) then
+    commaSelection:cycle(kind, 1, {})
+    return
+  end
+
+  local screen = self.orchestrator:activeScreen()
+  if not screen then return end
+  local generation = self.gate:next()
+  local items = {
+    {id = "single", text = "One slot, full screen"},
+    {id = "half", text = "Two slots, 50:50", ratio = 0.5},
+    {id = "wide", text = "Two slots, 70:30", ratio = 0.7},
+  }
+  commaSelection:cycle(kind, 1, {
+    currentID = items[#items].id,
+    screen = screen,
+    load = function(done) done(items) end,
+    onSelect = function(item)
+      if not self.gate:isCurrent(generation) then return end
+      hs.timer.doAfter(0, function()
+        if not self.gate:isCurrent(generation) then return end
+        if item.id == "single" then self:makeFocusedSingle(screen)
+        else self:enableTwo(screen, item.ratio) end
+      end)
+    end,
+  })
+  if commaSelection.session then commaSelection.session.generation = generation end
 end
 
 function WindowNavigation:toggleRatio()

@@ -68,7 +68,17 @@ local byKey = {}
 for _, definition in ipairs(definitions) do
   if definition.key then byKey[definition.key] = definition end
 end
-assert(byKey.i.bundleID == "com.google.Chrome.app.pommaclcbfghclhalboakcipcmmndhcj")
+assert(byKey.i == nil and byKey.u == nil)
+local byID = {}
+for _, definition in ipairs(definitions) do
+  if definition.id then byID[definition.id] = definition end
+end
+assert(byID.chat.bundleID == "com.google.Chrome.app.pommaclcbfghclhalboakcipcmmndhcj")
+assert(byID.meet.bundleID == "com.google.Chrome.app.kjgfgldnnfoeklkmfkjfagphfepbbdan")
+assert(byID.gmail.bundleID == "com.google.Chrome.app.fmgjjmmmlfnkbppncabfkddbjimcfncm")
+assert(byID.calendar.bundleID == "com.google.Chrome.app.kjbdgfilnfhdoflbpgamdcdgpehopbep")
+assert(definitions.groups[1].key == "i" and definitions.groups[1].applications[2] == "meet")
+assert(definitions.groups[2].key == "u" and definitions.groups[2].applications[2] == "calendar")
 assert(byKey.j.launchEnvironment.START_ZELLIJ == "1")
 
 local WindowNavigation = require("modules.window_navigation")

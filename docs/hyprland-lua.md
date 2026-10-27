@@ -104,7 +104,8 @@ macOS uses the same `F` filter, `S` target and Shift direction axes, two-slot mo
 vacant source slots after cross-display selection and ratios. Its native non-slot
 windows replace Parking as refill candidates; an empty display is selected through
 Hammerspoon's retained active-frame state. Dot Mode still uses `M` for the ratio
-on macOS.
+on macOS. macOS selects one slot or a 50:50/70:30 split through a `mainMod + /`
+Comma Selection instead of Hyprland's direct `/` and `Shift + /` actions.
 
 | File | Responsibility |
 | --- | --- |

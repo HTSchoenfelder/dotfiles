@@ -135,9 +135,16 @@ function ApplicationNavigation:_waitForWindow(application, request, chooseInstan
   poll()
 end
 
-function ApplicationNavigation:activate(application, mode, chooseInstance)
-  local generation = self.gate:next()
-  local request = self:_request(application, mode, generation)
+function ApplicationNavigation:activate(application, mode, chooseInstance, request)
+  local generation
+  if request then
+    generation = request.generation
+    if not self.gate:isCurrent(generation) then return end
+    request.application = application
+  else
+    generation = self.gate:next()
+    request = self:_request(application, mode, generation)
+  end
   if not request then return end
   self.repository:listForBundle(application.bundleID, function(windows)
     if not self.gate:isCurrent(generation) then return end

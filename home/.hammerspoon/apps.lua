@@ -1,4 +1,4 @@
-return {
+local applications = {
   {
     key = "j",
     name = "Kitty / Zellij",
@@ -19,11 +19,33 @@ return {
     newWindowShortcut = {modifiers = {"cmd"}, key = "n"},
   },
   {
-    key = "i",
+    id = "chat",
     name = "Google Chat",
     bundleID = "com.google.Chrome.app.pommaclcbfghclhalboakcipcmmndhcj",
+  },
+  {
+    id = "meet",
+    name = "Google Meet",
+    bundleID = "com.google.Chrome.app.kjgfgldnnfoeklkmfkjfagphfepbbdan",
+  },
+  {
+    id = "gmail",
+    name = "Gmail",
+    bundleID = "com.google.Chrome.app.fmgjjmmmlfnkbppncabfkddbjimcfncm",
+  },
+  {
+    id = "calendar",
+    name = "Google Calendar",
+    bundleID = "com.google.Chrome.app.kjbdgfilnfhdoflbpgamdcdgpehopbep",
   },
   {key = ";", name = "Obsidian", bundleID = "md.obsidian"},
   {key = "o", name = "KeePassXC", bundleID = "org.keepassxc.keepassxc"},
   {name = "Spotify", bundleID = "com.spotify.client"},
 }
+
+applications.groups = {
+  {key = "i", name = "Chat / Meet", applications = {"chat", "meet"}},
+  {key = "u", name = "Mail / Calendar", applications = {"gmail", "calendar"}},
+}
+
+return applications
