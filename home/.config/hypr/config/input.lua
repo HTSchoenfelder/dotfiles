@@ -14,3 +14,8 @@ hl.config({
         },
     },
 })
+
+hl.device({
+    name = "cherry-mw-8c-advanced",
+    sensitivity = -0.5,
+})
