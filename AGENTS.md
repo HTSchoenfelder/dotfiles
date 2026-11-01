@@ -12,6 +12,12 @@ These instructions apply to the entire repository.
 - Inspect the repository and current diff before editing. Preserve unrelated work.
 - Prefer small, reviewable changes. Do not commit, push, reset or rebase unless
   explicitly requested.
+- Implement agreed behavior with the simplest direct solution. Add abstractions,
+  fallback layers and special cases only when a concrete requirement needs them.
+- In shared configuration, declare shared behavior once for all platforms, even
+  when it matches a platform default. Use platform conditions only for necessary
+  technical differences; retain context boundaries such as editor and terminal
+  focus.
 - Update every affected document and shortcut reference with each behavior or
   architecture change. Always inspect `readme.md`.
 - `work.md` is the single backlog and macOS test document. Only act on a pending

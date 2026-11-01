@@ -62,35 +62,49 @@ pending({{id = "1", text = "One"}, {id = "2", text = "Two"}})
 assert(chooser.row == 2)
 
 comma:cancel()
-local tasks = {}
-local function taskNew(path, callback, arguments)
-  local task = {path = path, callback = callback, arguments = arguments}
-  function task:start() tasks[#tasks + 1] = self; return true end
-  return task
-end
+local mediaActions = {}
 local media = MediaControls.new({
   commaSelection = comma,
-  openSpotify = function() tasks[#tasks + 1] = {open = true} end,
-  taskNew = taskNew,
-  notify = function() error("Media action unexpectedly failed") end,
+  openSpotify = function() mediaActions[#mediaActions + 1] = "spotify" end,
+  sendMediaKey = function(key) mediaActions[#mediaActions + 1] = key end,
 })
 media:cycle(1)
 assert(chooser.row == 1 and chooser.choices[1].text == "Play/Pause")
 taps[#taps].callback({getFlags = function() return {} end})
-assert(tasks[1].path == "/usr/bin/osascript")
-assert(tasks[1].arguments[2]:match("playpause$"))
+assert(mediaActions[1] == "PLAY")
 
 media:cycle(1)
 media:cycle(1)
 assert(chooser.row == 2 and chooser.choices[2].text == "Next")
 taps[#taps].callback({getFlags = function() return {} end})
-assert(tasks[2].path == "/usr/bin/osascript")
-assert(tasks[2].arguments[2]:match("next track$"))
+assert(mediaActions[2] == "NEXT")
+
+media:cycle(1)
+media:cycle(1)
+media:cycle(1)
+assert(chooser.row == 3)
+taps[#taps].callback({getFlags = function() return {} end})
+assert(mediaActions[3] == "PREVIOUS")
 
 media:cycle(-1)
 assert(chooser.row == 4 and chooser.choices[4].text == "Spotify")
 taps[#taps].callback({getFlags = function() return {} end})
-assert(tasks[3].open)
+assert(mediaActions[4] == "spotify")
+
+media:cycle(1)
+chooser.callback(nil)
+assert(#mediaActions == 4, "cancel must not send a media key")
+
+local systemEvents = {}
+hs.eventtap.event.newSystemKeyEvent = function(key, down)
+  return {post = function() systemEvents[#systemEvents + 1] = {key = key, down = down} end}
+end
+local nativeMedia = MediaControls.new({commaSelection = comma, openSpotify = function() end})
+for index = 1, 3 do
+  nativeMedia:execute(MediaControls.actions[index])
+  assert(systemEvents[index * 2 - 1].key == MediaControls.actions[index].mediaKey)
+  assert(systemEvents[index * 2 - 1].down and not systemEvents[index * 2].down)
+end
 
 local activeScreen = "first"
 local actions = {}

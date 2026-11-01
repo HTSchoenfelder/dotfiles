@@ -101,12 +101,38 @@ slot state, and keep the Hammerspoon Console open for Lua or Accessibility error
    app. Check `F` for instance selection and `S` for the other slot without
    moving focus from the original side. Then use `mainMod + Y` and confirm that
    Play/Pause, Next and Previous are followed by Spotify as the last entry.
+   Start playback in the Spotify Chrome PWA, focus another app, select each
+   player action and release all `mainMod` modifiers. The chooser closes and
+   macOS delivers the matching media key to the active player. The last entry
+   activates the installed Spotify PWA in the selected slot. Repeat backwards
+   and cancel once to verify that canceling sends no media action. No native
+   Spotify installation or Apple Events permission is required.
 8. Copy two text values and an image outside a password manager. Press
    `mainMod + V`, filter the chooser and select each older item in turn. The
    chooser closes, the original window regains focus and the selected text or
    image is pasted. Copy a value in KeePassXC and confirm it does not appear.
    Reload Hammerspoon and confirm that the clipboard history is empty apart from
    the pasteboard item current at reload time.
+9. In VS Code, test `Ctrl+A/C/X/V/Z/Y` in Quick Open/search inputs and extension
+   webview inputs such as Codex Chat using disposable text. Repeat the VS Code
+   checks on NixOS: the shared bindings use the same keys and context boundaries
+   on both platforms, including actions that match Linux defaults. Verify
+   copy/paste in Explorer and lists, and `Ctrl+S/W/B`, `Ctrl+Shift+F` and other workbench actions
+   outside editor text. In a disposable editor, test Normal, Insert, Visual and
+   command-line modes: the added GUI editing translation must never run there.
+   Existing explicit Quick Open/MRU/terminal workbench exceptions still apply.
+   In the integrated terminal, compare `Ctrl+A/E/P/J/C` and word navigation with
+   Kitty/Zsh; `Ctrl+P` must not open Quick Open, `Ctrl+E` must not leave the
+   terminal and `Ctrl+J` must not hide it. Select harmless output and verify
+   `Ctrl+Shift+C`, then paste harmless text using `Ctrl+Shift+V` in both terminals.
+10. In KeePassXC, use a disposable database with dummy credentials and TOTP.
+    Check `Ctrl+B/C/U/T/Y` (username/password/URL/TOTP/password plus TOTP),
+    `Ctrl+Shift+B/C/T` (visibility/show TOTP), `Ctrl+F`, new/edit/clone entry,
+    settings, save and `Ctrl+L`/`Ctrl+Shift+L`. With two disposable databases,
+    check `Ctrl+Tab`, `Ctrl+Shift+Tab`, `Ctrl+PageUp/PageDown`, `Alt+1..9` and
+    `Ctrl+F4`. Test entry Auto-Type through `Ctrl+Shift+V` only into a disposable
+    text field. Confirm normal text editing and that clipboard history still
+    excludes KeePassXC. Do not change global Auto-Type or Secret Service settings.
 
 ### Failure handling and report
 

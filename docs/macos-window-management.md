@@ -29,7 +29,7 @@ this workflow.
 
 Hammerspoon also hosts the current GUI key-remapping event tap. VS Code keeps
 context-sensitive command, Monaco, Vim and terminal ownership in its native
-keybinding system; Hammerspoon only adds Accessibility-gated navigation for
+keybinding system; Hammerspoon adds Accessibility-gated editing and navigation for
 native and webview text inputs. This input boundary is intentionally documented
 separately from window geometry.
 
@@ -158,7 +158,9 @@ shortcut catalog. Selecting a catalog row runs its registered action; choosing a
 Comma Selection or media row opens its normal chooser for the final selection.
 The launcher places an existing application window in the captured focused slot;
 new native windows are assigned from window-created events.
-Spotify actions run asynchronously through `osascript`.
+Player actions send native macOS media-key press/release pairs to the active
+player. The Spotify launcher targets the installed Chrome PWA by its bundle ID;
+it does not require the native Spotify application or Apple Events permission.
 
 RØDECaster MIDI remains entirely in Hammerspoon. `MainMod + Backslash` sends one
 absolute mute or unmute value; it does not emulate a momentary button press. The

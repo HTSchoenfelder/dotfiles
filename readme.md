@@ -16,8 +16,9 @@ documented.
 
 Keyboard parity extends beyond window management: Linux-shaped `Ctrl` editing,
 text navigation and application shortcuts should retain their physical keys even
-where macOS expects `Command` or `Option`. The current implementation and remaining
-VS Code and application-specific gaps are tracked in the
+where macOS expects `Command` or `Option`. VS Code keeps editing translation
+outside all Vim modes, and KeePassXC has its own application map. The current
+implementation and platform boundaries are described in the
 [macOS keyboard parity](docs/macos-keyboard-parity.md) document.
 
 The fixed Kinesis Advantage 360 Pro ZMK layout is the physical foundation for
@@ -104,12 +105,17 @@ runs Ruby diagnostics after reading and writing a buffer. See the active
 
 VSCodeVim stays close to its defaults and uses the same physical workflow on
 NixOS and macOS. Relative line numbers and Space as leader are the intentional
-baseline customizations. The shared VS Code keybindings retain only Quick Open,
+baseline customizations. The shared VS Code keybindings retain Quick Open,
 the Command Palette, editor MRU selection, context-limited editor focus and the
 intentional integrated-terminal controls on `Ctrl+J`, `Ctrl+Shift+J` and
 `Ctrl+'`; Insert-mode `Ctrl+J` is explicitly mapped to VSCodeVim `<Enter>` so the
-terminal shortcut preserves standard editing behavior. All other modal behavior
-comes from VSCodeVim. See the active
+terminal shortcut preserves standard editing behavior. These workbench shortcuts
+leave terminal focus to the shell; `Ctrl+Shift+C/V` copies and pastes there as in
+Kitty. Standard `Ctrl` editing and workbench shortcuts are explicitly shared
+between Linux and macOS outside editor text and the terminal, even when they
+match Linux defaults. Hammerspoon also handles native and extension webview text
+inputs on macOS. All Vim modes remain excluded from the additional editing
+translation. See the active
 [VS Code Vim design](docs/vscode-vim.md) for the target and current state.
 
 ## macOS / Hammerspoon quick reference
@@ -341,14 +347,19 @@ maps it to tab search, Back, previous tab, next tab and Forward. The macOS layer
 implements the same actions and translates the common Linux-shaped Chrome and
 system text shortcuts to their native macOS events. VS Code remains context-owned
 for commands, Monaco, Vim and its terminal, while native and webview text inputs
-receive the same navigation translation. Its status is documented in
+receive editing and navigation translation. Its status is documented in
 [macOS keyboard parity](docs/macos-keyboard-parity.md).
 
 Media, volume, microphone and brightness hardware keys use their native actions.
 The `Y` selection contains Play/Pause, Next and Previous followed by Spotify
-itself, so Spotify no longer needs a direct App Key. The `I` and `U` Google PWA
+itself, so Spotify no longer needs a direct App Key. On macOS, the first three
+entries send native media keys to the active player, including Spotify's Chrome
+PWA; the last entry opens that installed PWA. The `I` and `U` Google PWA
 groups use the locally installed Chrome app bundle IDs on macOS and the same
 modifier-release selection flow as Hyprland.
+KeePassXC maps its Linux `Ctrl` actions to native macOS shortcuts through
+Hammerspoon, including username/password/TOTP copying, locking, Auto-Type and
+database navigation. Its configuration and database remain application-owned.
 The actionable Hyprland shortcut catalog shows the description first and aligns
 the shortcut on the right. It includes global bindings, modifier combinations,
 Dot mode and hardware/media bindings; selecting a row runs that action.

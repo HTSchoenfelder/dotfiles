@@ -40,7 +40,8 @@ local applications = {
   },
   {key = ";", name = "Obsidian", bundleID = "md.obsidian"},
   {key = "o", name = "KeePassXC", bundleID = "org.keepassxc.keepassxc"},
-  {name = "Spotify", bundleID = "com.spotify.client"},
+  {id = "spotify", name = "Spotify",
+    bundleID = "com.google.Chrome.app.pjibgclleladliembfgfagdaldikeohf"},
 }
 
 applications.groups = {

@@ -77,6 +77,7 @@ assert(byID.chat.bundleID == "com.google.Chrome.app.pommaclcbfghclhalboakcipcmmn
 assert(byID.meet.bundleID == "com.google.Chrome.app.kjgfgldnnfoeklkmfkjfagphfepbbdan")
 assert(byID.gmail.bundleID == "com.google.Chrome.app.fmgjjmmmlfnkbppncabfkddbjimcfncm")
 assert(byID.calendar.bundleID == "com.google.Chrome.app.kjbdgfilnfhdoflbpgamdcdgpehopbep")
+assert(byID.spotify.bundleID == "com.google.Chrome.app.pjibgclleladliembfgfagdaldikeohf")
 assert(definitions.groups[1].key == "i" and definitions.groups[1].applications[2] == "meet")
 assert(definitions.groups[2].key == "u" and definitions.groups[2].applications[2] == "calendar")
 assert(byKey.j.launchEnvironment.START_ZELLIJ == "1")

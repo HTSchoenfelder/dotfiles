@@ -12,6 +12,21 @@ local generalCommandKeys = {
   z = true,
 }
 
+local keepassCommandKeys = {
+  [","] = true, ["/"] = true,
+  b = true, c = true, d = true, e = true, f = true, l = true,
+  m = true, n = true, o = true, q = true, s = true, t = true,
+  u = true, w = true, y = true,
+  up = true, down = true, pageup = true, pagedown = true,
+}
+
+local keepassShiftCommandKeys = {
+  [","] = true,
+  b = true, c = true, j = true, l = true, m = true, n = true,
+  r = true, s = true, t = true, u = true, v = true,
+  pageup = true, pagedown = true,
+}
+
 local chromeCustomKeys = {
   h = {mods = {"cmd"}, key = "left"},
   j = {mods = {"ctrl", "shift"}, key = "tab"},
@@ -86,6 +101,7 @@ function KeyRemapper.new(options, runtime)
 
   return setmetatable({
     chromeBundleID = options.chromeBundleID or "com.google.Chrome",
+    keepassBundleID = options.keepassBundleID or "org.keepassxc.keepassxc",
     terminalApps = toSet(options.terminalBundleIDs),
     vsCodeBundleID = options.vsCodeBundleID or "com.microsoft.VSCode",
     eventtapNew = runtime.eventtapNew or function(types, callback)
@@ -106,6 +122,32 @@ function KeyRemapper.new(options, runtime)
       hs.eventtap.keyStroke(mods, key, 0)
     end,
   }, KeyRemapper)
+end
+
+function KeyRemapper:_keepassTranslation(key, flags)
+  if flags.cmd then return nil end
+
+  -- Linux uses Alt+1..9 for database tabs; macOS uses Command+1..9.
+  if flags.alt then
+    if not flags.ctrl and not flags.shift and key:match("^[1-9]$") then
+      return {mods = {"cmd"}, key = key}
+    end
+    return nil
+  end
+  if not flags.ctrl then return nil end
+  if key == "tab" then
+    return {mods = modifiers({"alt"}, flags.shift), key = key}
+  end
+  if key == "f4" and not flags.shift then
+    return {mods = {"cmd"}, key = "w"}
+  end
+
+  -- KeePassXC deliberately keeps physical Ctrl+H/Shift+H for the SSH agent.
+  local keys = flags.shift and keepassShiftCommandKeys or keepassCommandKeys
+  if keys[key] then
+    return {mods = modifiers({"cmd"}, flags.shift), key = key}
+  end
+  return nil
 end
 
 function KeyRemapper:_terminalTranslation(key, flags)
@@ -218,9 +260,13 @@ function KeyRemapper:translate(bundleID, key, flags, context)
   end
   if bundleID == self.vsCodeBundleID then
     if context and context.vsCodeTextInput then
-      return self:_textTranslation(key, flags)
+      return self:_textTranslation(key, flags) or self:_editingTranslation(key, flags)
     end
     return nil
+  end
+  if bundleID == self.keepassBundleID then
+    local keepassTarget = self:_keepassTranslation(key, flags)
+    if keepassTarget then return keepassTarget end
   end
   if bundleID == self.chromeBundleID then
     local chromeTarget = self:_chromeTranslation(key, flags)
@@ -242,7 +288,8 @@ function KeyRemapper:_handle(event)
   local key = self.keyName(event:getKeyCode())
   local flags = event:getFlags()
   local context
-  if bundleID == self.vsCodeBundleID and self:_textTranslation(key, flags) then
+  if bundleID == self.vsCodeBundleID
+      and (self:_textTranslation(key, flags) or self:_editingTranslation(key, flags)) then
     context = {vsCodeTextInput = self:_isVSCodeTextInput()}
   end
 

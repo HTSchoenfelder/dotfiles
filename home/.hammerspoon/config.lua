@@ -43,6 +43,7 @@ config.clipboardHistory = {
 
 config.keyboard = {
   chromeBundleID = "com.google.Chrome",
+  keepassBundleID = "org.keepassxc.keepassxc",
   vsCodeBundleID = "com.microsoft.VSCode",
   terminalBundleIDs = {
     "net.kovidgoyal.kitty",

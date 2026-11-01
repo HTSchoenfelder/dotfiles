@@ -5,17 +5,17 @@ local actions = {
   {
     id = "play_pause",
     text = "Play/Pause",
-    script = 'tell application id "com.spotify.client" to playpause',
+    mediaKey = "PLAY",
   },
   {
     id = "next",
     text = "Next",
-    script = 'tell application id "com.spotify.client" to next track',
+    mediaKey = "NEXT",
   },
   {
     id = "previous",
     text = "Previous",
-    script = 'tell application id "com.spotify.client" to previous track',
+    mediaKey = "PREVIOUS",
   },
   {
     id = "spotify",
@@ -24,8 +24,9 @@ local actions = {
   },
 }
 
-local function defaultNotify(message)
-  hs.notify.new({title = "Media controls", informativeText = message}):send()
+local function sendMediaKey(key)
+  hs.eventtap.event.newSystemKeyEvent(key, true):post()
+  hs.eventtap.event.newSystemKeyEvent(key, false):post()
 end
 
 function MediaControls.new(options)
@@ -33,36 +34,14 @@ function MediaControls.new(options)
   return setmetatable({
     commaSelection = assert(options.commaSelection, "Comma Selection is required"),
     openSpotify = assert(options.openSpotify, "Spotify opener is required"),
-    taskNew = options.taskNew or hs.task.new,
-    notify = options.notify or defaultNotify,
-    tasks = {},
-    taskSerial = 0,
+    sendMediaKey = options.sendMediaKey or sendMediaKey,
   }, MediaControls)
 end
 
 function MediaControls:execute(action)
   if not action then return end
   if action.open then self.openSpotify(); return end
-  if not action.script then return end
-  self.taskSerial = self.taskSerial + 1
-  local serial = self.taskSerial
-  local task
-  task = self.taskNew("/usr/bin/osascript", function(exitCode, _, stderr)
-    self.tasks[serial] = nil
-    if exitCode ~= 0 then
-      local message = (stderr or ""):gsub("^%s+", ""):gsub("%s+$", "")
-      self.notify(message ~= "" and message or "Spotify action failed")
-    end
-  end, {"-e", action.script})
-  if not task then
-    self.notify("Could not create Spotify task")
-    return
-  end
-  self.tasks[serial] = task
-  if not task:start() then
-    self.tasks[serial] = nil
-    self.notify("Could not start Spotify task")
-  end
+  if action.mediaKey then self.sendMediaKey(action.mediaKey) end
 end
 
 function MediaControls:cycle(direction)

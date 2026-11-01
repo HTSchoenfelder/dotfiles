@@ -31,8 +31,8 @@ remain a workbench terminal control outside Insert mode. There are no Normal,
 Visual or command-line mode remappings. VS Code shows relative line numbers;
 `vim.smartRelativeLine` is deliberately not enabled.
 
-The shared `home/.config/Code/User/keybindings.json` contains only these explicit
-cross-platform exceptions:
+The shared `home/.config/Code/User/keybindings.json` retains these explicit
+cross-platform workbench exceptions outside terminal focus:
 
 | Physical shortcut | Action | Difference from defaults |
 | --- | --- | --- |
@@ -40,25 +40,44 @@ cross-platform exceptions:
 | `Ctrl+Shift+P` | Open the Command Palette | Matches the Linux default and preserves the physical key on macOS |
 | `Ctrl+,` | Select the previous MRU editor, then continue forward | Custom on both platforms; replaces the VS Code Settings shortcut |
 | `Ctrl+Shift+,` | Select the least-recently-used editor, then continue backward | Custom on both platforms |
-| `Ctrl+E` outside editor text | Return focus to the active editor group | Custom on both platforms; Vim retains `Ctrl+E` while editing |
+| `Ctrl+E` outside editor text and terminal focus | Return focus to the active editor group | Custom on both platforms; Vim and the shell retain `Ctrl+E` |
 | `Ctrl+J` while a terminal exists | Toggle the integrated terminal | Custom outside VSCodeVim Insert mode; Insert mode maps it to VSCodeVim `<Enter>` |
 | `Ctrl+Shift+J` | Create an integrated terminal | Custom except in VSCodeVim Insert mode |
 | `Ctrl+'` | Toggle the maximized panel | Custom on both platforms |
 
 MRU means most recently used. The editor chooser follows focus history rather
 than tab position. The J shortcuts are workbench-owned outside VSCodeVim Insert
-mode and remain available while the integrated terminal has focus. The explicit
+mode and terminal focus. The explicit
 Insert-mode route hands `Ctrl+J` back to VSCodeVim, where the compatibility
 mapping gives it the same behavior as `<Enter>` instead of bypassing VSCodeVim's
-cursor state. All other editor, workbench, list, Explorer and terminal keys come
-from VS Code, VSCodeVim and the platform defaults.
+cursor state. The existing workbench exceptions remain available in their
+documented editor contexts; no additional GUI editing translation applies in
+any Monaco editor mode, including Insert mode.
+
+Shared context-bound rules explicitly define the same `Ctrl` actions on Linux
+and macOS outside editor text and terminal focus, including Linux defaults:
+select all, copy/cut/paste, undo/redo, find, save/save-as/save-all, close, new/open,
+sidebar and view commands, editor-group
+focus, splitting and zoom. Hammerspoon additionally translates editing and text
+navigation in native and extension webview text inputs, including Codex Chat;
+its Accessibility checks exclude Monaco and the integrated terminal.
+
+While the integrated terminal has focus, the custom Quick Open, palette, MRU,
+focus and panel/terminal controls yield to shell/TUI input on both platforms.
+In particular, `Ctrl+P` reaches Zsh history, `Ctrl+E` reaches line-end navigation
+and `Ctrl+J` reaches the terminal rather than hiding it. `Ctrl+Shift+C/V` use
+VS Code's terminal copy/paste commands on both platforms, matching Kitty.
+Explicit empty-command rules for terminal-focused `Ctrl+A..Z`, the former
+workbench keys and `Ctrl+Shift+P/J` stop fallback to built-in or extension
+bindings, including VS Code's `Ctrl+K` chord prefix. The terminal receives the
+original key event rather than a hard-coded escape sequence.
 
 ## Ownership
 
 - `home/.config/Code/User/settings.json` owns shared VS Code and VSCodeVim
   settings.
-- `home/.config/Code/User/keybindings.json` owns the minimal cross-platform
-  shortcut exceptions.
+- `home/.config/Code/User/keybindings.json` owns context-bound workbench
+  shortcuts, shared `Ctrl` actions outside the editor and terminal clipboard actions.
 - `home/.config/nvim/` owns Neovim behavior independently. Shared conventions
   such as the Space leader should remain aligned deliberately rather than by
   loading one editor's configuration into the other.

@@ -71,6 +71,7 @@ local gui = "com.apple.TextEdit"
 local chrome = "com.google.Chrome"
 local terminal = "net.kovidgoyal.kitty"
 local vscode = "com.microsoft.VSCode"
+local keepass = "org.keepassxc.keepassxc"
 
 assertTarget(gui, "c", {ctrl = true}, {"cmd"}, "c")
 assertTarget(gui, "z", {ctrl = true, shift = true}, {"cmd", "shift"}, "z")
@@ -90,6 +91,27 @@ assertTarget(terminal, "c", {ctrl = true, shift = true}, {"cmd"}, "c")
 assertTarget(terminal, "v", {ctrl = true, shift = true}, {"cmd"}, "v")
 assertTarget(terminal, "z", {ctrl = true, shift = true}, {"cmd", "shift"}, "z")
 assertIgnored(vscode, "c", {ctrl = true})
+assertIgnored(vscode, "c", {ctrl = true, shift = true})
+
+assertTarget(keepass, "y", {ctrl = true}, {"cmd"}, "y")
+assertTarget(keepass, "b", {ctrl = true}, {"cmd"}, "b")
+assertTarget(keepass, "c", {ctrl = true, shift = true}, {"cmd", "shift"}, "c")
+assertTarget(keepass, "l", {ctrl = true, shift = true}, {"cmd", "shift"}, "l")
+assertTarget(keepass, "v", {ctrl = true, shift = true}, {"cmd", "shift"}, "v")
+assertTarget(keepass, "j", {ctrl = true, shift = true}, {"cmd", "shift"}, "j")
+assertTarget(keepass, ",", {ctrl = true, shift = true}, {"cmd", "shift"}, ",")
+assertTarget(keepass, "down", {ctrl = true}, {"cmd"}, "down")
+assertTarget(keepass, "tab", {ctrl = true}, {"alt"}, "tab")
+assertTarget(keepass, "tab", {ctrl = true, shift = true}, {"alt", "shift"}, "tab")
+assertTarget(keepass, "pageup", {ctrl = true, shift = true}, {"cmd", "shift"}, "pageup")
+assertTarget(keepass, "f4", {ctrl = true}, {"cmd"}, "w")
+assertTarget(keepass, "9", {alt = true}, {"cmd"}, "9")
+assertTarget(keepass, "left", {ctrl = true}, {"alt"}, "left")
+assertIgnored(keepass, "h", {ctrl = true})
+assertIgnored(keepass, "h", {ctrl = true, shift = true})
+assertIgnored(keepass, "1", {ctrl = true})
+assertIgnored(keepass, "y", {ctrl = true, alt = true, cmd = true})
+assertIgnored(keepass, "a", {ctrl = true, alt = true})
 
 local codexInput = axElement({
   AXRole = "AXTextArea",
@@ -111,6 +133,8 @@ assert(remapper:_isVSCodeTextInput(searchInput))
 assert(not remapper:_isVSCodeTextInput(editorInput))
 assert(not remapper:_isVSCodeTextInput(terminalInput))
 assertTarget(vscode, "left", {ctrl = true}, {"alt"}, "left", {vsCodeTextInput = true})
+assertTarget(vscode, "c", {ctrl = true}, {"cmd"}, "c", {vsCodeTextInput = true})
+assertTarget(vscode, "y", {ctrl = true}, {"cmd", "shift"}, "z", {vsCodeTextInput = true})
 assertIgnored(vscode, "left", {ctrl = true})
 
 assertTarget(chrome, "p", {ctrl = true}, {"cmd", "shift"}, "a")
@@ -164,6 +188,20 @@ assert(#sent == 2, "Monaco editor navigation must remain application-owned")
 focusedElement = terminalInput
 assert(not createdTaps[1].callback(wordLeftEvent))
 assert(#sent == 2, "terminal navigation must remain shell-owned")
+
+local copyEvent = {
+  getFlags = function() return {ctrl = true} end,
+  getKeyCode = function() return "c" end,
+}
+for _, element in ipairs({editorInput, terminalInput}) do
+  focusedElement = element
+  assert(not createdTaps[1].callback(copyEvent))
+end
+assert(#sent == 2, "editor and terminal copy must remain application-owned")
+focusedElement = codexInput
+assert(createdTaps[1].callback(copyEvent))
+assert(#sent == 3 and sent[3].key == "c")
+assertModifiers(sent[3].mods, {"cmd"})
 
 remapper:stop()
 assert(not createdTaps[1].started and remapper.tap == nil)

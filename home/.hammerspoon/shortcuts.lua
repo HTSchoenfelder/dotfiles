@@ -33,7 +33,7 @@ function shortcuts.start(services)
 
   local spotify
   for _, application in ipairs(applications) do
-    if application.bundleID == "com.spotify.client" then spotify = application; break end
+    if application.id == "spotify" then spotify = application; break end
   end
   assert(spotify, "Spotify application must be configured")
   local mediaControls = MediaControls.new({
