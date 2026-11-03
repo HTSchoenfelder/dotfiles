@@ -49,9 +49,11 @@ editing and navigation in native and webview text inputs. There is no active
 | `Ctrl+Shift+C/V` in native terminals | `Command+C/V` | Implemented |
 | Other `Ctrl` keys in native terminals | Untranslated | Correctly preserved for shells and TUIs |
 
-The Zsh configuration explicitly binds the terminal sequences for
-`Ctrl+Left/Right` to `backward-word` and `forward-word`. Terminal word navigation
-is therefore shell-owned rather than translated to a macOS GUI shortcut.
+Zsh uses its standard Emacs keymap. Terminal word navigation is shell-owned;
+there are no manual `Ctrl+Left/Right` sequence bindings or macOS GUI translations
+for terminal input. `Ctrl+X`, then `Ctrl+E`, edits the current input in Neovim and
+returns it to the prompt before execution. See the
+[shell editing reference](../readme.md#shell-editing).
 
 Secure Input and applications that consume an event before Hammerspoon can
 translate it remain platform limitations. These cases should be exceptions, not

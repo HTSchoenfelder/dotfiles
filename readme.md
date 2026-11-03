@@ -91,6 +91,21 @@ direct compositor `exec` calls, so they start only with `start-hyprland`, restar
 on failure and stop with the compositor. Hyprland Lua owns compositor behavior
 and user-triggered actions, not daemon lifetime.
 
+## Shell editing
+
+Zsh uses its standard Emacs keymap on both platforms. `Ctrl+J` accepts the input,
+`Ctrl+R` searches history, `Ctrl+T` transposes characters and `Alt+C` capitalizes a
+word. Completion uses Zsh's completion system without fzf's key bindings.
+The custom command-notification widget and manual Delete/`Ctrl+Left/Right`
+sequence bindings have been removed. fzf remains available as a standalone tool.
+
+`Ctrl+X`, then `Ctrl+E`, opens the current input in Neovim with its normal
+configuration. Save and quit with `:wq` to return the edited input to the prompt;
+Enter then executes it. This is the only additional shell-editing shortcut.
+Existing terminal sessions need a new Zsh process to drop previously loaded
+widgets and bindings. VS Code's separate `Ctrl+J` terminal toggle still takes
+precedence in its integrated terminal.
+
 ## Neovim
 
 The repository contains a small custom `lazy.nvim` configuration rather than a

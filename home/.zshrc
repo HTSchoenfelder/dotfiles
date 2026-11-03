@@ -1,6 +1,5 @@
 source $HOME/.zshrc_core
 source $HOME/.zshrc_cloud
-source $HOME/.zshrc_notify
 
 alias d='docker'
 alias dps='docker ps --format "table {{printf \"%.20s\" .Names}}\t{{.Image}}\t{{.Command}}\t{{.ID}}\t{{printf \"%.15s\" .Status}}"'
@@ -96,6 +95,7 @@ export PATH=$PATH:/home/henrik/.dapr/bin
 # export DOTNET_ROOT=/home/henrik/.dotnet
 export JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))
 export EDITOR=nvim
+bindkey -e
 
 fpath=(~/.docker/completions $fpath)
 
@@ -146,9 +146,10 @@ eval "$(zoxide init zsh)"
 
 eval "$(starship init zsh)"
 
-bindkey "^[[3~" delete-char
-bindkey "^[[1;5C" forward-word
-bindkey "^[[1;5D" backward-word
+autoload -Uz edit-command-line
+zle -N edit-command-line
+zstyle :zle:edit-command-line editor nvim
+bindkey -M emacs '^X^E' edit-command-line
 
 if [[ "$START_ZELLIJ" == 1 ]]; then
   eval "$(zellij setup --generate-auto-start zsh)"

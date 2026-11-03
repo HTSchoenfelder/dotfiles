@@ -26,6 +26,8 @@ that is necessary to produce the same result.
   treated as the source of truth when reasoning about current shortcuts.
 - Hyprland and Hammerspoon own global workflow shortcuts after the firmware has
   emitted its key events.
+- Hyprland sets the Cherry MW 8C Advanced pointer sensitivity to `-0.5` for this
+  mouse only; other pointing devices keep the global default.
 - Terminals and Zellij own terminal multiplexing; Neovim and VSCodeVim own
   modal editor behavior.
 
