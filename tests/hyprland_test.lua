@@ -859,8 +859,13 @@ test("Shift P opens an actionable catalog with descriptions and right-aligned sh
 
     assert(labels:find("Fill focused slot with Kitty / Zellij", 1, true))
     assert(arguments:find("window { width: calc(70% min 100ch); }", 1, true))
-    assert(labels:find("Show shortcut catalog", 1, true))
-    assert(labels:find("Show shortcut catalog%s+MainMod %+ Shift %+ P\n"))
+    assert(labels:find("Show command palette", 1, true))
+    for _, command in ipairs(require("lib.command_launcher").items(
+        "home/.config/hypr/launcher-data/execute.txt")) do
+        assert(labels:find("\n" .. command.label .. " ", 1, true),
+            "Missing configured command: " .. command.label)
+    end
+    assert(labels:find("Show command palette%s+MainMod %+ Shift %+ P\n"))
     assert(labels:find("Run configured command%s+MainMod %+ Shift %+ R\n"))
     assert(labels:find("Paste from clipboard history%s+MainMod %+ V\n"))
     assert(labels:find("Fill other slot with Kitty / Zellij%s+MainMod %+ S %+ J\n"))
@@ -892,6 +897,40 @@ test("Shift P opens an actionable catalog with descriptions and right-aligned sh
 
     session.choose(picker_index(session, labels:match("([^\n]*Fill focused slot with Kitty / Zellij[^\n]*)")))
     assert(session.focused == kitty and kitty.workspace.id == 1)
+end)
+
+test("command palette runs a shell command directly after Rofi closes", function(session)
+    session.press(modifier .. "SHIFT + P")
+    local request = session.map_picker()
+    local rows = assert(io.open(request.path))
+    local labels = rows:read("*a")
+    rows:close()
+    rofi_picker_selected(request.token, picker_index(session, labels:match("([^\n]*notify hallo[^\n]*)")))
+    assert(#session.commands == 1)
+    session.emit("layer.closed", { namespace = "rofi", pid = 5000 })
+    session.flush()
+    local arguments = session.commands[#session.commands].arguments
+    assert(arguments[1] == "bash" and arguments[2] == "-c" and arguments[3] == 'notify-send "Hallo"')
+end)
+
+test("command palette runs a configured Lua action directly", function(session)
+    local code = session.add("code", 1)
+    local kitty = session.add("kitty", 10)
+    session.focus(code)
+    session.press(modifier .. "SHIFT + P")
+    local rows = assert(io.open(session.picker_request().path))
+    local labels = rows:read("*a")
+    rows:close()
+    session.choose(picker_index(session, labels:match("([^\n]*reset workspaces[^\n]*)")))
+    assert(session.focused == kitty and kitty.workspace.id == 1 and code.workspace.id == 10)
+end)
+
+test("canceling the command palette never executes a configured command", function(session)
+    session.press(modifier .. "SHIFT + P")
+    session.map_picker()
+    session.emit("layer.closed", { namespace = "rofi", pid = 5000 })
+    session.flush()
+    assert(#session.commands == 1)
 end)
 
 test("dot B shows display status and enables the selected output", function(session)

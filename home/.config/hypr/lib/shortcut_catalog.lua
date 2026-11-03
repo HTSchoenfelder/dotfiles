@@ -79,16 +79,20 @@ function shortcut_catalog.items()
     return entries
 end
 
-function shortcut_catalog.open(picker)
+function shortcut_catalog.open(picker, commands)
+    local entries = shortcut_catalog.items()
+    for _, command in ipairs(commands or {}) do
+        entries[#entries + 1] = { description = command.label, shortcut = "", action = command.action }
+    end
     local items = {}
     local description_width = 0
     local shortcut_width = 0
-    for _, entry in ipairs(shortcut_catalog.items()) do
+    for _, entry in ipairs(entries) do
         description_width = math.max(description_width,
             math.min(utf8.len(entry.description) or #entry.description, description_limit))
         shortcut_width = math.max(shortcut_width, utf8.len(entry.shortcut) or #entry.shortcut)
     end
-    for _, entry in ipairs(shortcut_catalog.items()) do
+    for _, entry in ipairs(entries) do
         local description, description_length = fit(entry.description, description_width)
         local shortcut_length = utf8.len(entry.shortcut) or #entry.shortcut
         items[#items + 1] = {

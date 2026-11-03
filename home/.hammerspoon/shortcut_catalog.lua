@@ -59,13 +59,13 @@ end
 
 function catalog.start(modifiers, chooserFactory)
   catalog.chooserFactory = chooserFactory
-  catalog.add("Launchers", "MainMod + Shift + R", "Show shortcut catalog", catalog.show)
+  catalog.add("Launchers", "MainMod + Shift + P", "Show command palette", catalog.show)
   local shiftedModifiers = {}
   for _, modifier in ipairs(modifiers) do
     shiftedModifiers[#shiftedModifiers + 1] = modifier
   end
   shiftedModifiers[#shiftedModifiers + 1] = "shift"
-  catalog.binding = hs.hotkey.bind(shiftedModifiers, "r", catalog.show)
+  catalog.binding = hs.hotkey.bind(shiftedModifiers, "p", catalog.show)
 end
 
 return catalog

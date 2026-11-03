@@ -92,10 +92,13 @@ slot state, and keep the Hammerspoon Console open for Lua or Accessibility error
    does not replace either retained slot. Then choose a two-slot entry through
    `mainMod + /` and confirm that the clicked window becomes the first slot while
    the former slot window fills the other side.
-6. Open the macOS shortcut catalog with `mainMod + Shift + R` and select
+6. Open the macOS command palette with `mainMod + Shift + P` and select
    `Choose one slot or a two-slot ratio`, then a layout entry and a window chooser
    row. Confirm that both commands run and that canceling the catalog performs
-   no action.
+   no action. Confirm that `Reset window layout` appears with `MainMod + . → R`
+   and runs directly. Check that Dot Mode `R` resets the layout without another
+   chooser and `mainMod + Shift + R` opens no Hammerspoon surface.
+   `mainMod + R` still lists applications and `mainMod + P` still lists windows.
 7. Use `mainMod + I` and `mainMod + U` to cycle Chat/Meet and Gmail/Calendar.
    Shift starts at Meet or Calendar, and release of `mainMod` accepts the current
    app. Check `F` for instance selection and `S` for the other slot without
@@ -121,9 +124,13 @@ slot state, and keep the Hammerspoon Console open for Lua or Accessibility error
    outside editor text. In a disposable editor, test Normal, Insert, Visual and
    command-line modes: the added GUI editing translation must never run there.
    Existing explicit Quick Open/MRU/terminal workbench exceptions still apply.
-   In the integrated terminal, compare `Ctrl+A/E/P/J/C` and word navigation with
-   Kitty/Zsh; `Ctrl+P` must not open Quick Open, `Ctrl+E` must not leave the
-   terminal and `Ctrl+J` must not hide it. Select harmless output and verify
+   Check `Ctrl+Shift+F` from both editor text and the sidebar; Edit > Find in
+   Files and the Search sidebar must both show `Ctrl+Shift+F` on macOS.
+   In the integrated terminal, compare `Ctrl+A/E/P/C` and word navigation with
+   Kitty/Zsh; `Ctrl+P` must not open Quick Open and `Ctrl+E` must not leave the
+   terminal. `Ctrl+J` must hide the terminal, reopen it on the next press outside
+   Vim Insert mode, and create one when none exists. In Vim Insert mode it must
+   still insert a line break. Select harmless output and verify
    `Ctrl+Shift+C`, then paste harmless text using `Ctrl+Shift+V` in both terminals.
 10. In KeePassXC, use a disposable database with dummy credentials and TOTP.
     Check `Ctrl+B/C/U/T/Y` (username/password/URL/TOTP/password plus TOTP),

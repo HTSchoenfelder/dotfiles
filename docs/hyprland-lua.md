@@ -189,7 +189,9 @@ working directory, so the overlay opens the project rather than an empty dashboa
 `mainMod + R` still opens the application launcher. `mainMod + Shift + P` opens
 the actionable shortcut catalog through the same Rofi picker infrastructure,
 matching the command-palette shape. `mainMod + Shift + R` selects configured
-commands directly instead of routing them through Dot Mode.
+commands directly instead of routing them through Dot Mode. The palette also lists
+every individual command from `launcher-data/execute.txt`, including commands
+without shortcuts; both entry points use the same command actions.
 Rows show their description first and a right-aligned shortcut; accepting a row
 runs its action after Rofi has closed and keyboard focus has returned.
 

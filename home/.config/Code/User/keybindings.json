@@ -27,7 +27,7 @@
     {
         "command": "workbench.action.terminal.toggleTerminal",
         "key": "ctrl+j",
-        "when": "terminal.active && !terminalFocus && (!editorTextFocus || !vim.active || vim.mode != 'Insert')"
+        "when": "(terminalProcessSupported || terminalWebExtensionContributedProfile) && (!editorTextFocus || !vim.active || vim.mode != 'Insert')"
     },
     {
         "command": "extension.vim_ctrl+j",
@@ -152,7 +152,12 @@
     {
         "command": "workbench.view.search",
         "key": "ctrl+shift+f",
-        "when": "!editorTextFocus && !terminalFocus"
+        "when": "neverMatch =~ /doesNotMatch/"
+    },
+    {
+        "command": "workbench.action.findInFiles",
+        "key": "ctrl+shift+f",
+        "when": "!terminalFocus"
     },
     {
         "command": "workbench.action.replaceInFiles",
@@ -233,7 +238,6 @@
     { "key": "ctrl+g", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+h", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+i", "command": "", "when": "terminalFocus" },
-    { "key": "ctrl+j", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+k", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+l", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+m", "command": "", "when": "terminalFocus" },

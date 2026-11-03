@@ -100,13 +100,14 @@ Quick Open and the Command Palette, `Ctrl+,` and `Ctrl+Shift+,` for forward and
 backward editor MRU selection, `Ctrl+E` for returning focus to the editor from
 non-editor surfaces, `Ctrl+J` and `Ctrl+Shift+J` for toggling and creating an
 integrated terminal, and `Ctrl+'` for maximizing the panel. `Ctrl+E` is inactive
-while editor text or the terminal has focus. The J shortcuts are inactive in
-VSCodeVim Insert mode and in the terminal, but VS Code owns them in Normal mode;
-the equivalent Normal-mode downward motion remains available as `j`. An explicit
-Insert-mode rule routes `Ctrl+J` back through VSCodeVim, where a non-recursive
-mapping to `<Enter>` preserves the standard line break at the modal cursor
-position. Space as leader and relative line numbers form the shared presentation
-baseline. The complete target and current state are documented in
+while editor text or the terminal has focus. `Ctrl+J` also toggles from terminal
+focus and creates a terminal if needed. `Ctrl+Shift+J` remains inactive in the
+terminal. Both yield to VSCodeVim Insert mode, but VS Code owns them in Normal
+mode; the equivalent Normal-mode downward motion remains available as `j`. An
+explicit Insert-mode rule routes `Ctrl+J` back through VSCodeVim, where a
+non-recursive mapping to `<Enter>` preserves the standard line break at the
+modal cursor position. Space as leader and relative line numbers form the shared
+presentation baseline. The complete target and current state are documented in
 [VS Code Vim](vscode-vim.md).
 
 Shared `!editorTextFocus && !terminalFocus` rules explicitly provide the same
@@ -119,13 +120,21 @@ Hammerspoon editing and text-navigation translation. All Monaco editor modes,
 including Insert, remain outside that additional translation; the existing
 explicit workbench exceptions listed above still apply.
 
-The integrated terminal owns `Ctrl+C`, `Ctrl+A/E/P/J` and other shell/TUI inputs.
-The custom Quick Open, palette, MRU, focus and panel/terminal-control shortcuts
-exclude terminal focus on both platforms. `Ctrl+Shift+C/V` invoke VS Code's
-terminal copy/paste commands on both platforms, matching Kitty's physical keys.
-Terminal-focused empty-command rules keep `Ctrl+A..Z` and the former custom
-workbench keys from falling back to built-in or extension shortcuts. This also
-lets `Ctrl+K` reach the shell without starting a VS Code chord.
+`Ctrl+Shift+F` explicitly binds `workbench.action.findInFiles` outside terminal
+focus, including editor text, so Edit > Find in Files uses the Ctrl shortcut too.
+The Search sidebar keeps its separate label binding to `workbench.view.search`
+with VS Code's nonmatching `neverMatch =~ /doesNotMatch/` condition.
+
+The integrated terminal owns `Ctrl+C`, `Ctrl+A/E/P` and other shell/TUI inputs.
+`Ctrl+J` is the explicit exception: it toggles the terminal instead of reaching
+the shell; Enter still submits shell input. The custom Quick Open, palette, MRU,
+focus and panel/terminal-control shortcuts exclude terminal focus on both
+platforms, apart from `Ctrl+J`. `Ctrl+Shift+C/V` invoke VS Code's terminal
+copy/paste commands on both platforms, matching Kitty's physical keys.
+Terminal-focused empty-command rules keep `Ctrl+A..Z` except `Ctrl+J` and the
+former custom workbench keys from falling back to built-in or extension
+shortcuts. This also lets `Ctrl+K` reach the shell without starting a VS Code
+chord.
 
 VS Code must remain application-owned for commands and editor behavior because
 its `when` clauses can distinguish these contexts. Hammerspoon's narrow

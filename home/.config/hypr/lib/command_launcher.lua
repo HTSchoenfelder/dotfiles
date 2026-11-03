@@ -10,20 +10,33 @@ function command_launcher.parse(line)
     return { command = command, action = command:match("^lua:([%w_-]+)$"), label = label }
 end
 
+function command_launcher.items(path, actions)
+    local commands = launcher_data.load(path, command_launcher.parse)
+    if not commands then return end
+    local items = {}
+    for _, command in ipairs(commands) do
+        items[#items + 1] = {
+            label = command.label,
+            action = function()
+                if command.action then
+                    local action = actions and actions[command.action]
+                    if action then action() else compositor.notify("Unknown Lua command: " .. command.action) end
+                    return
+                end
+                -- Only the configured command is executable; Rofi returns a row index.
+                process.spawn({ "bash", "-c", command.command })
+            end,
+        }
+    end
+    return items
+end
+
 function command_launcher.open(picker, path, actions)
     if picker.is_open() then return end
-    local items = launcher_data.load(path, command_launcher.parse)
+    local items = command_launcher.items(path, actions)
     if not items then return end
     picker.open(items, {
-        on_select = function(item)
-            if item.action then
-                local action = actions and actions[item.action]
-                if action then action() else compositor.notify("Unknown Lua command: " .. item.action) end
-                return
-            end
-            -- Only the configured command is executable; Rofi returns a row index.
-            process.spawn({ "bash", "-c", item.command })
-        end,
+        on_select = function(item) item.action() end,
     })
 end
 

@@ -105,18 +105,21 @@ runs Ruby diagnostics after reading and writing a buffer. See the active
 
 VSCodeVim stays close to its defaults and uses the same physical workflow on
 NixOS and macOS. Relative line numbers and Space as leader are the intentional
-baseline customizations. The shared VS Code keybindings retain Quick Open,
-the Command Palette, editor MRU selection, context-limited editor focus and the
+baseline customizations. The shared VS Code keybindings retain Quick Open, the
+Command Palette, editor MRU selection, context-limited editor focus and the
 intentional integrated-terminal controls on `Ctrl+J`, `Ctrl+Shift+J` and
-`Ctrl+'`; Insert-mode `Ctrl+J` is explicitly mapped to VSCodeVim `<Enter>` so the
+`Ctrl+'`. `Ctrl+J` also toggles from terminal focus and creates a terminal if
+needed. Insert-mode `Ctrl+J` is explicitly mapped to VSCodeVim `<Enter>` so the
 terminal shortcut preserves standard editing behavior. These workbench shortcuts
-leave terminal focus to the shell; `Ctrl+Shift+C/V` copies and pastes there as in
-Kitty. Standard `Ctrl` editing and workbench shortcuts are explicitly shared
+leave terminal focus to the shell except for the explicit `Ctrl+J` toggle;
+`Ctrl+Shift+C/V` copies and pastes there as in Kitty. `Ctrl+Shift+F` invokes
+Find in Files outside terminal focus, with matching Ctrl labels in Edit and
+Search. Standard `Ctrl` editing and workbench shortcuts are explicitly shared
 between Linux and macOS outside editor text and the terminal, even when they
 match Linux defaults. Hammerspoon also handles native and extension webview text
 inputs on macOS. All Vim modes remain excluded from the additional editing
-translation. See the active
-[VS Code Vim design](docs/vscode-vim.md) for the target and current state.
+translation. See the active [VS Code Vim design](docs/vscode-vim.md) for the
+target and current state.
 
 ## macOS / Hammerspoon quick reference
 
@@ -152,7 +155,7 @@ and `S + App Key` compose those modifiers with that key; for example,
 | `mainMod + W` | Close the focused slot window and refill it from the non-slot MRU pool |
 | `mainMod + V` | Choose and paste a recent clipboard item |
 | `mainMod + R` | Toggle the native application launcher |
-| `mainMod + Shift + R` | Show the searchable shortcut catalog |
+| `mainMod + Shift + P` | Show the command palette with all shortcuts |
 | `mainMod + Backslash` | Toggle the RØDECaster mute state |
 
 Application, window and comma selection use the same compact `hs.chooser`
@@ -162,10 +165,13 @@ directories. Green marks the active slot, including an empty display selected by
 `H`; other retained slots are Pink. Untracked windows have no frame. Both titles
 and frames can be disabled in `home/.hammerspoon/config.lua`.
 
-The macOS shortcut catalog is actionable: selecting a row runs its action. Comma
-Selection and media rows open their chooser so a window or player action can then
-be selected. Google app group rows open the same group chooser; `F` and `S`
-variants preserve instance selection and other-slot placement.
+The macOS command palette includes every registered shortcut.
+`Reset window layout` runs directly through `mainMod + .`, then `R`, and appears
+with that shortcut in the palette. `mainMod + Shift + R` is currently unbound on
+macOS; `launcher-data/execute.txt` is Hyprland-only. Selecting a palette row runs
+its action. Comma Selection and media rows open their chooser so a window or
+player action can then be selected. Google app group rows open the same group
+chooser; `F` and `S` variants preserve instance selection and other-slot placement.
 
 Clipboard history is kept in Hammerspoon memory and resets when Hammerspoon
 reloads. It retains text and image pasteboard data, ignores configured password
@@ -229,7 +235,7 @@ do not displace existing slot contents.
 | --- | --- |
 | `mainMod + P` / `mainMod + S + P` | Search for a window for the focused / other slot |
 | `mainMod + F + P` / `mainMod + F + S + P` | Search focused-app windows for the focused / other slot |
-| `mainMod + Shift + P` | Show the searchable shortcut catalog |
+| `mainMod + Shift + P` | Show all shortcuts and configured commands |
 | `mainMod + Shift + R` | Select and run a configured command |
 | `mainMod + V` | Choose and paste a recent Clipse item |
 | `mainMod + ,` / `mainMod + Shift + ,` | Select by focus history forward/backward; replace the focused slot on modifier release |
@@ -287,7 +293,8 @@ Code with Kitty. `S + K` then replaces Chrome with Code while focus stays on
 Kitty. `N` swaps Kitty and Code while focus stays on the same screen side.
 
 Workspace selection remains `mainMod + B` / `Shift + B`; media selection remains
-`mainMod + Y` / `Shift + Y`. `mainMod + Shift + P` opens the shortcut catalog,
+`mainMod + Y` / `Shift + Y`. `mainMod + Shift + P` opens all shortcuts and
+individual commands from `home/.config/hypr/launcher-data/execute.txt`,
 while `mainMod + Shift + R` opens configured commands. The existing workspace
 reset explicitly restores a single terminal slot.
 
@@ -362,7 +369,8 @@ Hammerspoon, including username/password/TOTP copying, locking, Auto-Type and
 database navigation. Its configuration and database remain application-owned.
 The actionable Hyprland shortcut catalog shows the description first and aligns
 the shortcut on the right. It includes global bindings, modifier combinations,
-Dot mode and hardware/media bindings; selecting a row runs that action.
+Dot mode, hardware/media bindings and each configured command, including commands
+without shortcuts; selecting a row runs that action.
 Hyprland's Lua entry point is `home/.config/hypr/hyprland.lua`; architecture and
 interaction notes live in [`docs/hyprland-lua.md`](docs/hyprland-lua.md). The
 active macOS responsibility split is documented in

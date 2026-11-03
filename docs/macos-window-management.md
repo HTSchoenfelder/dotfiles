@@ -154,7 +154,12 @@ Hyprland's `HYPRSHOT_DIR`.
 
 `hs.chooser` is the shared native selection surface for applications, windows,
 instances, Spotify plus its player actions, emoji, snippets, commands and the
-shortcut catalog. Selecting a catalog row runs its registered action; choosing a
+command palette. `MainMod + P` selects from all windows, `MainMod + R` opens
+applications, and `MainMod + Shift + P` shows every registered shortcut.
+`Reset window layout` runs directly through Dot Mode `R` and appears with
+`MainMod + . → R` in the palette. `MainMod + Shift + R` is currently unbound;
+Hyprland's `launcher-data/execute.txt` is not used on macOS.
+Selecting a palette row runs its registered action; choosing a
 Comma Selection or media row opens its normal chooser for the final selection.
 The launcher places an existing application window in the captured focused slot;
 new native windows are assigned from window-created events.

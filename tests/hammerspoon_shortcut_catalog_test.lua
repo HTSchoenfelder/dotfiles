@@ -34,4 +34,18 @@ catalog.show()
 selectChoice(nil)
 assert(pending == nil and runs == 1)
 
+local bindings = {}
+hs.hotkey = {bind = function(modifiers, key, action)
+  assert(table.concat(modifiers, "+") == "alt+ctrl+cmd+shift")
+  bindings[key] = action
+  return {key = key}
+end}
+catalog.start({"alt", "ctrl", "cmd"}, catalog.chooserFactory)
+assert(bindings.p == catalog.show and bindings.r == nil)
+bindings.p()
+assert(#choices == 4)
+for _, choice in ipairs(choices) do
+  assert(choice.text ~= "MainMod + Shift + R")
+end
+
 print("Hammerspoon shortcut catalog tests passed")

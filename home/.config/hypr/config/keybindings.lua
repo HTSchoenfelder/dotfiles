@@ -143,14 +143,15 @@ local reset_workspaces = workspace_reset.new({
 })
 monitor_configuration.set_workspace_reconciler(reset_workspaces.restore_roles)
 
+local command_path = config_directory .. "/launcher-data/execute.txt"
+local command_actions = { ["reset-workspaces"] = reset_workspaces.run }
 local function open_commands()
-    command_launcher.open(picker, config_directory .. "/launcher-data/execute.txt", {
-        ["reset-workspaces"] = reset_workspaces.run,
-    })
+    command_launcher.open(picker, command_path, command_actions)
 end
 
-bind("SHIFT + P", function() shortcut_catalog.open(picker) end,
-    "Show shortcut catalog", "Launchers")
+bind("SHIFT + P", function()
+    shortcut_catalog.open(picker, command_launcher.items(command_path, command_actions))
+end, "Show command palette", "Launchers")
 bind("SHIFT + R", open_commands, "Run configured command", "Launchers")
 local config_home = os.getenv("XDG_CONFIG_HOME")
     or (os.getenv("HOME") and os.getenv("HOME") .. "/.config")

@@ -102,13 +102,6 @@ function DotMode:_captureScreen()
   })
 end
 
-function DotMode:_commands()
-  local chooser = self.chooserFactory()
-  chooser:show({{text = "Reset window layout"}}, function(selected)
-    if selected then self.resetLayout() end
-  end)
-end
-
 function DotMode:_bind(modifiers, key, callback, description)
   local action = self:_action(callback)
   self.modal:bind(modifiers, key, action)
@@ -134,7 +127,7 @@ function DotMode:start()
   self:_bind({}, "e", function()
     self.textLauncher:open(self.emojiPath, textData.emoji)
   end, "Insert emoji")
-  self:_bind({}, "r", function() self:_commands() end, "Reset window layout")
+  self:_bind({}, "r", self.resetLayout, "Reset window layout")
   self:_bind({}, "t", function()
     self.textLauncher:open(self.snippetPath, textData.snippet)
   end, "Insert snippet")

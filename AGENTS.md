@@ -68,7 +68,7 @@ The active NixOS ownership is defined in `setup/nixos/desktop-integration.nix` a
 - **Comma Selection** cycles in Rofi and accepts on `mainMod` release.
 - Hyprland has one or two normal slots per display. App keys, instance selection,
   `P` and Comma Selection replace the focused slot's content.
-- `Shift + App` and `Shift + P` fill the other slot (creating it when needed),
+- `S + App` and `S + P` fill the other slot (creating it when needed),
   retaining focus. One window cannot occupy both slots.
 - Selection from another slot on the same display swaps its contents. Selection
   from another display, Parking or a hidden workspace parks the displaced
@@ -92,6 +92,11 @@ The active NixOS ownership is defined in `setup/nixos/desktop-integration.nix` a
   MRU windows.
   Slot state and the active display remain in Hammerspoon Lua memory. `H` paints
   an active frame on an empty display even while native keyboard focus stays elsewhere.
+- `mainMod + P` selects all windows; `mainMod + R` opens all applications.
+  `mainMod + Shift + P` opens all defined shortcuts and configured commands,
+  including commands without shortcuts. `mainMod + Shift + R` selects only
+  configured commands on Hyprland and is currently unbound on macOS.
+  macOS Dot Mode `R` resets the window layout directly and appears in the palette.
 - **Dot Mode** is the submap entered with `mainMod + period`.
 - **Terminal Workspace** is workspace 1 (``) on the primary display.
 - **Display Workspace** is workspace 2 (`󰍹`) on the secondary display.

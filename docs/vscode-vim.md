@@ -32,7 +32,7 @@ Visual or command-line mode remappings. VS Code shows relative line numbers;
 `vim.smartRelativeLine` is deliberately not enabled.
 
 The shared `home/.config/Code/User/keybindings.json` retains these explicit
-cross-platform workbench exceptions outside terminal focus:
+cross-platform workbench exceptions:
 
 | Physical shortcut | Action | Difference from defaults |
 | --- | --- | --- |
@@ -41,18 +41,19 @@ cross-platform workbench exceptions outside terminal focus:
 | `Ctrl+,` | Select the previous MRU editor, then continue forward | Custom on both platforms; replaces the VS Code Settings shortcut |
 | `Ctrl+Shift+,` | Select the least-recently-used editor, then continue backward | Custom on both platforms |
 | `Ctrl+E` outside editor text and terminal focus | Return focus to the active editor group | Custom on both platforms; Vim and the shell retain `Ctrl+E` |
-| `Ctrl+J` while a terminal exists | Toggle the integrated terminal | Custom outside VSCodeVim Insert mode; Insert mode maps it to VSCodeVim `<Enter>` |
-| `Ctrl+Shift+J` | Create an integrated terminal | Custom except in VSCodeVim Insert mode |
+| `Ctrl+J` | Toggle the integrated terminal, including from terminal focus; create it if needed | Custom outside VSCodeVim Insert mode; Insert mode maps it to VSCodeVim `<Enter>` |
+| `Ctrl+Shift+J` | Create an integrated terminal | Custom outside terminal focus and VSCodeVim Insert mode |
+| `Ctrl+Shift+F` | Find in Files | Explicit on both platforms outside terminal focus, including editor text |
 | `Ctrl+'` | Toggle the maximized panel | Custom on both platforms |
 
 MRU means most recently used. The editor chooser follows focus history rather
-than tab position. The J shortcuts are workbench-owned outside VSCodeVim Insert
-mode and terminal focus. The explicit
-Insert-mode route hands `Ctrl+J` back to VSCodeVim, where the compatibility
-mapping gives it the same behavior as `<Enter>` instead of bypassing VSCodeVim's
-cursor state. The existing workbench exceptions remain available in their
-documented editor contexts; no additional GUI editing translation applies in
-any Monaco editor mode, including Insert mode.
+than tab position. `Ctrl+J` is workbench-owned outside VSCodeVim Insert mode,
+including terminal focus; `Ctrl+Shift+J` still yields to the terminal. The
+explicit Insert-mode route hands `Ctrl+J` back to VSCodeVim, where the
+compatibility mapping gives it the same behavior as `<Enter>` instead of
+bypassing VSCodeVim's cursor state. The existing workbench exceptions remain
+available in their documented editor contexts; no additional GUI editing
+translation applies in any Monaco editor mode, including Insert mode.
 
 Shared context-bound rules explicitly define the same `Ctrl` actions on Linux
 and macOS outside editor text and terminal focus, including Linux defaults:
@@ -62,12 +63,18 @@ focus, splitting and zoom. Hammerspoon additionally translates editing and text
 navigation in native and extension webview text inputs, including Codex Chat;
 its Accessibility checks exclude Monaco and the integrated terminal.
 
-While the integrated terminal has focus, the custom Quick Open, palette, MRU,
-focus and panel/terminal controls yield to shell/TUI input on both platforms.
-In particular, `Ctrl+P` reaches Zsh history, `Ctrl+E` reaches line-end navigation
-and `Ctrl+J` reaches the terminal rather than hiding it. `Ctrl+Shift+C/V` use
-VS Code's terminal copy/paste commands on both platforms, matching Kitty.
-Explicit empty-command rules for terminal-focused `Ctrl+A..Z`, the former
+`Ctrl+Shift+F` binds `workbench.action.findInFiles`, which owns Edit > Find in
+Files. The Search sidebar also retains a `workbench.view.search` binding with
+VS Code's own nonmatching `neverMatch =~ /doesNotMatch/` condition for its shortcut
+label. This keeps both labels on Ctrl without two competing executable bindings.
+
+While the integrated terminal has focus, `Ctrl+J` toggles it closed. This
+reserves that key for the workbench rather than shell/TUI input; Enter still
+submits shell input. Quick Open, palette, MRU, focus, new-terminal and
+panel-maximization controls continue to yield to the shell. `Ctrl+P` reaches Zsh
+history and `Ctrl+E` reaches line-end navigation. `Ctrl+Shift+C/V` use VS Code's
+terminal copy/paste commands on both platforms, matching Kitty. Explicit
+empty-command rules for terminal-focused `Ctrl+A..Z` except `Ctrl+J`, the former
 workbench keys and `Ctrl+Shift+P/J` stop fallback to built-in or extension
 bindings, including VS Code's `Ctrl+K` chord prefix. The terminal receives the
 original key event rather than a hard-coded escape sequence.
