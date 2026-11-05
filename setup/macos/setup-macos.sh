@@ -35,6 +35,12 @@ brew bundle --file "$script_directory/Brewfile"
 sudo nix run nix-darwin/master#darwin-rebuild -- switch \
     --flake "$script_directory#$configuration"
 
+# Reserve Ctrl+Left/Right for application word navigation instead of Spaces.
+/usr/bin/defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add \
+    79 '<dict><key>enabled</key><false/></dict>' \
+    81 '<dict><key>enabled</key><false/></dict>'
+/System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
+
 mkdir -p "$HOME/projects/dev"
 mkdir -p "$HOME/projects/temp"
 mkdir -p "$HOME/projects/work"

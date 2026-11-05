@@ -49,10 +49,15 @@ editing and navigation in native and webview text inputs. There is no active
 | `Ctrl+Shift+C/V` in native terminals | `Command+C/V` | Implemented |
 | Other `Ctrl` keys in native terminals | Untranslated | Correctly preserved for shells and TUIs |
 
-Zsh uses its standard Emacs keymap. Terminal word navigation is shell-owned;
-there are no manual `Ctrl+Left/Right` sequence bindings or macOS GUI translations
-for terminal input. `Ctrl+X`, then `Ctrl+E`, edits the current input in Neovim and
-returns it to the prompt before execution. See the
+Zsh uses its standard Emacs navigation on NixOS/Hyprland and macOS: `Alt+B/F`
+move backward/forward by one word; `Ctrl+A/E` move to the beginning/end of the
+current line. There are no manual `Ctrl+Left/Right` or `Home/End` sequence
+bindings. Hammerspoon leaves terminal navigation unchanged.
+`setup/macos/setup-macos.sh` disables the native `Ctrl+Left/Right` Spaces
+shortcuts so applications receive them; this does not add shell bindings.
+fzf retains `Ctrl+R`, `Ctrl+T` and `Alt+C` for history, path and directory
+selection. `Ctrl+X`, then `Ctrl+E`, edits the current input in Neovim and returns
+it to the prompt before execution. See the
 [shell editing reference](../readme.md#shell-editing).
 
 Secure Input and applications that consume an event before Hammerspoon can

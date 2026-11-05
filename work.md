@@ -126,7 +126,9 @@ slot state, and keep the Hammerspoon Console open for Lua or Accessibility error
    Existing explicit Quick Open/MRU/terminal workbench exceptions still apply.
    Check `Ctrl+Shift+F` from both editor text and the sidebar; Edit > Find in
    Files and the Search sidebar must both show `Ctrl+Shift+F` on macOS.
-   In the integrated terminal, compare `Ctrl+A/E/P/C` and word navigation with
+   In Kitty/Zsh and the integrated terminal, check the standard Emacs keys
+   `Alt+B/F` for word navigation and `Ctrl+A/E` for current-line boundaries on
+   both platforms. Compare `Ctrl+P/C` with
    Kitty/Zsh; `Ctrl+P` must not open Quick Open and `Ctrl+E` must not leave the
    terminal. `Ctrl+J` must hide the terminal, reopen it on the next press outside
    Vim Insert mode, and create one when none exists. In Vim Insert mode it must

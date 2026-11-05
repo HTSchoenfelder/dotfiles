@@ -93,18 +93,31 @@ and user-triggered actions, not daemon lifetime.
 
 ## Shell editing
 
-Zsh uses its standard Emacs keymap on both platforms. `Ctrl+J` accepts the input,
-`Ctrl+R` searches history, `Ctrl+T` transposes characters and `Alt+C` capitalizes a
-word. Completion uses Zsh's completion system without fzf's key bindings.
-The custom command-notification widget and manual Delete/`Ctrl+Left/Right`
-sequence bindings have been removed. fzf remains available as a standalone tool.
+Zsh uses its standard Emacs navigation on both platforms. `Ctrl+J` accepts the
+input. fzf's shell integration provides history search on `Ctrl+R`, path selection
+on `Ctrl+T`, directory selection on `Alt+C` and fuzzy completion.
+
+Zsh's standard navigation keys are:
+
+| Shortcut | Action |
+| --- | --- |
+| `Alt+B` | Move backward one word |
+| `Alt+F` | Move forward one word |
+| `Ctrl+A` | Move to the beginning of the current line |
+| `Ctrl+E` | Move to the end of the current line |
+
+Zsh owns terminal navigation independently of the compositor and Hammerspoon.
+There are no manual `Ctrl+Left/Right` or `Home/End` sequence bindings, so these
+keys depend on the terminal and shell environment. The macOS setup disables the
+system's `Ctrl+Left/Right` Spaces shortcuts so applications receive those keys;
+this does not add shell bindings.
 
 `Ctrl+X`, then `Ctrl+E`, opens the current input in Neovim with its normal
 configuration. Save and quit with `:wq` to return the edited input to the prompt;
-Enter then executes it. This is the only additional shell-editing shortcut.
-Existing terminal sessions need a new Zsh process to drop previously loaded
-widgets and bindings. VS Code's separate `Ctrl+J` terminal toggle still takes
-precedence in its integrated terminal.
+Enter then executes it.
+Run `exec zsh` in existing terminal sessions to drop previously loaded widgets
+and bindings; sourcing `.zshrc` again does not remove them. VS Code's separate
+`Ctrl+J` terminal toggle still takes precedence in its integrated terminal.
 
 ## Neovim
 
