@@ -76,6 +76,22 @@ remembered vacancy or replace their original focused slot. Floating utility
 windows/dialogs, hidden group members outside the Parking container, special
 workspaces and project overlays are excluded from slot selection and refill.
 
+Modal windows open floating and centered. GTK portal dialogs use a dedicated
+`xdg-desktop-portal-gtk` class rule because a live `Open File` portal request
+appeared tiled despite the portal's modal option. The rule caps their size at
+1280 × 760: VS Code's Open File dialog requested the display's full height even
+after it was floating. Every regular window that requests urgency, including an
+existing window on another workspace, moves to
+the active workspace and receives focus. Tiled windows enter the focused slot;
+floating windows retain floating and center after moving. A window already on
+the active workspace only changes focus. Explicit app launches keep their
+requested slot and `S` focus behavior. Urgency is cleared from the chooser state
+when the window receives focus or closes. `mainMod + P` and Comma Selection
+include urgent floating windows beside normal slot candidates. Their rows show
+`(urgent)` and use Rofi's urgent color while attention is pending. Selecting one
+focuses the floating window without replacing a slot. The normal MRU order is
+retained. Waybar workspace buttons do not indicate urgency.
+
 `window.close` records the vacated side and focus before native teardown. A
 one-shot callback refills from Parking MRU after teardown, preserving the peer
 and background keyboard focus. Targeted refill is limited to that slot; deferred
@@ -144,6 +160,7 @@ Focus and window transitions are intentionally restrained. Focus opacity and bor
 changes complete in 100 ms, window movement in 150 ms and window open/close motion
 uses a short non-overshooting curve. Border-angle interpolation is disabled, while
 workspace transitions retain their separate timing.
+VLC overrides the global active, inactive and fullscreen opacity to remain opaque.
 
 Normal active borders retain the Catppuccin Mocha Green–Sky–Mauve gradient.
 Focused project overlays override it with solid Catppuccin Mocha Sky; hidden
@@ -226,8 +243,9 @@ The scenarios cover slot replacement and cross-display swaps, Shift targeting,
 close/refill focus and ordering, exhausted Parking, session-state restoration,
 monitor MRU and empty/single displays, workspace changes and launch races,
 cycling, cancellation, reload, the shortcut catalog, player actions, shortcut
-forwarding, command selection, monitor toggling, project overlays and text
-insertion.
+forwarding, command selection, monitor toggling, project overlays, urgent window
+placement and chooser labels, modal rules and text insertion.
 Validate configuration/API calls with the installed Hyprland's `--verify-config`.
 Use a running session for Rofi's real keyboard and layer lifecycle; Lua mocks do
-not prove compositor event ordering or Wayland input behavior.
+not prove compositor event ordering or Wayland input behavior. Open a file from
+Nautilus and a native file-open dialog to check their real window behavior.

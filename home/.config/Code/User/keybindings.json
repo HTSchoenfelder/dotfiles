@@ -1,8 +1,7 @@
 [
     {
         "command": "workbench.action.focusActiveEditorGroup",
-        "key": "ctrl+e",
-        "when": "!editorTextFocus && !terminalFocus"
+        "key": "ctrl+e"
     },
     {
         "command": "workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup",
@@ -46,13 +45,11 @@
     },
     {
         "command": "workbench.action.quickOpen",
-        "key": "ctrl+p",
-        "when": "!terminalFocus"
+        "key": "ctrl+p"
     },
     {
         "command": "workbench.action.showCommands",
-        "key": "ctrl+shift+p",
-        "when": "!terminalFocus"
+        "key": "ctrl+shift+p"
     },
     {
         "command": "editor.action.selectAll",
@@ -106,8 +103,7 @@
     },
     {
         "command": "workbench.action.files.saveAll",
-        "key": "ctrl+alt+s",
-        "when": "!editorTextFocus && !terminalFocus"
+        "key": "ctrl+alt+s"
     },
     {
         "command": "workbench.action.closeActiveEditor",
@@ -146,8 +142,7 @@
     },
     {
         "command": "workbench.view.explorer",
-        "key": "ctrl+shift+e",
-        "when": "!editorTextFocus && !terminalFocus"
+        "key": "ctrl+shift+e"
     },
     {
         "command": "workbench.view.search",
@@ -156,8 +151,7 @@
     },
     {
         "command": "workbench.action.findInFiles",
-        "key": "ctrl+shift+f",
-        "when": "!terminalFocus"
+        "key": "ctrl+shift+f"
     },
     {
         "command": "workbench.action.replaceInFiles",
@@ -176,8 +170,17 @@
     },
     {
         "command": "workbench.view.scm",
-        "key": "ctrl+shift+g",
-        "when": "!editorTextFocus && !terminalFocus"
+        "key": "ctrl+shift+g"
+    },
+    {
+        "command": "chatgpt.sidebarSecondaryView.focus",
+        "key": "ctrl+alt+i",
+        "when": "!chatgpt.doesNotSupportSecondarySidebar"
+    },
+    {
+        "command": "chatgpt.sidebarView.focus",
+        "key": "ctrl+alt+i",
+        "when": "chatgpt.doesNotSupportSecondarySidebar"
     },
     {
         "command": "workbench.action.splitEditor",
@@ -233,7 +236,6 @@
     { "key": "ctrl+b", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+c", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+d", "command": "", "when": "terminalFocus" },
-    { "key": "ctrl+e", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+f", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+g", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+h", "command": "", "when": "terminalFocus" },
@@ -243,7 +245,6 @@
     { "key": "ctrl+m", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+n", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+o", "command": "", "when": "terminalFocus" },
-    { "key": "ctrl+p", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+q", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+r", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+s", "command": "", "when": "terminalFocus" },
@@ -254,7 +255,6 @@
     { "key": "ctrl+x", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+y", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+z", "command": "", "when": "terminalFocus" },
-    { "key": "ctrl+shift+p", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+shift+j", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+,", "command": "", "when": "terminalFocus" },
     { "key": "ctrl+shift+,", "command": "", "when": "terminalFocus" },

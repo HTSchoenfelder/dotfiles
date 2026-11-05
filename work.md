@@ -116,21 +116,32 @@ slot state, and keep the Hammerspoon Console open for Lua or Accessibility error
    image is pasted. Copy a value in KeePassXC and confirm it does not appear.
    Reload Hammerspoon and confirm that the clipboard history is empty apart from
    the pasteboard item current at reload time.
-9. In VS Code, test `Ctrl+A/C/X/V/Z/Y` in Quick Open/search inputs and extension
+9. In TextEdit, check `Ctrl+N/O/P` for New/Open/Print. In Chrome, check that
+   `Ctrl+P` still searches tabs and `Ctrl+T` opens a tab. In VS Code, test
+   `Ctrl+A/C/X/V/Z/Y` in Quick Open/search inputs and extension
    webview inputs such as Codex Chat using disposable text. Repeat the VS Code
    checks on NixOS: the shared bindings use the same keys and context boundaries
    on both platforms, including actions that match Linux defaults. Verify
-   copy/paste in Explorer and lists, and `Ctrl+S/W/B`, `Ctrl+Shift+F` and other workbench actions
+   copy/paste in Explorer and lists, and `Ctrl+S/W/B` and other workbench actions
    outside editor text. In a disposable editor, test Normal, Insert, Visual and
-   command-line modes: the added GUI editing translation must never run there.
+   command-line modes: `Ctrl+E`, `Ctrl+Shift+E/G/F`, `Ctrl+Alt+S`,
+   `Ctrl+Alt+I`, `Ctrl+P` and `Ctrl+Shift+P` must perform their workbench actions
+   from every mode. `Ctrl+E` replaces VSCodeVim Normal-mode scrolling. Check whether
+   `Ctrl+Alt+I` focuses the Codex view and whether its chat input receives the
+   text cursor. The added GUI editing translation must never run in Monaco.
    Existing explicit Quick Open/MRU/terminal workbench exceptions still apply.
    Check `Ctrl+Shift+F` from both editor text and the sidebar; Edit > Find in
    Files and the Search sidebar must both show `Ctrl+Shift+F` on macOS.
-   In Kitty/Zsh and the integrated terminal, check the standard Emacs keys
-   `Alt+B/F` for word navigation and `Ctrl+A/E` for current-line boundaries on
-   both platforms. Compare `Ctrl+P/C` with
-   Kitty/Zsh; `Ctrl+P` must not open Quick Open and `Ctrl+E` must not leave the
-   terminal. `Ctrl+J` must hide the terminal, reopen it on the next press outside
+   In Kitty/Zsh with Zellij Locked, check the standard Emacs keys `Alt+B/F`
+   for word navigation and `Ctrl+A/E` for current-line boundaries on both
+   platforms. In the integrated terminal, `Ctrl+A` still belongs to the shell,
+   while `Ctrl+E` returns to the editor. In Zellij, test
+   its default Normal-mode `Ctrl+P` and `Alt+F` actions, then enter Locked mode
+   with `Ctrl+G` and check that those keys reach Zsh or Neovim. Compare
+   `Ctrl+P/C` in the integrated terminal with Kitty/Zsh;
+   `Ctrl+P` must open Quick Open and `Ctrl+E` must focus the editor in VS Code.
+   The view, palette and Save All shortcuts must also run from terminal focus.
+   `Ctrl+J` must hide the terminal, reopen it on the next press outside
    Vim Insert mode, and create one when none exists. In Vim Insert mode it must
    still insert a line break. Select harmless output and verify
    `Ctrl+Shift+C`, then paste harmless text using `Ctrl+Shift+V` in both terminals.

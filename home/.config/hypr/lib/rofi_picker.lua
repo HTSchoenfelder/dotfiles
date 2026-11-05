@@ -122,13 +122,18 @@ function rofi_picker.new(options)
             rows:write(item.label:gsub("%c", " "), "\n")
         end
         rows:close()
+        local urgent_rows = {}
+        for index, item in ipairs(items) do
+            if item.urgent then urgent_rows[#urgent_rows + 1] = tostring(index - 1) end
+        end
         selection.items = items
         selection.rows_path = rows_path
         selection.token = rows_path .. ":" .. tostring(selection)
         selection.workspace = workspace.addressable_name
         active_selection = selection
         latest_selection = selection
-        local provider = process.command({ "lua", options.provider, selection.token, rows_path })
+        local provider = process.command({ "lua", options.provider, selection.token, rows_path,
+            table.concat(urgent_rows, ",") })
         local arguments = { "rofi", "-show", "selection", "-modes", "selection:" .. provider,
             "-no-sort", "-no-show-icons", "-no-auto-select" }
         if selection.theme then

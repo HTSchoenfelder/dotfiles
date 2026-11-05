@@ -78,21 +78,20 @@ missed chord, but they do not make Ctrl shortcuts second-class inputs.
 
 ## Zellij boundary
 
-Nix installs Zellij on both NixOS and macOS, but these dotfiles do not yet
-configure its bindings. Zellij may eventually own terminal sessions, tabs and
-panes; it must not silently redefine the firmware or editor contract.
+Nix installs Zellij on both NixOS and macOS. The tracked
+`home/.config/zellij/config.kdl` keeps appearance choices and inherits the
+installed Zellij keybindings. Zellij starts in Normal mode. Its default
+`Ctrl+P`, `Ctrl+T`, `Ctrl+S` and other mode keys belong to Zellij there;
+`Alt+F` also toggles floating panes. These keys cannot simultaneously reach Zsh
+or Neovim. `Ctrl+G` enters Locked mode, where Zellij passes the other keys to
+the focused shell or TUI; another `Ctrl+G` returns to Normal mode. Use Locked
+mode when a Zsh or Neovim binding conflicts with a Zellij default. The exact
+default set follows the installed version; see the
+[Zellij keybinding reference](https://zellij.dev/documentation/keybindings).
 
-Before enabling a custom Zellij workflow, its control modes must be checked
-against terminal interrupts, shell bindings and the editor shortcuts that need
-to pass through, especially `Ctrl+C`, `Ctrl+P`, `Ctrl+E`, `Ctrl+J`, `Ctrl+W` and
-their shifted variants. Outside VSCodeVim Insert mode and terminal focus,
-VS Code deliberately owns `Ctrl+J` and `Ctrl+Shift+J` for its integrated terminal;
-`Ctrl+'` also remains a VS Code panel command outside terminal focus. In Insert
-mode, VSCodeVim maps `Ctrl+J` to `<Enter>` so the same chord retains its standard
-editing meaning. A future Zellij
-configuration must account for that application boundary. The normal editing
-path should otherwise deliver terminal keys to the focused application, with
-Zellij actions entered through an explicit and deliberately chosen mode or
-prefix. The integrated terminal retains the same shell/TUI `Ctrl` inputs as
-Kitty, with clipboard actions on `Ctrl+Shift+C/V`. Additional macOS GUI editing
-translation excludes every Monaco editor mode and terminal focus.
+VS Code owns `Ctrl+J` for its integrated terminal outside VSCodeVim Insert mode,
+including when the terminal has focus. In Insert mode, VSCodeVim maps `Ctrl+J`
+to `<Enter>`. Quick Open, the Command Palette, editor and view focus, and Save All
+also work from terminal focus. Other shell/TUI `Ctrl` inputs remain terminal-owned,
+while `Ctrl+Shift+C/V` are VS Code terminal clipboard actions. Additional macOS
+GUI editing translation excludes every Monaco editor mode and terminal focus.

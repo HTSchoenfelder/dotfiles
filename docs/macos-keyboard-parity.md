@@ -38,8 +38,8 @@ editing and navigation in native and webview text inputs. There is no active
 
 | Linux-shaped input | Current macOS delivery | Coverage |
 | --- | --- | --- |
-| `Ctrl+A/C/V/X/F/S/W/Z` | Matching `Command` shortcut | GUI applications and VS Code non-editor text inputs; not terminals |
-| `Ctrl+Shift+A/C/V/X/F/S/W/Z` | Matching `Command+Shift` shortcut | GUI applications and VS Code non-editor text inputs; not terminals |
+| `Ctrl+A/C/F/N/O/P/S/T/V/W/X/Z` | Matching `Command` shortcut | GUI applications and VS Code non-editor text inputs; not terminals; Chrome and KeePassXC app rules take precedence |
+| `Ctrl+Shift+A/C/F/N/O/P/S/T/V/W/X/Z` | Matching `Command+Shift` shortcut | GUI applications and VS Code non-editor text inputs; not terminals; Chrome and KeePassXC app rules take precedence |
 | `Ctrl+Shift+Z` and `Ctrl+Y` | `Command+Shift+Z` | GUI applications and VS Code non-editor text inputs; KeePassXC owns `Ctrl+Y` |
 | `Ctrl+Left/Right` | Native word boundaries | GUI applications and VS Code non-editor text inputs; not terminals |
 | `Ctrl+Shift+Left/Right` | Native word selection | GUI applications and VS Code non-editor text inputs; not terminals |
@@ -104,10 +104,12 @@ to it.
 
 The current file deliberately keeps physical `Ctrl+P` and `Ctrl+Shift+P` for
 Quick Open and the Command Palette, `Ctrl+,` and `Ctrl+Shift+,` for forward and
-backward editor MRU selection, `Ctrl+E` for returning focus to the editor from
-non-editor surfaces, `Ctrl+J` and `Ctrl+Shift+J` for toggling and creating an
-integrated terminal, and `Ctrl+'` for maximizing the panel. `Ctrl+E` is inactive
-while editor text or the terminal has focus. `Ctrl+J` also toggles from terminal
+backward editor MRU selection, `Ctrl+E` for editor focus, `Ctrl+Shift+E/G/F` for
+Explorer, Source Control and Find in Files, `Ctrl+Alt+S` for Save All, and
+`Ctrl+Alt+I` for the Codex view. These keys also work in every VSCodeVim mode
+and from terminal focus; `Ctrl+E` therefore replaces Vim's Normal-mode scrolling in
+VS Code. `Ctrl+J` and `Ctrl+Shift+J` toggle and create an integrated terminal,
+and `Ctrl+'` maximizes the panel. `Ctrl+J` also toggles from terminal
 focus and creates a terminal if needed. `Ctrl+Shift+J` remains inactive in the
 terminal. Both yield to VSCodeVim Insert mode, but VS Code owns them in Normal
 mode; the equivalent Normal-mode downward motion remains available as `j`. An
@@ -120,26 +122,30 @@ presentation baseline. The complete target and current state are documented in
 Shared `!editorTextFocus && !terminalFocus` rules explicitly provide the same
 standard `Ctrl` actions on Linux and macOS, including actions that match Linux
 defaults. They apply in lists, Explorer, dialogs and other workbench surfaces:
-selection, copy/cut/paste, undo/redo, find, save/save-as/save-all, close, new/open,
-sidebar and view commands, editor-group focus, splitting and zoom. Native fields
+selection, copy/cut/paste, undo/redo, find, save/save-as, close, new/open,
+other sidebar and view commands, editor-group splitting and zoom. Native fields
 and extension webview text inputs also receive the Accessibility-gated
 Hammerspoon editing and text-navigation translation. All Monaco editor modes,
 including Insert, remain outside that additional translation; the existing
 explicit workbench exceptions listed above still apply.
 
-`Ctrl+Shift+F` explicitly binds `workbench.action.findInFiles` outside terminal
-focus, including editor text, so Edit > Find in Files uses the Ctrl shortcut too.
+`Ctrl+Shift+F` explicitly binds `workbench.action.findInFiles` in every focus
+context, so Edit > Find in Files uses the Ctrl shortcut too.
 The Search sidebar keeps its separate label binding to `workbench.view.search`
 with VS Code's nonmatching `neverMatch =~ /doesNotMatch/` condition.
 
-The integrated terminal owns `Ctrl+C`, `Ctrl+A/E/P` and other shell/TUI inputs.
-`Ctrl+J` is the explicit exception: it toggles the terminal instead of reaching
-the shell; Enter still submits shell input. The custom Quick Open, palette, MRU,
-focus and panel/terminal-control shortcuts exclude terminal focus on both
-platforms, apart from `Ctrl+J`. `Ctrl+Shift+C/V` invoke VS Code's terminal
+The Codex extension contributes two sidebar views depending on secondary-sidebar
+support. `Ctrl+Alt+I` uses the generated focus command for the supported view;
+whether the chat input gets the text cursor requires a live extension check.
+
+The integrated terminal owns `Ctrl+C`, `Ctrl+A` and other shell/TUI inputs.
+`Ctrl+E/P` run editor focus and Quick Open, while `Ctrl+Shift+P`, the view keys,
+Save All and `Ctrl+J` also remain workbench-owned there. MRU selection,
+new-terminal and panel-maximization controls still yield to terminal focus.
+Enter still submits shell input. `Ctrl+Shift+C/V` invoke VS Code's terminal
 copy/paste commands on both platforms, matching Kitty's physical keys.
-Terminal-focused empty-command rules keep `Ctrl+A..Z` except `Ctrl+J` and the
-former custom workbench keys from falling back to built-in or extension
+Terminal-focused empty-command rules keep `Ctrl+A..Z` except `Ctrl+E/J/P` and the
+other custom workbench keys from falling back to built-in or extension
 shortcuts. This also lets `Ctrl+K` reach the shell without starting a VS Code
 chord.
 

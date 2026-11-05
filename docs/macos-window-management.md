@@ -85,6 +85,12 @@ window native and untracked on its original display. An untracked selection also
 leaves the replaced window native and unchanged. Non-slot windows are neither
 hidden nor minimized to emulate Parking.
 
+Hyprland additionally uses its native urgent-window event to bring new or
+existing regular urgent windows to the active workspace, focus them and mark
+them in its window chooser until focus clears urgency. Their tiled or floating
+state is retained. This Hammerspoon setup has no equivalent per-window urgency
+signal, so this automatic placement and chooser marker are Hyprland-only.
+
 `MainMod + /` opens a three-entry Comma Selection: one full-screen slot, two
 50:50 slots and two 70:30 slots. Repeating `/` cycles the entries; releasing
 `MainMod` applies the selected layout to the display captured when the chooser

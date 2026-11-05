@@ -107,6 +107,11 @@ Zsh's standard navigation keys are:
 | `Ctrl+E` | Move to the end of the current line |
 
 Zsh owns terminal navigation independently of the compositor and Hammerspoon.
+Kitty launched with the app key starts Zellij in its default Normal mode, which
+captures keys such as `Ctrl+P` and `Alt+F`. Use Zellij's `Ctrl+G` Locked mode
+when those keys must reach Zsh or Neovim; press `Ctrl+G` again for Zellij
+controls. The tracked Zellij configuration keeps its appearance settings and
+inherits the installed default keybindings.
 There are no manual `Ctrl+Left/Right` or `Home/End` sequence bindings, so these
 keys depend on the terminal and shell environment. The macOS setup disables the
 system's `Ctrl+Left/Right` Spaces shortcuts so applications receive those keys;
@@ -134,20 +139,22 @@ runs Ruby diagnostics after reading and writing a buffer. See the active
 VSCodeVim stays close to its defaults and uses the same physical workflow on
 NixOS and macOS. Relative line numbers and Space as leader are the intentional
 baseline customizations. The shared VS Code keybindings retain Quick Open, the
-Command Palette, editor MRU selection, context-limited editor focus and the
+Command Palette, editor MRU selection, editor focus and the
 intentional integrated-terminal controls on `Ctrl+J`, `Ctrl+Shift+J` and
 `Ctrl+'`. `Ctrl+J` also toggles from terminal focus and creates a terminal if
 needed. Insert-mode `Ctrl+J` is explicitly mapped to VSCodeVim `<Enter>` so the
-terminal shortcut preserves standard editing behavior. These workbench shortcuts
-leave terminal focus to the shell except for the explicit `Ctrl+J` toggle;
-`Ctrl+Shift+C/V` copies and pastes there as in Kitty. `Ctrl+Shift+F` invokes
-Find in Files outside terminal focus, with matching Ctrl labels in Edit and
-Search. Standard `Ctrl` editing and workbench shortcuts are explicitly shared
-between Linux and macOS outside editor text and the terminal, even when they
-match Linux defaults. Hammerspoon also handles native and extension webview text
-inputs on macOS. All Vim modes remain excluded from the additional editing
-translation. See the active [VS Code Vim design](docs/vscode-vim.md) for the
-target and current state.
+terminal shortcut preserves standard editing behavior. The named editor, view,
+Save All, Quick Open and Command Palette shortcuts also work from terminal focus;
+`Ctrl+Shift+C/V` copies and pastes there as in Kitty. `Ctrl+E` focuses the editor;
+`Ctrl+Shift+E/G/F` focus Explorer, Source Control and Find in Files;
+`Ctrl+Alt+S` saves all files; `Ctrl+Alt+I` focuses the Codex view. These actions
+also work in Vim modes and from terminal focus. In VSCodeVim,
+`Ctrl+E` therefore replaces Vim's Normal-mode scrolling action. Standard `Ctrl` editing
+and other workbench shortcuts are explicitly shared between Linux and macOS
+outside editor text and the terminal, even when they match Linux defaults.
+Hammerspoon also handles native and extension webview text inputs on macOS.
+All Vim modes remain excluded from the additional editing translation. See the
+active [VS Code Vim design](docs/vscode-vim.md) for the target and current state.
 
 ## macOS / Hammerspoon quick reference
 
@@ -229,6 +236,7 @@ MRU windows.
 
 `mainMod` = `Super + Ctrl + Alt`. Each display retains one or two slots.
 The native master layout owns geometry; navigation changes slot contents.
+VLC windows remain fully opaque despite the global window opacity settings.
 The left slot is the master. The right slot is the only stack window. Direct App
 Keys are `J` = Kitty / Zellij, `K` = VS Code, `L` = Chrome, `;` = Obsidian and
 `O` = KeePassXC. Group App Keys use the same modifier-release selection lifecycle
@@ -301,6 +309,19 @@ new-window actions) fill a remembered vacancy or replace the previously focused
 slot. They do not create a third tile. On initial adoption of an older layout,
 excess normal windows go to Parking while retaining the master and the focused
 window when possible.
+
+Urgent regular windows, whether newly opened or already present, move to the
+current workspace and receive focus. Tiled windows enter the focused slot;
+floating windows keep floating and center after moving. A window already on the
+current workspace only receives focus. Explicit app launches still honor `S`
+focus retention. Modal dialogs and GTK portal dialogs, including portal file-open
+dialogs, float and center. GTK portal dialogs have a 1280 × 760 maximum size so
+VS Code's Open File dialog does not stretch to the full display height. Pending
+urgent windows appear in the `mainMod + P` and Comma Selection window lists
+with a green border and a searchable
+`(urgent)` suffix. Focus clears urgency, so an automatically focused window
+loses that marker. Choosing an urgent floating window focuses it without
+placing it in a slot. Waybar workspace buttons do not indicate urgency.
 
 ### Layout
 
@@ -380,7 +401,9 @@ slot contents. Waybar, Hyprpaper and Hypridle are bound to
 On Hyprland, `Ctrl + P/H/J/K/L` reaches the focused application unchanged. Chrome
 maps it to tab search, Back, previous tab, next tab and Forward. The macOS layer
 implements the same actions and translates the common Linux-shaped Chrome and
-system text shortcuts to their native macOS events. VS Code remains context-owned
+system text shortcuts to their native macOS events. General GUI applications
+also receive `Ctrl+N/O/P/T` as their native `Command` actions; Chrome and
+KeePassXC keep their specific meanings. VS Code remains context-owned
 for commands, Monaco, Vim and its terminal, while native and webview text inputs
 receive editing and navigation translation. Its status is documented in
 [macOS keyboard parity](docs/macos-keyboard-parity.md).

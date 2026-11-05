@@ -1,7 +1,7 @@
 local support = {}
 
 function support.session()
-    local session = { orders = {}, windows = {}, spaces = {}, monitors = {}, monitor_rules = {}, workspace_rules = {}, workspace_moves = {}, bindings = {}, events = {}, timers = {}, commands = {}, shortcuts = {}, notices = {}, held = {}, submap = "reset" }
+    local session = { orders = {}, windows = {}, spaces = {}, monitors = {}, monitor_rules = {}, workspace_rules = {}, window_rules = {}, workspace_moves = {}, bindings = {}, events = {}, timers = {}, commands = {}, shortcuts = {}, notices = {}, held = {}, submap = "reset" }
     local defining_submap = "reset"
     local process = require("lib.process")
     local original_spawn = process.spawn
@@ -164,11 +164,13 @@ function support.session()
     hl = {
         config = function() end,
         workspace_rule = function(rule) session.workspace_rules[#session.workspace_rules + 1] = rule end,
-        window_rule = function() end, layer_rule = function() end,
+        window_rule = function(rule) session.window_rules[#session.window_rules + 1] = rule end,
+        layer_rule = function() end,
         get_layers = function() return {} end,
         get_active_workspace = function() return session.current end,
         get_active_special_workspace = function() return nil end,
         get_active_window = function() return session.focused end,
+        get_urgent_window = function() return nil end,
         get_monitors = function(options)
             local monitors = {}
             for _, monitor in ipairs(session.monitors) do
@@ -361,12 +363,14 @@ function support.session()
         end,
     }
     package.loaded["config.workspaces"] = nil
+    package.loaded["config.window_rules"] = nil
     package.loaded["config.keybindings"] = nil
     package.loaded["config.hardware_keys"] = nil
     require("lib.monitor_configuration").set_workspace_roles({
         primary = "HDMI-A-1", secondary = "HDMI-A-2",
     })
     local settings = require("config.navigation")
+    require("config.window_rules")
     local state_file = settings.slot_state_file
     settings.slot_state_file = nil
     require("config.keybindings")

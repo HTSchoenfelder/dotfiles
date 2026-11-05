@@ -3,7 +3,7 @@
 local config_directory = assert(arg[0]:match("^(.*)/lib/rofi_mode.lua$"))
 package.path = config_directory .. "/?.lua;" .. package.path
 local process = require("lib.process")
-local token, rows_path = assert(arg[1]), assert(arg[2])
+local token, rows_path, urgent_rows = assert(arg[1]), assert(arg[2]), arg[3] or ""
 local instance = assert(os.getenv("HYPRLAND_INSTANCE_SIGNATURE"), "No Hyprland instance")
 
 local function report(callback, value)
@@ -20,6 +20,7 @@ if os.getenv("ROFI_RETV") == "0" then
     local rows = io.open(rows_path, "r")
     if not rows then return end
     io.write("\0prompt\x1f\n\0no-custom\x1ftrue\n\0markup-rows\x1ffalse\n")
+    if urgent_rows ~= "" then io.write("\0urgent\x1f", urgent_rows, "\n") end
     local index = 0
     for label in rows:lines() do
         io.write(label, "\0info\x1f", tostring(index), "\n")

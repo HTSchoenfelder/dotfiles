@@ -7,6 +7,27 @@ hl.window_rule({
 })
 
 hl.window_rule({
+    name = "opaque-vlc",
+    match = { class = "^vlc$" },
+    opacity = "1.0 override 1.0 override 1.0 override",
+})
+
+hl.window_rule({
+    name = "center-modal-dialogs",
+    match = { modal = true },
+    float = true,
+    center = true,
+})
+
+hl.window_rule({
+    name = "center-portal-dialogs",
+    match = { initial_class = "^xdg-desktop-portal-gtk$" },
+    float = true,
+    center = true,
+    max_size = { 1280, 760 },
+})
+
+hl.window_rule({
     name = "project-overlays",
     match = { initial_class = "^project-overlay-.*$" },
     float = true,

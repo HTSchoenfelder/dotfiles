@@ -1,6 +1,7 @@
 local compositor = require("lib.compositor")
 local process = require("lib.process")
 local slot_layout = require("lib.slot_layout")
+local overlays = require("lib.project_overlays")
 local window_navigation = {}
 
 local function matches_application(window, application)
@@ -10,6 +11,18 @@ end
 local function monitor_position(monitor)
     local position = monitor.position or {}
     return position.x or monitor.x or 0, position.y or monitor.y or 0
+end
+
+local function focus_rank(window)
+    -- Hyprland uses 0 for the most recent focus and -1 for never focused.
+    return window.focus_history_id >= 0 and window.focus_history_id or math.huge
+end
+
+local function sort_by_focus(windows)
+    table.sort(windows, function(first, second)
+        if focus_rank(first) == focus_rank(second) then return first.address < second.address end
+        return focus_rank(first) < focus_rank(second)
+    end)
 end
 
 local function other_monitor()
@@ -35,14 +48,7 @@ function window_navigation.list(application, parking)
     for _, window in ipairs(hl.get_windows({ mapped = true })) do
         if slot_layout.eligible(window, parking) and matches_application(window, application) then windows[#windows + 1] = window end
     end
-    local function focus_rank(window)
-        -- Hyprland uses 0 for the most recent focus and -1 for never focused.
-        return window.focus_history_id >= 0 and window.focus_history_id or math.huge
-    end
-    table.sort(windows, function(first, second)
-        if focus_rank(first) == focus_rank(second) then return first.address < second.address end
-        return focus_rank(first) < focus_rank(second)
-    end)
+    sort_by_focus(windows)
     return windows
 end
 
@@ -89,9 +95,69 @@ function window_navigation.new(options, picker)
         move = move, state_file = options.state_file })
     local pending_launches = {}
     local opening = {}
+    local requested_windows = {}
+    local urgent = {}
+    local initial_urgent = hl.get_urgent_window()
+    if initial_urgent and initial_urgent.address then urgent[initial_urgent.address] = true end
     local stopped = false
     local latest_request
     local finish_timer
+
+    local function selectable_windows(application)
+        local windows = list(application)
+        for _, window in ipairs(hl.get_windows({ mapped = true })) do
+            if urgent[window.address] and window.floating and not window.hidden
+                and window.workspace and not window.workspace.special
+                and not overlays.is_overlay(window)
+                and matches_application(window, application) then
+                windows[#windows + 1] = window
+            end
+        end
+        sort_by_focus(windows)
+        return windows
+    end
+
+    local function show_urgent(window)
+        if not urgent[window.address] or requested_windows[window.address]
+            or not window.mapped
+            or not window.workspace or window.workspace.special
+            or overlays.is_overlay(window) then return end
+        local workspace = hl.get_active_workspace()
+        if not workspace or workspace.special then return end
+        local target = slots.capture("focused", window)
+        if not target then return end
+        latest_request = nil
+        picker.cancel()
+        if window.workspace.addressable_name == workspace.addressable_name then
+            if opening[window.address] and not window.floating then
+                opening[window.address] = nil
+                slots.opened(window, target)
+            end
+        else
+            opening[window.address] = nil
+            if window.group then window.group:remove(window) end
+            if window.floating then
+                window_navigation.move(window, workspace.addressable_name)
+                if not window.floating then
+                    compositor.dispatch(hl.dsp.window.float({ window = window, action = "set" }))
+                end
+                compositor.dispatch(hl.dsp.window.center({ window = window }))
+            else
+                slots.place(window, target)
+            end
+        end
+        compositor.dispatch(hl.dsp.focus({ window = window }))
+    end
+
+    local function schedule_urgent(window)
+        if not urgent[window.address] then return end
+        local entry = opening[window.address]
+        if entry and not entry.ready then return end
+        hl.timer(function()
+            if not stopped then show_urgent(window) end
+        end, { timeout = 1, type = "oneshot" })
+    end
+    if initial_urgent then schedule_urgent(initial_urgent) end
 
     local function request_is_current(request)
         return request == latest_request and slots.current(request.slot)
@@ -124,7 +190,9 @@ function window_navigation.new(options, picker)
         for _, window in ipairs(windows) do
             items[#items + 1] = {
                 address = window.address,
-                label = window.title ~= "" and window.title or window.class,
+                label = (window.title ~= "" and window.title or window.class)
+                    .. (urgent[window.address] and " (urgent)" or ""),
+                urgent = urgent[window.address] == true,
                 window = window,
             }
         end
@@ -134,7 +202,13 @@ function window_navigation.new(options, picker)
             is_current = function() return request_is_current(request) end,
             on_select = function(item)
                 if item.window.mapped and matches_application(item.window, application) then
-                    select(item.window, request)
+                    if item.window.floating then
+                        window_navigation.move(item.window, request.workspace)
+                        compositor.dispatch(hl.dsp.window.center({ window = item.window }))
+                        compositor.dispatch(hl.dsp.focus({ window = item.window }))
+                    else
+                        select(item.window, request)
+                    end
                 end
             end,
         })
@@ -181,10 +255,38 @@ function window_navigation.new(options, picker)
         local entry = opening[window.address] or { window = window, slot = slots.capture("focused", window) }
         entry.ready = true
         opening[window.address] = entry
+        local requested = false
+        for application in pairs(pending_launches) do
+            if matches_application(window, application) then requested = true; break end
+        end
+        if requested then
+            requested_windows[window.address] = window
+            hl.timer(function()
+                if requested_windows[window.address] == window then
+                    requested_windows[window.address] = nil
+                end
+            end, { timeout = 5000, type = "oneshot" })
+        end
+        schedule_urgent(window)
         schedule_launch_completion()
     end)
+    hl.on("window.urgent", function(window)
+        if stopped or not window or not window.address then return end
+        urgent[window.address] = true
+        schedule_urgent(window)
+    end)
     hl.on("window.destroy", function(window)
-        if window and window.address then opening[window.address] = nil end
+        if window and window.address then
+            opening[window.address] = nil
+            requested_windows[window.address] = nil
+            urgent[window.address] = nil
+        end
+    end)
+    hl.on("window.active", function(window)
+        if window and window.address then
+            requested_windows[window.address] = nil
+            urgent[window.address] = nil
+        end
     end)
     for _, event in ipairs({ "window.class", "window.active" }) do
         hl.on(event, schedule_launch_completion)
@@ -196,7 +298,7 @@ function window_navigation.new(options, picker)
         picker.cancel()
         local request = create_request(request_options)
         if not request then return end
-        local windows = list(application)
+        local windows = choose_instance and selectable_windows(application) or list(application)
         local excluded = slots.excluded(request.slot)
         local had_windows = #windows > 0
         if excluded then
@@ -238,7 +340,7 @@ function window_navigation.new(options, picker)
 
     function navigation.cycle(direction, key, request_options, application)
         if picker.is_open() then return end
-        local windows = list(application)
+        local windows = selectable_windows(application)
         if #windows == 0 then return end
         local request = create_request(request_options)
         if not request then return end

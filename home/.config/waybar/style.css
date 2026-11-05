@@ -43,12 +43,6 @@ tooltip label{
     border-radius: 5px;
 }
 
-#workspaces button.urgent {
-    color: #11111b;
-    background: #a6e3a1;
-    border-radius: 5px;
-}
-
 #workspaces button:hover {
     background: #11111b;
     color: #cdd6f4;

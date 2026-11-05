@@ -37,7 +37,9 @@ The core configuration intentionally contains only:
 
 There are no custom window-navigation, clipboard, Visual-mode, test or Git
 mappings. `Ctrl+P` is the one direct Normal-mode exception: it opens Telescope's
-file finder to match the physical VS Code shortcut on NixOS and macOS.
+file finder to match the physical VS Code shortcut on NixOS and macOS. Inside
+Zellij, its default Normal mode captures `Ctrl+P`; press `Ctrl+G` to use Zellij's
+Locked mode before sending `Ctrl+P` to Neovim.
 
 The active plugin capabilities are:
 

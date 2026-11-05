@@ -4,6 +4,7 @@
     lavender: #b4befe;
     mauve: #cba6f7;
     red: #f38ba8;
+    green: #a6e3a1;
     background-color: transparent;
     text-color: @text;
     border-color: @lavender;
@@ -68,6 +69,15 @@ element {
 element selected {
     border-color: @lavender;
     text-color: @mauve;
+}
+
+element urgent {
+    border-color: @green;
+}
+
+element selected.urgent {
+    border-color: @green;
+    text-color: @green;
 }
 
 element-text {

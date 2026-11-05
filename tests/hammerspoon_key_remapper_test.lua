@@ -74,6 +74,8 @@ local vscode = "com.microsoft.VSCode"
 local keepass = "org.keepassxc.keepassxc"
 
 assertTarget(gui, "c", {ctrl = true}, {"cmd"}, "c")
+assertTarget(gui, "n", {ctrl = true}, {"cmd"}, "n")
+assertTarget(gui, "p", {ctrl = true}, {"cmd"}, "p")
 assertTarget(gui, "z", {ctrl = true, shift = true}, {"cmd", "shift"}, "z")
 assertTarget(gui, "y", {ctrl = true}, {"cmd", "shift"}, "z")
 assertTarget(gui, "left", {ctrl = true}, {"alt"}, "left")
@@ -87,6 +89,7 @@ assertTarget(gui, "end", {ctrl = true, shift = true}, {"cmd", "shift"}, "down")
 assertIgnored(gui, "c", {ctrl = true, cmd = true})
 
 assertIgnored(terminal, "left", {ctrl = true})
+assertIgnored(terminal, "p", {ctrl = true})
 assertTarget(terminal, "c", {ctrl = true, shift = true}, {"cmd"}, "c")
 assertTarget(terminal, "v", {ctrl = true, shift = true}, {"cmd"}, "v")
 assertTarget(terminal, "z", {ctrl = true, shift = true}, {"cmd", "shift"}, "z")
