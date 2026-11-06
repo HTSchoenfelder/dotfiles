@@ -4,6 +4,7 @@ let
     name = "yazi-file-picker";
     runtimeInputs = with pkgs; [
       coreutils
+      gnused
       kitty
       yazi
     ];
@@ -45,9 +46,10 @@ let
       fi
 
       kitty \
-        --class yazi-file-picker \
+        --class yazi-overlay \
         --title "$title" \
-        env "''${yazi_environment[@]}" yazi "''${yazi_arguments[@]}"
+        env "''${yazi_environment[@]}" yazi "''${yazi_arguments[@]}" \
+        2> >(sed '/The uniform: draw_bg_bitfield is not active in the linked GPU program:/d' >&2)
 
       if [[ "$directory" == 1 && ! -s "$output" && -s "$directory_output" ]]; then
         cp -- "$directory_output" "$output"

@@ -197,8 +197,9 @@ to the calling shell and filters Kitty's harmless inactive
 `draw_bg_bitfield` shader diagnostic. Other Kitty errors remain visible. `q`
 exits and changes the shell to Yazi's current directory; `Q` exits without
 changing it. Move selected files with `x`, navigate to the destination and press
-`p`. In a portal Save File picker, navigate to the destination with `h`, `j`, `k`
-and `l`, then press
+`p`. Portal open and save dialogs reuse the same borderless overlay class and
+geometry. In a portal Save File picker, navigate to the destination with `h`,
+`j`, `k` and `l`, then press
 `Enter`. Yazi opens a `Save as:` input initialized with the application's
 suggested filename and returns that path without creating a placeholder file.
 An existing destination requires overwrite confirmation. `Q` cancels. Folder

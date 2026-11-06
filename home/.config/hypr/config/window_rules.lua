@@ -28,7 +28,8 @@ hl.window_rule({
 })
 
 hl.window_rule({
-    name = "yazi-file-picker",
+    name = "yazi-overlays",
+    -- Keep the old class working until the installed portal wrapper is rebuilt.
     match = { initial_class = "^yazi-(file-picker|overlay)$" },
     float = true,
     center = true,

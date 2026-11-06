@@ -309,7 +309,7 @@ test("modal and portal dialogs float and center through window rules", function(
     for _, candidate in ipairs(session.window_rules) do
         if candidate.name == "center-modal-dialogs" then modal = candidate end
         if candidate.name == "center-portal-dialogs" then portal = candidate end
-        if candidate.name == "yazi-file-picker" then picker = candidate end
+        if candidate.name == "yazi-overlays" then picker = candidate end
     end
     assert(modal and modal.match.modal and modal.float and modal.center)
     assert(portal and portal.match.initial_class == "^xdg-desktop-portal-gtk$"

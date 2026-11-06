@@ -81,12 +81,14 @@ a dedicated Kitty window. Interactive `y` sessions launched from Zellij use the
 same direct-Kitty path because Zellij currently corrupts Yazi's Kitty image
 previews. The shell wrapper suppresses only Kitty's harmless inactive
 `draw_bg_bitfield` shader diagnostic while retaining other stderr output. The
-`yazi-file-picker` and `yazi-overlay` classes keep both variants floating,
-centered, borderless, outside groups and outside layout slots. Their fixed
-1280 × 760 size matches the fallback GTK portal-dialog limit. The GTK rule
-remains for applications that bypass the FileChooser portal or use other GTK
-portal interfaces; a live VS Code `Open File` request otherwise asked for the
-display's full height after becoming floating. Every regular window that
+portal wrapper and interactive shell wrapper both use the `yazi-overlay` class,
+keeping them floating, centered, borderless, outside groups and outside layout
+slots. The rule temporarily retains the previous `yazi-file-picker` class so an
+installed pre-rebuild wrapper remains usable. Their fixed 1280 × 760 size
+matches the fallback GTK portal-dialog limit. The GTK rule remains for
+applications that bypass the FileChooser portal or use other GTK portal
+interfaces; a live VS Code `Open File` request otherwise asked for the display's
+full height after becoming floating. Every regular window that
 requests urgency, including an existing window on another workspace, moves to
 the active workspace and receives focus. Tiled windows enter the focused slot;
 floating windows retain floating and center after moving. A window already on
