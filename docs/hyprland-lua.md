@@ -216,6 +216,10 @@ Command entries use `command|label`, split at the last `|` to allow shell pipeli
 Only labels appear in Rofi. Numeric row selection preserves duplicate labels;
 only the selected command from this trusted configuration runs via `bash -c`.
 Commands retain shell expansion and quoting from the original launcher.
+Power entries use Hyprshutdown for graceful logout, restart and poweroff. Lock
+and suspend call the corresponding system action directly. Hyprlauncher and
+Hyprpwcenter are optional entries in the same palette; Rofi remains the owner of
+application launch, Comma Selection and every compositor picker.
 
 `Ctrl + P/H/J/K/L` are forwarded through `hl.dsp.send_shortcut` to the focused
 window. Chrome maps them to `Ctrl+Shift+A`, `Alt+Left`, `Ctrl+Shift+Tab`,

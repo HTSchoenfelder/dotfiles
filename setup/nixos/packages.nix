@@ -69,7 +69,6 @@
     firefoxpwa
     gparted
     clipse
-    wlogout
     usbutils
     playerctl
     mlocate
@@ -89,6 +88,9 @@
     gthumb
     wev
     tree
+    hyprlauncher
+    hyprpwcenter
+    hyprshutdown
     hyprshot
     libnotify
     hyprlock

@@ -401,7 +401,11 @@ Workspace selection remains `mainMod + B` / `Shift + B`; media selection remains
 `mainMod + Y` / `Shift + Y`. `mainMod + Shift + P` opens all shortcuts and
 individual commands from `home/.config/hypr/launcher-data/execute.txt`,
 while `mainMod + Shift + R` opens configured commands. The existing workspace
-reset explicitly restores a single terminal slot.
+reset explicitly restores a single terminal slot. The configured system actions
+use Hyprshutdown to close applications before logout, restart or poweroff;
+lock and suspend remain direct system actions. Hyprlauncher is
+available as an additional trial launcher without replacing Rofi, and
+Hyprpwcenter is available alongside Pavucontrol and Qpwgraph for comparison.
 
 Clipboard history is recorded persistently by the existing text and PNG Clipse
 watchers owned by `graphical-session.target`. `mainMod + V` starts a short-lived

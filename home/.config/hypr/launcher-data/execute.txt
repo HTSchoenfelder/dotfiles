@@ -1,6 +1,11 @@
 lua:reset-workspaces|reset workspaces
-hyprctl dispatch 'hl.dsp.exit()'|exit Hyprland
-wlogout|wlogout
+loginctl lock-session|lock session
+systemctl suspend|suspend system
+hyprshutdown|log out
+hyprshutdown -t 'Restarting...' --post-cmd 'systemctl reboot'|restart system
+hyprshutdown -t 'Shutting down...' --post-cmd 'systemctl poweroff'|power off system
+hyprlauncher|Hyprlauncher
+hyprpwcenter|PipeWire control center
 spotify_player playback start liked -r|spotify liked songs
 kitty --class kitty_spotify --title Spotify spotify_player|spotify player
 pkill -SIGUSR2 waybar|restart waybar
