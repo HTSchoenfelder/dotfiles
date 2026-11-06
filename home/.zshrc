@@ -26,10 +26,9 @@ alias proj='cd ~/projects'
 alias aza='az account show --output tsv --query "name"'
 alias azas='az account set --subscription'
 
-alias nixbuildv='sudo nixos-rebuild switch --flake $HOME/dotfiles/setup/nixos --show-trace --print-build-logs --verbose'
 alias nixupdate='nix flake update --flake $HOME/dotfiles/setup/nixos'
-alias nixupdatemac='sudo nix flake update --flake ~/dotfiles/setup/macos/'
-alias nixbuildmac='sudo nix run nix-darwin/master#darwin-rebuild -- switch --flake ~/dotfiles/setup/macos#macbook'
+alias nixupdatemac='nix flake update --flake ~/dotfiles/setup/macos/'
+alias nixbuildmac='sudo darwin-rebuild switch --flake ~/dotfiles/setup/macos#macbook'
 alias nixupdatelatest='nix flake update nixpkgs-latest --flake $HOME/dotfiles/setup/nixos'
 alias nixupdatestable='nix flake update nixpkgs-stable --flake $HOME/dotfiles/setup/nixos'
 alias nixrepl='nix repl -f flake:nixpkgs'
@@ -50,17 +49,37 @@ nixsh() {
 }
 
 nixbuild() {
-    if [ -z "$1" ]; then
-        echo "Error: No target specified. Usage: nixbuild <target> [-v]" >&2
+    local configuration="${1:-}"
+    local verbose="${2:-}"
+    local profile_file="$HOME/.config/dotfiles/nixos-profile"
+    if [[ "$configuration" == "-v" ]]; then
+        configuration=""
+        verbose="-v"
+    fi
+
+    if [[ -z "$configuration" ]]; then
+        if [[ ! -r "$profile_file" ]]; then
+            echo "No NixOS profile configured. Run initial setup or pass a profile." >&2
+            return 1
+        fi
+        IFS= read -r configuration < "$profile_file"
+    fi
+
+    if [[ -z "$configuration" ]]; then
+        echo "The NixOS profile is empty." >&2
         return 1
     fi
 
     local flags=()
-    if [ "$2" = "-v" ]; then
+    if [[ "$verbose" == "-v" ]]; then
         flags=(--show-trace --print-build-logs --verbose)
     fi
 
-    sudo nixos-rebuild switch --flake "$HOME/dotfiles/setup/nixos#$1" "${flags[@]}"
+    sudo nixos-rebuild switch --flake "$HOME/dotfiles/setup/nixos#$configuration" "${flags[@]}"
+}
+
+nixbuildv() {
+    nixbuild "${1:-}" -v
 }
 
 brew-orphans() {

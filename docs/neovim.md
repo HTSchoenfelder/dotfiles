@@ -33,13 +33,15 @@ The core configuration intentionally contains only:
 - Space as global and local leader.
 - Absolute current-line and relative surrounding-line numbers.
 - Two-space, space-based indentation.
+- `Space T W` to toggle word-boundary wrapping in the current window.
 - Default swap-file recovery behavior.
 
 There are no custom window-navigation, clipboard, Visual-mode, test or Git
-mappings. `Ctrl+P` is the one direct Normal-mode exception: it opens Telescope's
-file finder to match the physical VS Code shortcut on NixOS and macOS. Inside
-Zellij, its default Normal mode captures `Ctrl+P`; press `Ctrl+G` to use Zellij's
-Locked mode before sending `Ctrl+P` to Neovim.
+mappings. `Space T W` is a Normal-mode editor toggle for `wrap`, `linebreak` and
+`breakindent` in the current window. `Ctrl+P` opens Telescope's file finder to
+match the physical VS Code shortcut on NixOS and macOS. Inside Zellij, its
+default Normal mode captures `Ctrl+P`; press `Ctrl+G` to use Zellij's Locked mode
+before sending `Ctrl+P` to Neovim.
 
 The active plugin capabilities are:
 

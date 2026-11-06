@@ -1,21 +1,13 @@
 {
   inputs = {
-    nixpkgs.url = "git+https://github.com/NixOS/nixpkgs?ref=nixos-unstable";
     nixpkgs-latest.url = "git+https://github.com/nixos/nixpkgs?ref=nixos-unstable";
-    nixpkgs-stable.url = "git+https://github.com/nixos/nixpkgs?ref=nixos-24.11";
-    hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    nixpkgs-stable.url = "git+https://github.com/nixos/nixpkgs?ref=nixos-26.05";
   };
 
   outputs =
     {
-      nixpkgs,
-      nixpkgs-stable,
       nixpkgs-latest,
-      home-manager,
+      nixpkgs-stable,
       ...
     }@inputs:
     let
@@ -27,27 +19,26 @@
           config.allowUnfree = true;
         };
       pkgsStable = mkPkgs nixpkgs-stable;
-      pkgsLatest = mkPkgs nixpkgs-latest;
       mkHost =
-        hardwareModule:
-        nixpkgs.lib.nixosSystem {
+        hardwareModule: hostModule:
+        nixpkgs-latest.lib.nixosSystem {
           inherit system;
           specialArgs = {
-            inherit inputs pkgsStable pkgsLatest;
+            inherit inputs pkgsStable;
           };
           modules = [
             ./configuration.nix
             hardwareModule
+            hostModule
             ./packages.nix
-            home-manager.nixosModules.home-manager
           ];
         };
     in
     {
       nixosConfigurations = {
-        desktop = mkHost ./configurations/desktop/hardware.nix;
-        notebook = mkHost ./configurations/notebook/hardware.nix;
-        qemu = mkHost ./configurations/qemu/hardware.nix;
+        desktop = mkHost ./configurations/desktop/hardware.nix ./configurations/desktop/host.nix;
+        notebook = mkHost ./configurations/notebook/hardware.nix ./configurations/notebook/host.nix;
+        qemu = mkHost ./configurations/qemu/hardware.nix ./configurations/qemu/host.nix;
       };
     };
 }

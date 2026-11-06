@@ -3,8 +3,8 @@
   ...
 }:
 {
-  nix.settings.experimental-features = "nix-command flakes";
   nixpkgs.config.allowUnfree = true;
+  # Determinate manages the Nix daemon and nix.conf.
   nix.enable = false;
 
   system = {

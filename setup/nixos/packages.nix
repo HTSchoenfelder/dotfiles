@@ -1,17 +1,15 @@
 {
   pkgs,
   pkgsStable,
-  pkgsLatest,
   ...
 }:
 {
   environment.systemPackages = with pkgs; [
-    pkgsLatest.vscode
+    vscode
     pkgsStable.spotify
     pkgsStable.hyprpaper
     pkgsStable.azure-cli
     synology-drive-client
-    home-manager
     git
     go
     terraform
@@ -85,7 +83,7 @@
     gcc
     clang
     dotnetCorePackages.sdk_9_0
-    nixfmt-rfc-style
+    nixfmt
     seahorse
     google-chrome
     gthumb
@@ -151,6 +149,7 @@
     waybar
     libsecret
     rofi
+    chatgpt
   ];
 
   fonts.packages = with pkgs; [

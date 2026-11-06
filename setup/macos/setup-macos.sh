@@ -32,7 +32,7 @@ fi
 echo "Git is available, continuing..."
 
 brew bundle --file "$script_directory/Brewfile"
-sudo nix run nix-darwin/master#darwin-rebuild -- switch \
+sudo nix run --inputs-from "$script_directory" nix-darwin#darwin-rebuild -- switch \
     --flake "$script_directory#$configuration"
 
 # Reserve Ctrl+Left/Right for application word navigation instead of Spaces.

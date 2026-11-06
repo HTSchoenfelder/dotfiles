@@ -7,9 +7,6 @@
 let
   userName = "henrik";
   userDescription = "Henrik";
-  hyprlandPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-  hyprlandPortalPackage =
-    inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
 
   # tty1 is the regular interactive login for Henrik: skip the username prompt,
   # but keep the normal PAM password authentication. Other TTYs remain standard
@@ -60,9 +57,12 @@ in
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
-    package = hyprlandPackage;
-    portalPackage = hyprlandPortalPackage;
+    # Keep the default Nixpkgs binary cache path. Session startup stays manual.
+    withUWSM = true;
+    package = pkgs.hyprland;
+    portalPackage = pkgs.xdg-desktop-portal-hyprland;
   };
+  programs.uwsm.enable = lib.mkForce false;
 
   nix = {
     settings = {
@@ -70,17 +70,14 @@ in
         "nix-command"
         "flakes"
       ];
-      substituters = [ "https://hyprland.cachix.org" ];
-      trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
       # NIX_PATH is still used by tools such as `nix repl '<nixpkgs>'`.
       nix-path = lib.mkForce "nixpkgs=/etc/nix/inputs/nixpkgs";
     };
-    registry.nixpkgs.flake = inputs.nixpkgs;
+    registry.nixpkgs.flake = inputs.nixpkgs-latest;
     channel.enable = false;
   };
 
   networking = {
-    hostName = "nixos";
     networkmanager.enable = true;
     firewall = {
       enable = true;
@@ -204,14 +201,24 @@ in
   services.flatpak.enable = true;
   systemd.services.flatpak-repo = {
     wantedBy = [ "multi-user.target" ];
-    path = [ pkgs.flatpak ];
+    path = [
+      pkgs.flatpak
+      pkgs.gnugrep
+    ];
+    serviceConfig = {
+      Type = "oneshot";
+      Restart = "on-failure";
+      RestartSec = "30s";
+    };
     script = ''
-      flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+      if ! flatpak remotes --system --columns=name | grep -Fxq flathub; then
+        flatpak remote-add --system --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+      fi
     '';
   };
 
   # Keep legacy NIX_PATH consumers pinned to the flake's nixpkgs input.
-  environment.etc."nix/inputs/nixpkgs".source = "${inputs.nixpkgs}";
+  environment.etc."nix/inputs/nixpkgs".source = "${inputs.nixpkgs-latest}";
   systemd.tmpfiles.rules = [
     "r /root/.nix-defexpr/channels"
     "r /nix/var/nix/profiles/per-user/root/channels"
@@ -253,6 +260,4 @@ in
     enable = true;
     enableSSHSupport = false;
   };
-
-  system.stateVersion = "24.11";
 }

@@ -49,21 +49,76 @@ logical replacement pool.
 
 Linux and macOS use independent flakes and lock files under `setup/nixos` and
 `setup/macos`. The NixOS flake defines the shared module stack once and supplies
-only the host-specific hardware module for `desktop`, `notebook` and `qemu`.
+host-specific hardware and hostname modules for `desktop`, `notebook` and `qemu`.
+Each flake uses a latest Nixpkgs input for its default package set and a maintained
+stable input for packages that need a separate update cadence. Add a commit-pinned
+Nixpkgs input only when a particular package needs a particular revision; import
+that input as a package set and select just that package from it. The commit is
+then recorded in the flake lock file alongside the two regular inputs.
+For example, an exception for VS Code would add
+`nixpkgs-vscode.url = "github:NixOS/nixpkgs/<commit>"` to the flake inputs, import
+`nixpkgs-vscode` with the same system and unfree setting, and use that package
+set's `vscode` in `packages.nix`. No package currently needs such a pin.
+`nix flake update` advances a lock file within its configured branch; switching
+to a newer stable release also requires changing the input URL in `flake.nix`.
+Hyprland and its matching desktop portal use the latest Nixpkgs package set.
+`nixupdatelatest` therefore updates Hyprland along with the other latest
+packages. Nixpkgs releases can lag behind Hyprland's main branch, but their
+prebuilt packages avoid a local compositor build when the binary cache has them.
+An exact upstream commit can still be pinned as an exception when needed; that
+may require compiling Hyprland locally.
+The NixOS Hyprland module couples its UWSM option to a build flag. The
+configuration keeps UWSM support in the cached Hyprland binary, but disables
+the UWSM service so `start-hyprland` remains the session entry point. A full
+`nixbuild` can still download or build other updated system packages.
 
 On NixOS, `configuration.nix` owns system-level policy,
 `desktop-integration.nix` owns toolkit and desktop integration, and
 `desktop-session.nix` owns long-running graphical user services. Host hardware
-stays in `configurations/<host>/hardware.nix`; package and font selection stays in
+stays in `configurations/<profile>/hardware.nix` and the chosen hostname in
+`configurations/<profile>/host.nix` together with the initial
+`system.stateVersion`; package and font selection stays in
 `packages.nix`. On macOS, `configuration.nix` owns nix-darwin settings and
 LaunchAgents, while `packages.nix` owns packages and fonts.
 
-Evaluate all declared systems without building them:
+`system.stateVersion` records the NixOS release used for that host's first
+installation. It does not select package versions and does not advance when the
+latest or stable flake input is updated. The desktop was first installed with
+26.05; notebook and qemu retain their previous 24.11 value until their own
+initial installation state is confirmed.
+
+Evaluate the declared systems without building them:
 
 ```sh
 nix flake check --no-build ./setup/nixos
-nix flake check --no-build ./setup/macos
+nix eval --raw ./setup/macos#darwinConfigurations.macbook.config.system.build.toplevel.drvPath
 ```
+
+The macOS command explicitly evaluates the system derivation; `nix flake check`
+alone only checks the `darwinConfigurations` output shape.
+
+## NixOS initial setup and updates
+
+Run `setup/nixos/setup-nixos.sh [desktop|notebook|qemu]` once on the installed
+NixOS machine. It asks for a freely chosen hostname, generates the selected
+profile's hardware module from the mounted filesystems, shows changes and saves
+the previous files before replacing them. Filesystems use stable device paths
+such as UUIDs; the script does not relabel partitions. It then evaluates and,
+after confirmation, activates the selected configuration. The hostname remains
+in the tracked `host.nix` module alongside the initial `system.stateVersion`.
+The setup offers the value from an existing generated NixOS configuration when
+available; otherwise it asks for the first-install release. The selected profile
+is stored in `~/.config/dotfiles/nixos-profile` for later rebuilds. The setup also links the
+host's Hyprland monitor configuration and the home dotfiles through Stow.
+The existing desktop hardware module already uses UUIDs; notebook and qemu are
+converted when their initial setup runs on those machines.
+
+For subsequent updates, change the Nix files or update the desired flake inputs,
+evaluate the configuration, and run `nixbuild` or `nixbuildv` from Zsh. Both use
+the saved profile; `nixbuild <profile>` explicitly selects another one. On macOS,
+`nixupdatemac` updates the lock file as the regular user and `nixbuildmac` runs
+the installed `darwin-rebuild` against the local flake. These commands do not run
+the one-time NixOS setup again.
 
 ## NixOS session startup
 
@@ -131,7 +186,8 @@ Neovim distribution. Nix owns Neovim, language servers, formatters and linters
 on both platforms; `lazy.nvim` owns editor plugins only. Native Neovim LSP runs
 TypeScript, Ruby, HTML and Lua servers and retains its built-in mappings and
 manual completion. `conform.nvim` formats through `:Format`, while `nvim-lint`
-runs Ruby diagnostics after reading and writing a buffer. See the active
+runs Ruby diagnostics after reading and writing a buffer. `Space T W` toggles
+word-boundary wrapping in the current window. See the active
 [Neovim design](docs/neovim.md) for the target, current state and plugin boundary.
 
 ## VS Code Vim
