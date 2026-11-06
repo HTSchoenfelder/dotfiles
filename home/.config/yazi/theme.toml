@@ -1,0 +1,13 @@
+[flavor]
+dark = "catppuccin-mocha"
+light = "catppuccin-mocha"
+
+[git]
+unknown = { fg = "#6c7086" }
+ignored = { fg = "#6c7086" }
+untracked = { fg = "#cba6f7" }
+unstaged = { fg = "#f9e2af" }
+staged = { fg = "#a6e3a1" }
+added = { fg = "#a6e3a1" }
+deleted = { fg = "#f38ba8" }
+updated = { fg = "#fab387" }

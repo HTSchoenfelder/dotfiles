@@ -76,12 +76,18 @@ remembered vacancy or replace their original focused slot. Floating utility
 windows/dialogs, hidden group members outside the Parking container, special
 workspaces and project overlays are excluded from slot selection and refill.
 
-Modal windows open floating and centered. GTK portal dialogs use a dedicated
-`xdg-desktop-portal-gtk` class rule because a live `Open File` portal request
-appeared tiled despite the portal's modal option. The rule caps their size at
-1280 × 760: VS Code's Open File dialog requested the display's full height even
-after it was floating. Every regular window that requests urgency, including an
-existing window on another workspace, moves to
+Modal windows open floating and centered. XDG FileChooser requests use Yazi in
+a dedicated Kitty window. Interactive `y` sessions launched from Zellij use the
+same direct-Kitty path because Zellij currently corrupts Yazi's Kitty image
+previews. The shell wrapper suppresses only Kitty's harmless inactive
+`draw_bg_bitfield` shader diagnostic while retaining other stderr output. The
+`yazi-file-picker` and `yazi-overlay` classes keep both variants floating,
+centered, borderless, outside groups and outside layout slots. Their fixed
+1280 × 760 size matches the fallback GTK portal-dialog limit. The GTK rule
+remains for applications that bypass the FileChooser portal or use other GTK
+portal interfaces; a live VS Code `Open File` request otherwise asked for the
+display's full height after becoming floating. Every regular window that
+requests urgency, including an existing window on another workspace, moves to
 the active workspace and receives focus. Tiled windows enter the focused slot;
 floating windows retain floating and center after moving. A window already on
 the active workspace only changes focus. Explicit app launches keep their

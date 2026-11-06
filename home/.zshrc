@@ -36,11 +36,21 @@ alias brewbundle='brew bundle install --file ~/dotfiles/setup/macos/Brewfile'
 alias shl='start-hyprland'
 
 function y() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-	command yazi "$@" --cwd-file="$tmp"
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd exit_status
+	if [[ -n "${ZELLIJ:-}" ]] && command -v kitty &> /dev/null \
+			&& [[ "$OSTYPE" == darwin* || -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]]; then
+		kitty --class yazi-overlay --title Yazi \
+			env -u ZELLIJ -u ZELLIJ_SESSION_NAME -u ZELLIJ_PANE_ID \
+			yazi "$@" --cwd-file="$tmp" \
+			2> >(sed '/The uniform: draw_bg_bitfield is not active in the linked GPU program:/d' >&2)
+	else
+		command yazi "$@" --cwd-file="$tmp"
+	fi
+	exit_status=$?
 	IFS= read -r -d '' cwd < "$tmp"
 	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
 	rm -f -- "$tmp"
+	return "$exit_status"
 }
 
 nixsh() {

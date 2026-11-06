@@ -14,6 +14,15 @@
     starship
     eza
     yazi
+    file
+    ffmpeg
+    _7zz
+    poppler-utils
+    fd
+    ripgrep
+    jq
+    resvg
+    imagemagick
     kubectl
     pkgsStable.direnv
     terraform

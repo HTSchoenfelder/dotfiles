@@ -304,16 +304,22 @@ test("external floating dialogs and overlays do not replace the current slot", f
     assert(current.workspace.id == 1 and session.focused == current)
 end)
 
-test("modal and GTK portal dialogs float and center through window rules", function(session)
-    local modal, portal
+test("modal and portal dialogs float and center through window rules", function(session)
+    local modal, portal, picker
     for _, candidate in ipairs(session.window_rules) do
         if candidate.name == "center-modal-dialogs" then modal = candidate end
         if candidate.name == "center-portal-dialogs" then portal = candidate end
+        if candidate.name == "yazi-file-picker" then picker = candidate end
     end
     assert(modal and modal.match.modal and modal.float and modal.center)
     assert(portal and portal.match.initial_class == "^xdg-desktop-portal-gtk$"
         and portal.float and portal.center and portal.max_size[1] == 1280
         and portal.max_size[2] == 760)
+    assert(picker and picker.match.initial_class == "^yazi-(file-picker|overlay)$"
+        and picker.float and picker.center and picker.size[1] == 1280
+        and picker.size[2] == 760 and picker.border_size == 0
+        and picker.group == "deny"
+        and picker.no_shortcuts_inhibit)
 end)
 
 test("new tiled urgent windows move to the active workspace and receive focus", function(session)

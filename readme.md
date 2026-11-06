@@ -137,7 +137,7 @@ of desktop processes without affecting the login shell or system services.
 | User socket activation | PipeWire and PipeWire Pulse; PipeWire starts WirePlumber |
 | `graphical-session.target` | Dunst, the Polkit agent, NetworkManager and Blueman applets, Udiskie and Clipse clipboard watchers |
 | `hyprland-session.target` | Waybar, Hyprpaper and Hypridle |
-| D-Bus activation during the session | XDG Desktop Portal and its GTK and Hyprland backends |
+| D-Bus activation during the session | XDG Desktop Portal and its GTK, Hyprland and terminal file-chooser backends |
 | Hyprland Lua on explicit interaction | Short-lived launchers, screenshots, media commands and requested applications |
 
 NixOS declares packages and units; `systemd --user` supervises long-running
@@ -178,6 +178,35 @@ Enter then executes it.
 Run `exec zsh` in existing terminal sessions to drop previously loaded widgets
 and bindings; sourcing `.zshrc` again does not remove them. VS Code's separate
 `Ctrl+J` terminal toggle still takes precedence in its integrated terminal.
+
+## Yazi
+
+Yazi uses the Catppuccin Mocha flavor and matching code-preview theme on both
+platforms. It shows hidden files and symlink targets, sorts directories first in
+natural order and gives the preview pane the largest share of the window. Git
+status signs appear beside files inside repositories. Nix installs the external
+preview tools for archives, PDFs, SVGs, videos and additional image formats.
+The repository vendors a stable-schema-compatible Catppuccin flavor and pins
+`git.yazi` through `package.toml`; package upgrades must be run against the
+checkout and revalidated before deployment.
+
+Start Yazi through the `y` shell wrapper. Inside Zellij it opens a dedicated,
+borderless Kitty overlay because Zellij's current Kitty graphics implementation
+corrupts Yazi image previews. The overlay still returns Yazi's final directory
+to the calling shell and filters Kitty's harmless inactive
+`draw_bg_bitfield` shader diagnostic. Other Kitty errors remain visible. `q`
+exits and changes the shell to Yazi's current directory; `Q` exits without
+changing it. Move selected files with `x`, navigate to the destination and press
+`p`. In a portal Save File picker, navigate to the destination with `h`, `j`, `k`
+and `l`, then press
+`Enter`. Yazi opens a `Save as:` input initialized with the application's
+suggested filename and returns that path without creating a placeholder file.
+An existing destination requires overwrite confirmation. `Q` cancels. Folder
+selection uses `q` to accept the current directory and `Q` to cancel.
+
+`!` opens a blocking shell in the current directory, `g r` moves to the current
+Git repository root and `Esc` cancels create and rename inputs immediately. The
+standard `~` or `F1` help remains the complete shortcut reference.
 
 ## Neovim
 
@@ -370,10 +399,18 @@ Urgent regular windows, whether newly opened or already present, move to the
 current workspace and receive focus. Tiled windows enter the focused slot;
 floating windows keep floating and center after moving. A window already on the
 current workspace only receives focus. Explicit app launches still honor `S`
-focus retention. Modal dialogs and GTK portal dialogs, including portal file-open
-dialogs, float and center. GTK portal dialogs have a 1280 × 760 maximum size so
-VS Code's Open File dialog does not stretch to the full display height. Pending
-urgent windows appear in the `mainMod + P` and Comma Selection window lists
+focus retention. Modal dialogs and GTK portal dialogs float and center. Portal
+file-open, folder and save requests use Yazi in a dedicated 1280 × 760 Kitty
+overlay. Open requests support single, multiple and directory selection. Save
+requests start in the suggested directory; `Enter` prompts for a filename and
+returns the resulting path without creating a temporary destination. The
+terminal chooser is D-Bus activated and never participates in
+layout slots. Applications that bypass the XDG FileChooser portal retain their
+native dialogs. macOS deliberately retains native Open and Save panels because
+it has no equivalent replaceable portal boundary. GTK portal dialogs keep the
+same maximum size so a GTK fallback such as VS Code's Open File dialog does
+not stretch to the full display height. Pending urgent windows appear in the
+`mainMod + P` and Comma Selection window lists
 with a green border and a searchable
 `(urgent)` suffix. Focus clears urgency, so an automatically focused window
 loses that marker. Choosing an urgent floating window focuses it without

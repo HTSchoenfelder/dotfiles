@@ -28,6 +28,17 @@ hl.window_rule({
 })
 
 hl.window_rule({
+    name = "yazi-file-picker",
+    match = { initial_class = "^yazi-(file-picker|overlay)$" },
+    float = true,
+    center = true,
+    size = { 1280, 760 },
+    border_size = 0,
+    group = "deny",
+    no_shortcuts_inhibit = true,
+})
+
+hl.window_rule({
     name = "project-overlays",
     match = { initial_class = "^project-overlay-.*$" },
     float = true,

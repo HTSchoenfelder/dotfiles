@@ -60,6 +60,12 @@
     kitty
     wl-clipboard
     yazi
+    file
+    ffmpeg
+    _7zz
+    poppler-utils
+    resvg
+    imagemagick
     wtype
     wireplumber
     pavucontrol
