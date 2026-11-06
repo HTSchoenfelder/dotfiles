@@ -7,7 +7,7 @@
   environment.systemPackages = with pkgs; [
     vscode
     pkgsStable.spotify
-    pkgsStable.hyprpaper
+    hyprpaper
     pkgsStable.azure-cli
     synology-drive-client
     git

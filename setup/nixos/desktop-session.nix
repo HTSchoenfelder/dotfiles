@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  pkgsStable,
   ...
 }:
 let
@@ -92,7 +91,7 @@ in
       // {
         enableDefaultPath = false;
       };
-    hyprpaper = hyprlandSessionService "Hyprland wallpaper daemon" "${pkgsStable.hyprpaper}/bin/hyprpaper";
+    hyprpaper = hyprlandSessionService "Hyprland wallpaper daemon" "${pkgs.hyprpaper}/bin/hyprpaper";
     hypridle = hyprlandSessionService "Hyprland idle daemon" "${pkgs.hypridle}/bin/hypridle";
     clipse-text = clipboardService "text";
     clipse-images = clipboardService "image/png";
