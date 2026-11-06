@@ -63,6 +63,13 @@ in
   xdg.portal.xdgOpenUsePortal = true;
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-termfilechooser ];
 
+  # The package's compiled sysconfdir lives in its immutable Nix store path,
+  # so point the user service at the system-generation config explicitly.
+  systemd.user.services.xdg-desktop-portal-termfilechooser.serviceConfig.ExecStart = lib.mkForce [
+    ""
+    "${pkgs.xdg-desktop-portal-termfilechooser}/libexec/xdg-desktop-portal-termfilechooser --config /etc/xdg/xdg-desktop-portal-termfilechooser/config"
+  ];
+
   # The portal invokes the wrapper on demand; it is not a session daemon.
   # The Yazi save plugin returns a destination path without creating a file.
   environment.etc."xdg/xdg-desktop-portal-termfilechooser/config".text = ''

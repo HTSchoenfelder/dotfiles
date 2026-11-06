@@ -88,9 +88,12 @@ installed pre-rebuild wrapper remains usable. Their fixed 1280 × 760 size
 matches the fallback GTK portal-dialog limit. The GTK rule remains for
 applications that bypass the FileChooser portal or use other GTK portal
 interfaces; a live VS Code `Open File` request otherwise asked for the display's
-full height after becoming floating. Every regular window that
-requests urgency, including an existing window on another workspace, moves to
-the active workspace and receives focus. Tiled windows enter the focused slot;
+full height after becoming floating. The termfilechooser service receives the
+generated `/etc/xdg` config through an explicit `--config` argument because the
+Nix package's compiled sysconfdir points inside its immutable store path. Every
+regular window that requests urgency, including an existing window on another
+workspace, moves to the active workspace and receives focus. Tiled windows enter
+the focused slot;
 floating windows retain floating and center after moving. A window already on
 the active workspace only changes focus. Explicit app launches keep their
 requested slot and `S` focus behavior. Urgency is cleared from the chooser state

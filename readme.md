@@ -410,8 +410,10 @@ layout slots. Applications that bypass the XDG FileChooser portal retain their
 native dialogs. macOS deliberately retains native Open and Save panels because
 it has no equivalent replaceable portal boundary. GTK portal dialogs keep the
 same maximum size so a GTK fallback such as VS Code's Open File dialog does
-not stretch to the full display height. Pending urgent windows appear in the
-`mainMod + P` and Comma Selection window lists
+not stretch to the full display height. The terminal chooser service receives
+the generated `/etc/xdg` configuration path explicitly because its Nix package
+otherwise searches only its immutable store sysconfdir. Pending urgent windows
+appear in the `mainMod + P` and Comma Selection window lists
 with a green border and a searchable
 `(urgent)` suffix. Focus clears urgency, so an automatically focused window
 loses that marker. Choosing an urgent floating window focuses it without
