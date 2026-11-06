@@ -172,6 +172,9 @@ new native windows are assigned from window-created events.
 Player actions send native macOS media-key press/release pairs to the active
 player. The Spotify launcher targets the installed Chrome PWA by its bundle ID;
 it does not require the native Spotify application or Apple Events permission.
+The macOS `Y` chooser retains Play/Pause, Next, Previous and Spotify. Hyprland
+also offers Now Playing at the end and Dot Mode `Y` for a brief MPRIS notification;
+the Chrome PWA has no matching metadata action in this Hammerspoon configuration.
 
 RØDECaster MIDI remains entirely in Hammerspoon. `MainMod + Backslash` sends one
 absolute mute or unmute value; it does not emulate a momentary button press. The

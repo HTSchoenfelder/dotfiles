@@ -432,6 +432,7 @@ instead of Rofi.
 | `G` | Toggle a project Lazygit overlay |
 | `J` | Toggle a project Kitty overlay |
 | `W` | Hide all project overlays |
+| `Y` | Show Spotify's current track (Hyprland only) |
 | `E` | Select and insert an emoji |
 | `R` | Reset the current window layout (macOS only) |
 | `T` | Select and insert a snippet |
@@ -469,12 +470,15 @@ receive editing and navigation translation. Its status is documented in
 [macOS keyboard parity](docs/macos-keyboard-parity.md).
 
 Media, volume, microphone and brightness hardware keys use their native actions.
-The `Y` selection contains Play/Pause, Next and Previous followed by Spotify
-itself, so Spotify no longer needs a direct App Key. On macOS, the first three
-entries send native media keys to the active player, including Spotify's Chrome
-PWA; the last entry opens that installed PWA. The `I` and `U` Google PWA
-groups use the locally installed Chrome app bundle IDs on macOS and the same
-modifier-release selection flow as Hyprland.
+On Hyprland, the `Y` selection contains Play/Pause, Spotify, Next, Previous and
+Now Playing. Spotify no longer needs a direct App Key. Selecting Now Playing
+briefly shows Spotify's title, artist and cover in a desktop notification when
+Spotify supplies them through MPRIS; Dot Mode `Y` shows the same notification
+directly. On macOS, this chooser retains Play/Pause, Next, Previous and Spotify:
+player actions send native media keys to the active player, including Spotify's
+Chrome PWA, and Spotify opens that installed PWA.
+The `I` and `U` Google PWA groups use locally installed Chrome app bundle IDs
+and follow the same modifier-release selection flow as Hyprland.
 KeePassXC maps its Linux `Ctrl` actions to native macOS shortcuts through
 Hammerspoon, including username/password/TOTP copying, locking, Auto-Type and
 database navigation. Its configuration and database remain application-owned.

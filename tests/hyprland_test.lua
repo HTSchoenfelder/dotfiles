@@ -732,16 +732,35 @@ test("Y starts with Play/Pause and is confirmed by a quick release", function(se
     assert(arguments[1] == "playerctl" and arguments[4] == "play-pause")
 end)
 
-test("Y orders player actions before Spotify", function(session)
-    for index, command in ipairs({ "play-pause", "next", "previous" }) do
+test("Y uses the requested media action order", function(session)
+    for _, action in ipairs({
+        { index = 0, command = "play-pause" },
+        { index = 2, command = "next" },
+        { index = 3, command = "previous" },
+    }) do
         session.press(modifier .. "Y")
-        session.choose(index - 1)
+        session.choose(action.index)
         local arguments = session.commands[#session.commands].arguments
-        assert(arguments[1] == "playerctl" and arguments[4] == command)
+        assert(arguments[1] == "playerctl" and arguments[4] == action.command)
     end
     session.press(modifier .. "Y")
-    session.choose(3)
+    session.choose(1)
     assert(session.commands[#session.commands].arguments[1] == "spotify")
+end)
+
+test("Y shows Now Playing only when that row is selected", function(session)
+    session.press(modifier .. "Y")
+    local request = assert(session.picker_request())
+    local rows = assert(io.open(request.path))
+    assert(rows:read("*a") == "Play/Pause\nSpotify\nNext\nPrevious\nNow Playing\n")
+    rows:close()
+    local count = #session.commands
+    session.press(modifier .. "Y")
+    assert(#session.commands == count)
+    session.choose(4)
+    local notification = session.commands[#session.commands].arguments
+    assert(notification[1] == "lua" and notification[2]:match("/lib/now_playing.lua$")
+        and notification[3] == "spotify")
 end)
 
 test("I cycles Chat then Meet and U cycles Gmail then Calendar", function(session)
@@ -770,10 +789,22 @@ test("F S Shift I chooses a Meet instance for the other slot", function(session)
     assert(not meet.layout.is_master and peer.workspace.id == 10)
 end)
 
-test("reverse Y starts at Spotify", function(session)
+test("reverse Y starts at Now Playing", function(session)
     session.press(modifier .. "SHIFT + Y")
     session.press("Control_L")
-    assert(session.commands[#session.commands].arguments[1] == "spotify")
+    local arguments = session.commands[#session.commands].arguments
+    assert(arguments[1] == "lua" and arguments[2]:match("/lib/now_playing.lua$")
+        and arguments[3] == "spotify")
+end)
+
+test("dot Y shows now playing on key release", function(session)
+    session.press(modifier .. "period")
+    session.key_down("Y")
+    assert(session.submap == "dot" and #session.commands == 0)
+    session.key_up("Y")
+    local arguments = session.commands[#session.commands].arguments
+    assert(session.submap == "reset" and arguments[1] == "lua"
+        and arguments[2]:match("/lib/now_playing.lua$") and arguments[3] == "spotify")
 end)
 
 test("text launchers preserve Unicode and snippet escapes", function()

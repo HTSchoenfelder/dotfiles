@@ -256,6 +256,9 @@ dot_mode.bind({
             overlays.toggle("terminal")
         end },
         { key = "W", description = "Hide all project overlays", run = overlays.hide_all },
+        { key = "Y", description = "Show now playing", run = function()
+            media_controls.show_now_playing("spotify")
+        end },
         { key = "E", description = "Insert emoji", run = function()
             text_launcher.open(picker, config_directory .. "/launcher-data/emoji.txt", text_launcher.emoji)
         end },

@@ -191,6 +191,11 @@ responsible for Wayland text input. Their arguments are quoted centrally; window
 titles and snippet text are never evaluated as commands. Existing Rofi styling and
 launcher data are reused. Snippets retain the `text|alias` format and support
 `\n`, `\t` and `\\` escapes. Both text and alias are searchable.
+The `Y` chooser orders Play/Pause, Spotify, Next, Previous and Now Playing.
+Selecting Now Playing or using Dot Mode `Y` starts a short-lived Lua process that
+reads Spotify's title, artist and cover through MPRIS and briefly shows a desktop
+notification. The title is bold, followed by a blank line and the artist.
+The process does not block Hyprland's Lua thread.
 
 `mainMod + period` enters dot mode and holds a native Hyprland notification until
 the mode ends. A no-op press binding consumes the selected key before its release
@@ -199,8 +204,8 @@ the old or newly focused client. `Q`, `A` and `Z`
 capture a region, the active window and the active
 monitor. `/` toggles the active display split. `B` selects and toggles connected
 displays. `V`, `G` and `J` toggle project Neovim, Lazygit and terminal overlays;
-`W` hides all project overlays. `E` and `T` select emojis and snippets. The submap
-resets before the selected tool opens.
+`W` hides all project overlays. `Y` shows the current Spotify track. `E` and `T`
+select emojis and snippets. The submap resets before the selected tool opens.
 Neovim receives the project directory as `.` in addition to inheriting it as its
 working directory, so the overlay opens the project rather than an empty dashboard.
 `mainMod + R` still opens the application launcher. `mainMod + Shift + P` opens
