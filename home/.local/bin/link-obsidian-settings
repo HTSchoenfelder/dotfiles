@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+shared_directory="${XDG_CONFIG_HOME:-$HOME/.config}/obsidian-shared"
+
+case "$(uname -s)" in
+  Darwin)
+    registry="$HOME/Library/Application Support/obsidian/obsidian.json"
+    ;;
+  Linux)
+    registry="${XDG_CONFIG_HOME:-$HOME/.config}/obsidian/obsidian.json"
+    ;;
+  *)
+    echo "Unsupported operating system: $(uname -s)" >&2
+    exit 1
+    ;;
+esac
+
+if [ ! -f "$registry" ]; then
+  echo "Obsidian vault registry not found: $registry" >&2
+  exit 1
+fi
+
+if [ ! -d "$shared_directory" ]; then
+  echo "Shared Obsidian settings not found: $shared_directory" >&2
+  exit 1
+fi
+
+status=0
+
+settings_match() {
+  local source=$1
+  local target=$2
+
+  if [[ "$source" == *.json ]] &&
+    jq -e . "$source" >/dev/null 2>&1 &&
+    jq -e . "$target" >/dev/null 2>&1; then
+    [ "$(jq -S -c . "$source")" = "$(jq -S -c . "$target")" ]
+  else
+    cmp -s "$source" "$target"
+  fi
+}
+
+while IFS= read -r vault; do
+  [ -n "$vault" ] || continue
+  vault_settings="$vault/.obsidian"
+  mkdir -p "$vault_settings"
+
+  for source in "$shared_directory"/*; do
+    [ -e "$source" ] || continue
+    name=${source##*/}
+    target="$vault_settings/$name"
+
+    if [ -L "$target" ]; then
+      if [ "$(readlink "$target")" = "$source" ]; then
+        continue
+      fi
+      rm "$target"
+    elif [ -e "$target" ]; then
+      if ! settings_match "$source" "$target"; then
+        echo "Refusing to replace different settings: $target" >&2
+        status=1
+        continue
+      fi
+      rm "$target"
+    fi
+
+    ln -s "$source" "$target"
+  done
+done < <(jq -r '.vaults[]?.path' "$registry")
+
+exit "$status"

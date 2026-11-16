@@ -497,6 +497,24 @@ primary display and Display to the secondary display without resetting focus or
 slot contents. Waybar, Hyprpaper and Hypridle are bound to
 `hyprland-session.target` and supervised by `systemd --user`.
 
+## Desktop application defaults
+
+The tracked `~/.config/mimeapps.list` makes Google Chrome the default handler for
+web pages and HTTP/HTTPS links. It also retains the user-level handlers for
+email, Codex links and unknown web schemes.
+
+Obsidian stores user-facing settings inside each vault even though it also has a
+global application-data directory. The tracked `~/.config/obsidian-shared`
+directory is the common source for app, appearance, core-plugin, graph and
+hotkey settings. Run `link-obsidian-settings` after creating or registering a
+vault; it links every file in that directory into every vault known to Obsidian
+and refuses to replace settings with different contents. `workspace.json`
+remains vault-local because it contains open files and layout state.
+
+The shared hotkeys map `Ctrl+P` to Quick switcher and `Ctrl+Shift+P` to Command
+palette. Changes that Obsidian writes through these links are shared by all
+linked vaults and appear as changes in the dotfiles repository.
+
 ## Application shortcut forwarding
 
 On Hyprland, `Ctrl + P/H/J/K/L` reaches the focused application unchanged. Chrome
