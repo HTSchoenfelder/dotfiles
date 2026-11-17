@@ -72,10 +72,14 @@ local chrome = "com.google.Chrome"
 local terminal = "net.kovidgoyal.kitty"
 local vscode = "com.microsoft.VSCode"
 local keepass = "org.keepassxc.keepassxc"
+local obsidian = "md.obsidian"
 
 assertTarget(gui, "c", {ctrl = true}, {"cmd"}, "c")
 assertTarget(gui, "n", {ctrl = true}, {"cmd"}, "n")
-assertTarget(gui, "p", {ctrl = true}, {"cmd"}, "p")
+assertIgnored(gui, "p", {ctrl = true})
+assertIgnored(gui, "p", {ctrl = true, shift = true})
+assertIgnored(obsidian, "p", {ctrl = true})
+assertIgnored(obsidian, "p", {ctrl = true, shift = true})
 assertTarget(gui, "z", {ctrl = true, shift = true}, {"cmd", "shift"}, "z")
 assertTarget(gui, "y", {ctrl = true}, {"cmd", "shift"}, "z")
 assertTarget(gui, "left", {ctrl = true}, {"alt"}, "left")
@@ -138,6 +142,8 @@ assert(not remapper:_isVSCodeTextInput(terminalInput))
 assertTarget(vscode, "left", {ctrl = true}, {"alt"}, "left", {vsCodeTextInput = true})
 assertTarget(vscode, "c", {ctrl = true}, {"cmd"}, "c", {vsCodeTextInput = true})
 assertTarget(vscode, "y", {ctrl = true}, {"cmd", "shift"}, "z", {vsCodeTextInput = true})
+assert(remapper:translate(vscode, "p", {ctrl = true}, {vsCodeTextInput = true}) == nil)
+assert(remapper:translate(vscode, "p", {ctrl = true, shift = true}, {vsCodeTextInput = true}) == nil)
 assertIgnored(vscode, "left", {ctrl = true})
 
 assertTarget(chrome, "p", {ctrl = true}, {"cmd", "shift"}, "a")

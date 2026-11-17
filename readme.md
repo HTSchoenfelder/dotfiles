@@ -507,13 +507,17 @@ Obsidian stores user-facing settings inside each vault even though it also has a
 global application-data directory. The tracked `~/.config/obsidian-shared`
 directory is the common source for app, appearance, core-plugin, graph and
 hotkey settings. Run `link-obsidian-settings` after creating or registering a
-vault; it links every file in that directory into every vault known to Obsidian
-and refuses to replace settings with different contents. `workspace.json`
-remains vault-local because it contains open files and layout state.
+vault; it links every file in that directory into every vault known to Obsidian,
+replacing existing settings even when their contents differ. It prints a success
+message after completing the run. `workspace.json` remains vault-local because it
+contains open files and layout state.
 
 The shared hotkeys map `Ctrl+P` to Quick switcher and `Ctrl+Shift+P` to Command
-palette. Changes that Obsidian writes through these links are shared by all
-linked vaults and appear as changes in the dotfiles repository.
+palette directly on both platforms. Quick switcher also retains a native `Mod+P`
+alias (`Command+P` on macOS, `Ctrl+P` on Linux). Hammerspoon passes these `Ctrl`
+shortcuts through and handles system editing and text navigation in Obsidian.
+Changes that Obsidian writes through these links are shared by all linked vaults
+and appear as changes in the dotfiles repository.
 
 ## Application shortcut forwarding
 
@@ -521,9 +525,10 @@ On Hyprland, `Ctrl + P/H/J/K/L` reaches the focused application unchanged. Chrom
 maps it to tab search, Back, previous tab, next tab and Forward. The macOS layer
 implements the same actions and translates the common Linux-shaped Chrome and
 system text shortcuts to their native macOS events. General GUI applications
-also receive `Ctrl+N/O/P/T` as their native `Command` actions; Chrome and
-KeePassXC keep their specific meanings. VS Code remains context-owned
-for commands, Monaco, Vim and its terminal, while native and webview text inputs
+also receive `Ctrl+N/O/T` as their native `Command` actions. `Ctrl+P` and
+`Ctrl+Shift+P` remain application-owned; Chrome keeps its explicit `Ctrl+P` tab
+search rule. Chrome and KeePassXC keep their specific meanings. VS Code remains
+context-owned for commands, Monaco, Vim and its terminal, while native and webview text inputs
 receive editing and navigation translation. Its status is documented in
 [macOS keyboard parity](docs/macos-keyboard-parity.md).
 

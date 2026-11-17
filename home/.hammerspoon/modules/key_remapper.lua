@@ -7,7 +7,6 @@ local generalCommandKeys = {
   f = true,
   n = true,
   o = true,
-  p = true,
   s = true,
   t = true,
   v = true,

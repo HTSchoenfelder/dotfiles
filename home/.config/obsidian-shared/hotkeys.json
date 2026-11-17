@@ -5,6 +5,12 @@
         "Ctrl"
       ],
       "key": "P"
+    },
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "P"
     }
   ],
   "command-palette:open": [

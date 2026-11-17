@@ -38,8 +38,9 @@ editing and navigation in native and webview text inputs. There is no active
 
 | Linux-shaped input | Current macOS delivery | Coverage |
 | --- | --- | --- |
-| `Ctrl+A/C/F/N/O/P/S/T/V/W/X/Z` | Matching `Command` shortcut | GUI applications and VS Code non-editor text inputs; not terminals; Chrome and KeePassXC app rules take precedence |
-| `Ctrl+Shift+A/C/F/N/O/P/S/T/V/W/X/Z` | Matching `Command+Shift` shortcut | GUI applications and VS Code non-editor text inputs; not terminals; Chrome and KeePassXC app rules take precedence |
+| `Ctrl+A/C/F/N/O/S/T/V/W/X/Z` | Matching `Command` shortcut | GUI applications and VS Code non-editor text inputs; not terminals; Chrome and KeePassXC app rules take precedence |
+| `Ctrl+Shift+A/C/F/N/O/S/T/V/W/X/Z` | Matching `Command+Shift` shortcut | GUI applications and VS Code non-editor text inputs; not terminals; Chrome and KeePassXC app rules take precedence |
+| `Ctrl+P` and `Ctrl+Shift+P` | Untranslated | Application-owned file picker and command actions; Chrome keeps its explicit `Ctrl+P` tab search rule |
 | `Ctrl+Shift+Z` and `Ctrl+Y` | `Command+Shift+Z` | GUI applications and VS Code non-editor text inputs; KeePassXC owns `Ctrl+Y` |
 | `Ctrl+Left/Right` | Native word boundaries | GUI applications and VS Code non-editor text inputs; not terminals |
 | `Ctrl+Shift+Left/Right` | Native word selection | GUI applications and VS Code non-editor text inputs; not terminals |
@@ -90,6 +91,18 @@ events, not mouse clicks. Native `Command` shortcuts remain available as an esca
 hatch for actions intentionally displaced by the custom `P/H/J/K/L` layer:
 `Command+Y` opens History, `Command+Shift+J` opens Downloads, `Command+L` focuses
 the address bar and `Command+P` opens Print.
+
+## Obsidian
+
+Obsidian uses the general GUI translation, including editing and text navigation.
+Physical `Ctrl+P` and `Ctrl+Shift+P` pass through unchanged. The shared
+`home/.config/obsidian-shared/hotkeys.json` binds them directly to Quick switcher
+and Command palette on both platforms. Quick switcher also retains a native
+`Mod+P` alias (`Command+P` on macOS, `Ctrl+P` on Linux).
+
+Obsidian owns configurable command hotkeys; Hammerspoon owns general macOS
+translation for system editing/navigation keys. System editing shortcuts such as
+copy and paste are not configurable in Obsidian's Hotkeys page.
 
 ## VS Code
 

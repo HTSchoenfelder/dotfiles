@@ -27,20 +27,7 @@ if [ ! -d "$shared_directory" ]; then
   exit 1
 fi
 
-status=0
-
-settings_match() {
-  local source=$1
-  local target=$2
-
-  if [[ "$source" == *.json ]] &&
-    jq -e . "$source" >/dev/null 2>&1 &&
-    jq -e . "$target" >/dev/null 2>&1; then
-    [ "$(jq -S -c . "$source")" = "$(jq -S -c . "$target")" ]
-  else
-    cmp -s "$source" "$target"
-  fi
-}
+vaults=$(jq -r '.vaults[]?.path' "$registry")
 
 while IFS= read -r vault; do
   [ -n "$vault" ] || continue
@@ -58,16 +45,11 @@ while IFS= read -r vault; do
       fi
       rm "$target"
     elif [ -e "$target" ]; then
-      if ! settings_match "$source" "$target"; then
-        echo "Refusing to replace different settings: $target" >&2
-        status=1
-        continue
-      fi
       rm "$target"
     fi
 
     ln -s "$source" "$target"
   done
-done < <(jq -r '.vaults[]?.path' "$registry")
+done <<< "$vaults"
 
-exit "$status"
+echo "Obsidian settings linked successfully."
