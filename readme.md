@@ -513,7 +513,14 @@ onboarding tooltips. Fullscreen mode is explicit so activity also collapses in
 Zellij, where Codex otherwise defaults to terminal scrollback. Restart Codex to
 apply the terminal mode.
 
-Stow links the file to `~/.codex/config.toml` on a fresh installation. If that
+The Codex-specific Catppuccin Mocha theme uses the normal text color for bold
+and italic prose, headings and table headers. Quotes are muted, links use a
+subdued blue, and inline code uses a subdued green. Codex keeps its Markdown
+font styles, and Kitty uses Agave Nerd Font for terminal text. Codex loads the
+`.tmTheme` from `~/.codex/themes/` using `tui.theme`. Restart Codex after theme
+file edits. The `/theme` picker can preview and select other themes.
+
+Stow links the theme and, on a fresh installation, `~/.codex/config.toml`. If that
 file already exists, merge the tracked settings into it to preserve local model,
 project trust, MCP and plugin settings; Stow cannot merge existing files.
 Credentials, sessions and caches remain local. Full access is a per-session
