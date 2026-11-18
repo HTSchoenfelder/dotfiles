@@ -216,20 +216,17 @@ standard `~` or `F1` help remains the complete shortcut reference.
 
 ## Neovim
 
-The repository contains a small custom `lazy.nvim` configuration rather than a
-Neovim distribution. Nix owns Neovim, language servers, formatters and linters
-on both platforms; `lazy.nvim` owns editor plugins only. Native Neovim LSP runs
-TypeScript, Ruby, HTML and Lua servers and retains its built-in mappings and
-manual completion. `conform.nvim` formats through `:Format`, while `nvim-lint`
-runs Ruby diagnostics after reading and writing a buffer. `Space T W` toggles
-word-boundary wrapping in the current window. See the active
-[Neovim design](docs/neovim.md) for the target, current state and plugin boundary.
+LazyVim is the standard Neovim configuration in `home/.config/nvim/`, started
+with `nvim` or the `lazyvim` alias. It uses Catppuccin Mocha and shows hidden
+files and directories in the Snacks explorer by default. Other editor behavior
+follows LazyVim's defaults. The previous custom configuration remains in
+`home/.config/nvim_t/` for reference; run it with `NVIM_APPNAME=nvim_t nvim`.
 
-The optional `lazyvim` alias starts a separate, unmodified `nvim-lazyvim` starter
-outside this repository. Nix supplies LuaRocks, Lua 5.1 compatibility and the
-PDF, LaTeX and Mermaid preview tools on both platforms.
-Setup boundaries and health-check dependencies are
-documented under [Isolated LazyVim test](docs/neovim.md#isolated-lazyvim-test).
+Nix supplies Neovim and external tools on both platforms, including LuaRocks,
+Lua 5.1 compatibility and PDF, LaTeX and Mermaid preview tools. `lazy.nvim`
+manages plugins; LazyVim retains its default Mason integration. See the
+[Neovim configuration](docs/neovim.md) for ownership, the reference configuration
+and health-check dependencies.
 
 ## VS Code Vim
 

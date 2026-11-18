@@ -22,7 +22,7 @@ alias myip="curl -s ifconfig.io | tee >(wl-copy)"
 
 alias code='code --profile Default --enable-features=WebRTCPipeWireCapturer --ozone-platform-hint=wayland'
 alias proj='cd ~/projects'
-alias lazyvim='NVIM_APPNAME=nvim-lazyvim nvim'
+alias lazyvim='nvim'
 
 alias aza='az account show --output tsv --query "name"'
 alias azas='az account set --subscription'

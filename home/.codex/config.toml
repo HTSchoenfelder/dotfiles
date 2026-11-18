@@ -1,8 +1,12 @@
 hide_agent_reasoning = true
 model_verbosity = "low"
+service_tier = "priority"
 
 [tui]
 alternate_screen = "always"
 collapse_turn_details = true
 animations = false
 show_tooltips = false
+
+[projects."/home/henrik/dotfiles"]
+trust_level = "trusted"

@@ -290,7 +290,7 @@
   "chat.titleBar.signIn.enabled": false,
   "workbench.browser.showInTitleBar": false,
   "window.commandCenter": false,
-  "window.menuBarVisibility": "hidden",
   "chat.titleBar.openInAgentsWindow.enabled": false,
-  "terminal.integrated.initialHint": false
+  "terminal.integrated.initialHint": false,
+  "window.menuBarVisibility": "compact"
 }
