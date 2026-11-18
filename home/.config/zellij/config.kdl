@@ -216,3 +216,4 @@ show_startup_tips false
 // Default: true
 // 
 // show_release_notes false
+keybinds preset="unlock-first" primary="Ctrl" secondary="Alt"

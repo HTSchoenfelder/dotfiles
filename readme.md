@@ -26,7 +26,7 @@ this workflow. Its thumb modifiers and layers are intentionally well suited to
 both shortcut chords and Vim-style sequences; software adapts to that input
 contract rather than redesigning the firmware around application conflicts. See
 the [keyboard input model](docs/keyboard-input.md) for the ownership boundaries
-and the future Zellij constraint.
+and Zellij navigation.
 
 Hammerspoon is the only macOS workflow and window-management process. It owns
 shortcuts, modes, choosers, application intentions, MRU state, MIDI integration,
@@ -162,11 +162,16 @@ Zsh's standard navigation keys are:
 | `Ctrl+E` | Move to the end of the current line |
 
 Zsh owns terminal navigation independently of the compositor and Hammerspoon.
-Kitty launched with the app key starts Zellij in its default Normal mode, which
-captures keys such as `Ctrl+P` and `Alt+F`. Use Zellij's `Ctrl+G` Locked mode
-when those keys must reach Zsh or Neovim; press `Ctrl+G` again for Zellij
-controls. The tracked Zellij configuration keeps its appearance settings and
-inherits the installed default keybindings.
+Zellij uses the built-in `unlock-first` preset and starts in Locked mode, so
+`Ctrl+P/T/S` reach Zsh or Neovim. `Ctrl+G`, then `p` or `t`, enters Pane or Tab
+mode; `Enter`, `Esc` or `Ctrl+G` returns to Locked. Direct `Alt+H/J/K/L` and
+`Alt+Arrow` navigation also works in Locked; left/right crosses to the adjacent
+tab at the pane edge. Other preset Alt shortcuts remain active too: `Alt+F`
+toggles floating panes instead of moving forward one word in Zsh.
+On macOS, Kitty treats only left Option as terminal Alt; right Option remains
+available for AltGr characters and umlauts. Fully restart Kitty after changing
+this setting. See the [Zellij boundary](docs/keyboard-input.md#zellij-boundary)
+for the navigation shortcuts.
 There are no manual `Ctrl+Left/Right` or `Home/End` sequence bindings, so these
 keys depend on the terminal and shell environment. The macOS setup disables the
 system's `Ctrl+Left/Right` Spaces shortcuts so applications receive those keys;
@@ -502,6 +507,20 @@ being disabled or disconnected, Hyprland restores Terminal and Parking to the
 primary display and Display to the secondary display without resetting focus or
 slot contents. Waybar, Hyprpaper and Hypridle are bound to
 `hyprland-session.target` and supervised by `systemd --user`.
+
+## Codex CLI
+
+`home/.codex/config.toml` provides portable display defaults: concise answers,
+hidden reasoning, collapsed completed tool activity, and no animations or
+onboarding tooltips. Fullscreen mode is explicit so activity also collapses in
+Zellij, where Codex otherwise defaults to terminal scrollback. Restart Codex to
+apply the terminal mode.
+
+Stow links the file to `~/.codex/config.toml` on a fresh installation. If that
+file already exists, merge the tracked settings into it to preserve local model,
+project trust, MCP and plugin settings; Stow cannot merge existing files.
+Credentials, sessions and caches remain local. Full access is a per-session
+choice through `/permissions` and is not a persistent default in this file.
 
 ## Desktop application defaults
 

@@ -79,14 +79,29 @@ missed chord, but they do not make Ctrl shortcuts second-class inputs.
 ## Zellij boundary
 
 Nix installs Zellij on both NixOS and macOS. The tracked
-`home/.config/zellij/config.kdl` keeps appearance choices and inherits the
-installed Zellij keybindings. Zellij starts in Normal mode. Its default
-`Ctrl+P`, `Ctrl+T`, `Ctrl+S` and other mode keys belong to Zellij there;
-`Alt+F` also toggles floating panes. These keys cannot simultaneously reach Zsh
-or Neovim. `Ctrl+G` enters Locked mode, where Zellij passes the other keys to
-the focused shell or TUI; another `Ctrl+G` returns to Normal mode. Use Locked
-mode when a Zsh or Neovim binding conflicts with a Zellij default. The exact
-default set follows the installed version; see the
+`home/.config/zellij/config.kdl` keeps appearance choices and selects the built-in
+`unlock-first` preset with primary `Ctrl` and secondary `Alt`. Zellij starts in
+Locked mode, where `Ctrl+P`, `Ctrl+T` and `Ctrl+S` reach the focused shell or TUI.
+Press `Ctrl+G` to unlock, then `p` for Pane mode or `t` for Tab mode. These are
+sequential key presses. `Enter`, `Esc` or `Ctrl+G` returns from either mode to
+Locked. Directional navigation stays in its mode; creating or closing a pane or
+tab returns to Locked automatically.
+
+Direct Alt shortcuts remain active in Locked mode:
+
+| Shortcut | Action |
+| --- | --- |
+| `Alt+H/J/K/L` or `Alt+Arrow` | Focus the pane in that direction; left/right crosses to the adjacent tab at the pane edge |
+| `Alt+N` | Create a pane |
+| `Alt+I/O` | Move the current tab left/right |
+| `Alt+F` | Toggle floating panes; this consumes Zsh's forward-word shortcut |
+
+On macOS, `home/.config/kitty/kitty.conf` sets `macos_option_as_alt left`:
+left Option sends terminal Alt shortcuts, while right Option preserves native
+layout character input for AltGr characters and umlauts. Fully restart Kitty
+after changing this setting; reloading its configuration does not apply it.
+The same logical Alt shortcuts apply on NixOS. No firmware or global Hammerspoon
+remapping is needed. The exact preset follows the installed version; see the
 [Zellij keybinding reference](https://zellij.dev/documentation/keybindings).
 
 VS Code owns `Ctrl+J` for its integrated terminal outside VSCodeVim Insert mode,

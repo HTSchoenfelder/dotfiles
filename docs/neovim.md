@@ -39,9 +39,10 @@ The core configuration intentionally contains only:
 There are no custom window-navigation, clipboard, Visual-mode, test or Git
 mappings. `Space T W` is a Normal-mode editor toggle for `wrap`, `linebreak` and
 `breakindent` in the current window. `Ctrl+P` opens Telescope's file finder to
-match the physical VS Code shortcut on NixOS and macOS. Inside Zellij, its
-default Normal mode captures `Ctrl+P`; press `Ctrl+G` to use Zellij's Locked mode
-before sending `Ctrl+P` to Neovim.
+match the physical VS Code shortcut on NixOS and macOS. Zellij's `unlock-first`
+preset starts in Locked mode, where `Ctrl+P` reaches Neovim directly. Direct
+`Alt+H/J/K/L` navigation belongs to Zellij even in Locked mode; on macOS use
+left Option, while right Option remains available for AltGr characters.
 
 The active plugin capabilities are:
 

@@ -73,6 +73,7 @@
     obsidian
     utm
     vscode
+    chatgpt
     # keepassxc
     # spotify
   ];
