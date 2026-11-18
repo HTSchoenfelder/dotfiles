@@ -220,6 +220,12 @@ runs Ruby diagnostics after reading and writing a buffer. `Space T W` toggles
 word-boundary wrapping in the current window. See the active
 [Neovim design](docs/neovim.md) for the target, current state and plugin boundary.
 
+The optional `lazyvim` alias starts a separate, unmodified `nvim-lazyvim` starter
+outside this repository. Nix supplies LuaRocks, Lua 5.1 compatibility and the
+PDF, LaTeX and Mermaid preview tools on both platforms.
+Setup boundaries and health-check dependencies are
+documented under [Isolated LazyVim test](docs/neovim.md#isolated-lazyvim-test).
+
 ## VS Code Vim
 
 VSCodeVim stays close to its defaults and uses the same physical workflow on

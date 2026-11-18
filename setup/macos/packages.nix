@@ -28,6 +28,19 @@
     terraform
     zellij
     neovim
+    lua51Packages.luarocks
+    (writeShellScriptBin "lua5.1" ''exec ${lua5_1}/bin/lua "$@"'')
+    ghostscript
+    tectonic
+    (symlinkJoin {
+      name = "mermaid-cli";
+      paths = [ mermaid-cli ];
+      nativeBuildInputs = [ makeWrapper ];
+      postBuild = ''
+        wrapProgram "$out/bin/mmdc" \
+          --set PUPPETEER_EXECUTABLE_PATH "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+      '';
+    })
     lua-language-server
     typescript-language-server
     vscode-langservers-extracted

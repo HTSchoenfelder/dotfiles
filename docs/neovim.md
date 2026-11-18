@@ -71,3 +71,43 @@ layers, a startup dashboard, a completion framework plus snippet collection,
 two Git plugins, tmux-specific test execution and a Swagger preview plugin. They
 were removed from the baseline because their workflows had not been selected
 deliberately. Any of them can return when a concrete need justifies it.
+
+## Isolated LazyVim test
+
+The optional LazyVim starter lives outside this repository in
+`${XDG_CONFIG_HOME:-$HOME/.config}/nvim-lazyvim`. Start it with
+`NVIM_APPNAME=nvim-lazyvim nvim`, or the `lazyvim` shell alias. Plain `nvim`
+continues to use the configuration described above. The separate app name also
+separates plugins, cache and state; it does not restrict access to project files.
+
+The starter keeps its original configuration, including LuaRocks support.
+Both Nix package lists supply the external health-check and preview tools:
+
+| Package / command | Purpose |
+| --- | --- |
+| `ripgrep` / `rg`, `fd` | Picker search |
+| `imagemagick` / `magick` | Image conversion |
+| `lua51Packages.luarocks` / `luarocks` | Lua 5.1 plugin dependencies |
+| `lua5.1` | Lua 5.1 compatibility command; the existing `lua` stays unchanged |
+| `ghostscript` / `gs` | PDF previews |
+| `tectonic` | LaTeX previews |
+| `mermaid-cli` / `mmdc` | Mermaid previews |
+
+On NixOS, Mermaid CLI uses the package's Chromium dependency. On macOS, only
+the `mmdc` wrapper sets `PUPPETEER_EXECUTABLE_PATH` to the installed
+`/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`; other Puppeteer
+processes keep their own browser configuration. Tectonic may download TeX assets
+when first rendering a document.
+
+After changing packages, activate them with `nixbuild` on NixOS or `nixbuildmac`
+on macOS, then restart the test instance. If health checks still cannot find a
+declared tool, inspect the active system and the editor's `PATH` before adding
+duplicate package declarations.
+
+Use `:LazyHealth` in the test instance and save its report with
+`:w /tmp/lazyvim-health.txt`. Snacks checks image dependencies even when its
+image module is disabled. Additional Tree-sitter parsers for image rendering
+remain plugin-managed; installing system tools does not enable the image module
+or change the starter's parser selection. Which-key keymap-overlap notices and
+Blink's dynamically enabled source notice are informational; keep the default
+mappings and sources unless their actual behavior needs changing.

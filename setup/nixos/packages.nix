@@ -22,6 +22,11 @@
     kustomize
     just
     neovim
+    lua51Packages.luarocks
+    (writeShellScriptBin "lua5.1" ''exec ${lua5_1}/bin/lua "$@"'')
+    ghostscript
+    tectonic
+    mermaid-cli
     lua-language-server
     typescript-language-server
     vscode-langservers-extracted
