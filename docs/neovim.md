@@ -15,6 +15,11 @@ including Space as leader, relative line numbers, picker, completion, LSP,
 formatting and keymaps. The starter's `lua/plugins/example.lua` returns an empty
 spec and does not activate its example settings.
 
+Lazygit uses `~/.config/lazygit/config.yml` from the shell, project overlays and
+LazyVim. Snacks opens the floating terminal with its automatic Lazygit
+configuration disabled. The shared `nvim-remote` preset opens files in the parent
+Neovim when launched there, and starts Neovim when launched directly.
+
 The fixed ZMK layout supports native Vim sequences and Ctrl chords. The physical
 input contract and Zellij's terminal navigation are documented in
 [Keyboard input model](keyboard-input.md). Direct `Alt+H/J/K/L` navigation belongs

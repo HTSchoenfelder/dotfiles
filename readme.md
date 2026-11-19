@@ -222,6 +222,9 @@ files and directories in the Snacks explorer by default. Other editor behavior
 follows LazyVim's defaults. The previous custom configuration remains in
 `home/.config/nvim_t/` for reference; run it with `NVIM_APPNAME=nvim_t nvim`.
 
+Lazygit uses the same Catppuccin Mocha configuration in LazyVim, the shell and
+project overlays, from `home/.config/lazygit/config.yml`.
+
 Nix supplies Neovim and external tools on both platforms, including LuaRocks,
 Lua 5.1 compatibility and PDF, LaTeX and Mermaid preview tools. `lazy.nvim`
 manages plugins; LazyVim retains its default Mason integration. See the
@@ -523,8 +526,9 @@ file edits. The `/theme` picker can preview and select other themes.
 Stow links the theme and, on a fresh installation, `~/.codex/config.toml`. If that
 file already exists, merge the tracked settings into it to preserve local model,
 project trust, MCP and plugin settings; Stow cannot merge existing files.
-Credentials, sessions and caches remain local. Full access is a per-session
-choice through `/permissions` and is not a persistent default in this file.
+Credentials, sessions and caches remain local. The trusted dotfiles repository
+sets Full Access without approval prompts through its project-level
+`.codex/config.toml`.
 
 ## Desktop application defaults
 
